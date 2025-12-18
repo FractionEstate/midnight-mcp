@@ -21,7 +21,7 @@ npm install -g @midnight/mcp-server
 ### From Source
 
 ```bash
-git clone https://github.com/midnight-network/midnight-mcp.git
+git clone https://github.com/Olanetsoft/midnight-mcp.git
 cd midnight-mcp
 npm install
 npm run build
