@@ -95,9 +95,9 @@ The server indexes 15 public repositories from the Midnight organization:
 
 ### Partner Libraries
 
-| Repository                        | Description                                      | File Types               |
-| --------------------------------- | ------------------------------------------------ | ------------------------ |
-| `OpenZeppelin/compact-contracts`  | OpenZeppelin Contracts for Midnight - secure, audited design patterns | `.compact`, `.ts`, `.md` |
+| Repository                       | Description                                                           | File Types               |
+| -------------------------------- | --------------------------------------------------------------------- | ------------------------ |
+| `OpenZeppelin/compact-contracts` | OpenZeppelin Contracts for Midnight - secure, audited design patterns | `.compact`, `.ts`, `.md` |
 
 ## Core Components
 

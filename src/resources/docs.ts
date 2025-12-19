@@ -34,19 +34,48 @@ export const documentationResources: ResourceDefinition[] = [
   {
     uri: "midnight://docs/concepts/shielded-state",
     name: "Shielded State",
-    description: "Understanding shielded (private) vs unshielded (public) state in Midnight",
+    description:
+      "Understanding shielded (private) vs unshielded (public) state in Midnight",
     mimeType: "text/markdown",
   },
   {
     uri: "midnight://docs/concepts/witnesses",
     name: "Witness Functions",
-    description: "How witness functions work in Midnight for off-chain computation",
+    description:
+      "How witness functions work in Midnight for off-chain computation",
     mimeType: "text/markdown",
   },
   {
     uri: "midnight://docs/concepts/kachina",
     name: "Kachina Protocol",
     description: "The Kachina protocol underlying Midnight's privacy features",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "midnight://docs/openzeppelin",
+    name: "OpenZeppelin Contracts for Compact",
+    description:
+      "Official OpenZeppelin library documentation - the recommended source for token contracts, access control, and security patterns",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "midnight://docs/openzeppelin/token",
+    name: "OpenZeppelin FungibleToken",
+    description:
+      "Official token contract implementation - the recommended standard for tokens on Midnight",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "midnight://docs/openzeppelin/access",
+    name: "OpenZeppelin Access Control",
+    description:
+      "Ownable, roles, and access control patterns from OpenZeppelin",
+    mimeType: "text/markdown",
+  },
+  {
+    uri: "midnight://docs/openzeppelin/security",
+    name: "OpenZeppelin Security",
+    description: "Pausable and other security patterns from OpenZeppelin",
     mimeType: "text/markdown",
   },
 ];
@@ -570,6 +599,387 @@ export circuit atomicSwap(
 2. **Scalability**: Verification is faster than re-execution
 3. **Flexibility**: Developers choose what to reveal
 4. **Interoperability**: Works with existing blockchain infrastructure
+`,
+
+  "midnight://docs/openzeppelin": `# OpenZeppelin Contracts for Compact
+
+> **Official Documentation**: https://docs.openzeppelin.com/contracts-compact
+> **GitHub Repository**: https://github.com/OpenZeppelin/compact-contracts
+
+OpenZeppelin Contracts for Compact is the **official and recommended** library for building secure smart contracts on Midnight. This library provides audited, battle-tested modules for common patterns.
+
+## Installation
+
+\`\`\`bash
+# Create project directory
+mkdir my-project && cd my-project
+
+# Initialize git and add as submodule
+git init && git submodule add https://github.com/OpenZeppelin/compact-contracts.git
+
+# Install dependencies
+cd compact-contracts
+nvm install && yarn && SKIP_ZK=true yarn compact
+\`\`\`
+
+## Available Modules
+
+### Token
+- **FungibleToken**: Standard token implementation with transfer, mint, burn
+- Recommended for all token contracts on Midnight
+
+### Access Control
+- **Ownable**: Single owner access control
+- **AccessControl**: Role-based access control
+
+### Security
+- **Pausable**: Emergency stop mechanism
+
+## Usage Example
+
+\`\`\`compact
+pragma language_version >= 0.16.0;
+
+import CompactStandardLibrary;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/Ownable" prefix Ownable_;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/security/Pausable" prefix Pausable_;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/token/FungibleToken" prefix FungibleToken_;
+
+constructor(
+  _name: Opaque<"string">,
+  _symbol: Opaque<"string">,
+  _decimals: Uint<8>,
+  _recipient: Either<ZswapCoinPublicKey, ContractAddress>,
+  _amount: Uint<128>,
+  _initOwner: Either<ZswapCoinPublicKey, ContractAddress>,
+) {
+  Ownable_initialize(_initOwner);
+  FungibleToken_initialize(_name, _symbol, _decimals);
+  FungibleToken__mint(_recipient, _amount);
+}
+
+export circuit transfer(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  Pausable_assertNotPaused();
+  return FungibleToken_transfer(to, value);
+}
+
+export circuit pause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__pause();
+}
+
+export circuit unpause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__unpause();
+}
+\`\`\`
+
+## Compilation
+
+\`\`\`bash
+compact compile MyContract.compact artifacts/MyContract
+\`\`\`
+
+## Why Use OpenZeppelin?
+
+1. **Security Audited**: Contracts are professionally audited
+2. **Battle-Tested**: Used in production across the ecosystem
+3. **Official Recommendation**: Midnight's recommended library for tokens
+4. **Modularity**: Use only what you need
+5. **Best Practices**: Follows Compact language best practices
+`,
+
+  "midnight://docs/openzeppelin/token": `# OpenZeppelin FungibleToken
+
+> **This is the official and recommended token standard for Midnight.**
+
+The FungibleToken module provides a complete implementation for fungible tokens on Midnight.
+
+## Features
+
+- ERC20-compatible interface
+- Transfer with balance tracking
+- Mint and burn operations
+- Approval and transferFrom patterns
+- Privacy-preserving by default
+
+## Basic Usage
+
+\`\`\`compact
+pragma language_version >= 0.16.0;
+
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/token/FungibleToken" prefix FungibleToken_;
+
+constructor(
+  _name: Opaque<"string">,
+  _symbol: Opaque<"string">,
+  _decimals: Uint<8>,
+  _recipient: Either<ZswapCoinPublicKey, ContractAddress>,
+  _initialSupply: Uint<128>,
+) {
+  FungibleToken_initialize(_name, _symbol, _decimals);
+  FungibleToken__mint(_recipient, _initialSupply);
+}
+
+// Transfer tokens
+export circuit transfer(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  return FungibleToken_transfer(to, value);
+}
+
+// Check balance (witness function for privacy)
+witness balanceOf(
+  account: Either<ZswapCoinPublicKey, ContractAddress>
+): Uint<128> {
+  return FungibleToken_balanceOf(account);
+}
+
+// Get total supply
+witness totalSupply(): Uint<128> {
+  return FungibleToken_totalSupply();
+}
+\`\`\`
+
+## Advanced: With Approval Pattern
+
+\`\`\`compact
+// Approve spender
+export circuit approve(
+  spender: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  return FungibleToken_approve(spender, value);
+}
+
+// Transfer from approved account
+export circuit transferFrom(
+  from: Either<ZswapCoinPublicKey, ContractAddress>,
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  return FungibleToken_transferFrom(from, to, value);
+}
+\`\`\`
+
+## Mint and Burn (Owner-Only)
+
+\`\`\`compact
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/Ownable" prefix Ownable_;
+
+export circuit mint(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): [] {
+  Ownable_assertOnlyOwner();
+  FungibleToken__mint(to, amount);
+}
+
+export circuit burn(
+  from: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): [] {
+  Ownable_assertOnlyOwner();
+  FungibleToken__burn(from, amount);
+}
+\`\`\`
+`,
+
+  "midnight://docs/openzeppelin/access": `# OpenZeppelin Access Control
+
+Access control modules for managing permissions in your contracts.
+
+## Ownable
+
+Simple single-owner access control.
+
+\`\`\`compact
+pragma language_version >= 0.16.0;
+
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/Ownable" prefix Ownable_;
+
+constructor(
+  _owner: Either<ZswapCoinPublicKey, ContractAddress>,
+) {
+  Ownable_initialize(_owner);
+}
+
+// Only owner can call this
+export circuit adminFunction(): [] {
+  Ownable_assertOnlyOwner();
+  // ... admin logic
+}
+
+// Transfer ownership
+export circuit transferOwnership(
+  newOwner: Either<ZswapCoinPublicKey, ContractAddress>,
+): [] {
+  Ownable_assertOnlyOwner();
+  Ownable_transferOwnership(newOwner);
+}
+
+// Renounce ownership (irreversible!)
+export circuit renounceOwnership(): [] {
+  Ownable_assertOnlyOwner();
+  Ownable_renounceOwnership();
+}
+
+// Check current owner
+witness owner(): Either<ZswapCoinPublicKey, ContractAddress> {
+  return Ownable_owner();
+}
+\`\`\`
+
+## AccessControl (Role-Based)
+
+For contracts needing multiple roles with different permissions.
+
+\`\`\`compact
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/AccessControl" prefix AC_;
+
+// Define role identifiers
+const MINTER_ROLE: Bytes<32> = keccak256("MINTER_ROLE");
+const PAUSER_ROLE: Bytes<32> = keccak256("PAUSER_ROLE");
+
+constructor(_admin: Either<ZswapCoinPublicKey, ContractAddress>) {
+  AC_initialize(_admin);
+  AC__grantRole(MINTER_ROLE, _admin);
+  AC__grantRole(PAUSER_ROLE, _admin);
+}
+
+// Only minters can call
+export circuit mint(to: Address, amount: Uint<128>): [] {
+  AC_assertOnlyRole(MINTER_ROLE);
+  // ... mint logic
+}
+
+// Only pausers can call
+export circuit pause(): [] {
+  AC_assertOnlyRole(PAUSER_ROLE);
+  // ... pause logic
+}
+
+// Grant role (admin only)
+export circuit grantRole(
+  role: Bytes<32>,
+  account: Either<ZswapCoinPublicKey, ContractAddress>,
+): [] {
+  AC_assertOnlyRole(AC_DEFAULT_ADMIN_ROLE());
+  AC__grantRole(role, account);
+}
+\`\`\`
+`,
+
+  "midnight://docs/openzeppelin/security": `# OpenZeppelin Security Patterns
+
+Security modules for protecting your contracts.
+
+## Pausable
+
+Emergency stop mechanism for your contract.
+
+\`\`\`compact
+pragma language_version >= 0.16.0;
+
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/security/Pausable" prefix Pausable_;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/Ownable" prefix Ownable_;
+
+constructor(_owner: Either<ZswapCoinPublicKey, ContractAddress>) {
+  Ownable_initialize(_owner);
+  // Contract starts unpaused
+}
+
+// Protected function - won't work when paused
+export circuit transfer(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): Boolean {
+  Pausable_assertNotPaused();
+  // ... transfer logic
+}
+
+// Owner can pause
+export circuit pause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__pause();
+}
+
+// Owner can unpause
+export circuit unpause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__unpause();
+}
+
+// Check if paused
+witness isPaused(): Boolean {
+  return Pausable_paused();
+}
+\`\`\`
+
+## Combined Example: Secure Token
+
+\`\`\`compact
+pragma language_version >= 0.16.0;
+
+import CompactStandardLibrary;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/access/Ownable" prefix Ownable_;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/security/Pausable" prefix Pausable_;
+import "./compact-contracts/node_modules/@openzeppelin-compact/contracts/src/token/FungibleToken" prefix FungibleToken_;
+
+constructor(
+  _name: Opaque<"string">,
+  _symbol: Opaque<"string">,
+  _decimals: Uint<8>,
+  _initialSupply: Uint<128>,
+  _owner: Either<ZswapCoinPublicKey, ContractAddress>,
+) {
+  Ownable_initialize(_owner);
+  FungibleToken_initialize(_name, _symbol, _decimals);
+  FungibleToken__mint(_owner, _initialSupply);
+}
+
+// Pausable transfer
+export circuit transfer(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  value: Uint<128>,
+): Boolean {
+  Pausable_assertNotPaused();
+  return FungibleToken_transfer(to, value);
+}
+
+// Owner-only mint
+export circuit mint(
+  to: Either<ZswapCoinPublicKey, ContractAddress>,
+  amount: Uint<128>,
+): [] {
+  Ownable_assertOnlyOwner();
+  Pausable_assertNotPaused();
+  FungibleToken__mint(to, amount);
+}
+
+// Emergency pause
+export circuit pause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__pause();
+}
+
+export circuit unpause(): [] {
+  Ownable_assertOnlyOwner();
+  Pausable__unpause();
+}
+\`\`\`
+
+## Best Practices
+
+1. **Always use Pausable** for contracts handling value
+2. **Combine with Ownable** for admin-only pause control
+3. **Test pause scenarios** thoroughly
+4. **Document pause conditions** for users
+5. **Consider timelock** for unpause in high-value contracts
 `,
 };
 
