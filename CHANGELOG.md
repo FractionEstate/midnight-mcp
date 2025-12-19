@@ -8,16 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.0.2] - 2025-12-19
 
 ### Changed
+
 - Optimized npm package size (426 kB → 272 kB)
 - Excluded source maps from published package
 
 ### Fixed
+
 - Tool names now use hyphens instead of colons (MCP pattern compliance)
 - Claude Desktop config JSON formatting
 
 ## [0.0.1] - 2025-12-19
 
 ### Added
+
 - Initial release
 - **14 MCP Tools**:
   - `midnight-search-compact` - Semantic search for Compact code

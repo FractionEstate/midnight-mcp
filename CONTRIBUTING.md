@@ -28,6 +28,7 @@ Thank you for your interest in contributing to Midnight MCP! This guide will hel
 ## Development Workflow
 
 ### Running Locally
+
 ```bash
 npm run dev    # Watch mode with hot reload
 npm run build  # Production build
@@ -35,11 +36,13 @@ npm start      # Run built server
 ```
 
 ### Testing with MCP Inspector
+
 ```bash
 npx @modelcontextprotocol/inspector node dist/index.js
 ```
 
 ### Code Style
+
 - Use TypeScript strict mode
 - Follow existing code patterns
 - Add JSDoc comments for public functions

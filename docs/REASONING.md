@@ -81,7 +81,7 @@ The AI thinks:
 
 ```json
 {
-  "tool": "midnight:get-version-info",
+  "tool": "midnight-get-version-info",
   "arguments": { "repo": "compact" }
 }
 ```
@@ -105,7 +105,7 @@ The AI thinks:
 
 ```json
 {
-  "tool": "midnight:search-compact",
+  "tool": "midnight-search-compact",
   "arguments": {
     "query": "token contract transfer balance mapping",
     "limit": 5
@@ -136,7 +136,7 @@ The AI thinks:
 
 ```json
 {
-  "tool": "midnight:get-latest-syntax",
+  "tool": "midnight-get-latest-syntax",
   "arguments": { "repo": "compact" }
 }
 ```
@@ -243,7 +243,7 @@ public circuit increment() {
 
 ```json
 {
-  "tool": "midnight:check-breaking-changes",
+  "tool": "midnight-check-breaking-changes",
   "arguments": {
     "repo": "compact",
     "currentVersion": "v0.3.0"
@@ -270,7 +270,7 @@ public circuit increment() {
 
 ```json
 {
-  "tool": "midnight:get-file-at-version",
+  "tool": "midnight-get-file-at-version",
   "arguments": {
     "repo": "compact",
     "path": "examples/counter.compact",
@@ -339,35 +339,35 @@ Generated code compiles ✅
 
 | Tool                              | Purpose                               |
 | --------------------------------- | ------------------------------------- |
-| `midnight:get-version-info`       | Get latest release info               |
-| `midnight:check-breaking-changes` | Check if version has breaking changes |
-| `midnight:get-migration-guide`    | Step-by-step upgrade instructions     |
-| `midnight:get-file-at-version`    | Get exact code at specific version    |
-| `midnight:compare-syntax`         | Diff between two versions             |
-| `midnight:get-latest-syntax`      | Authoritative syntax reference        |
+| `midnight-get-version-info`       | Get latest release info               |
+| `midnight-check-breaking-changes` | Check if version has breaking changes |
+| `midnight-get-migration-guide`    | Step-by-step upgrade instructions     |
+| `midnight-get-file-at-version`    | Get exact code at specific version    |
+| `midnight-compare-syntax`         | Diff between two versions             |
+| `midnight-get-latest-syntax`      | Authoritative syntax reference        |
 
 ### Search Tools
 
 | Tool                         | Purpose                    |
 | ---------------------------- | -------------------------- |
-| `midnight:search-compact`    | Find Compact code examples |
-| `midnight:search-typescript` | Find SDK code examples     |
-| `midnight:search-docs`       | Search documentation       |
+| `midnight-search-compact`    | Find Compact code examples |
+| `midnight-search-typescript` | Find SDK code examples     |
+| `midnight-search-docs`       | Search documentation       |
 
 ### Analysis Tools
 
 | Tool                        | Purpose                      |
 | --------------------------- | ---------------------------- |
-| `midnight:analyze-contract` | Static analysis of contracts |
-| `midnight:explain-circuit`  | Explain what a circuit does  |
+| `midnight-analyze-contract` | Static analysis of contracts |
+| `midnight-explain-circuit`  | Explain what a circuit does  |
 
 ### Repository Tools
 
 | Tool                          | Purpose                     |
 | ----------------------------- | --------------------------- |
-| `midnight:get-file`           | Fetch any file from repos   |
-| `midnight:list-examples`      | List example DApps          |
-| `midnight:get-latest-updates` | Recent commits across repos |
+| `midnight-get-file`           | Fetch any file from repos   |
+| `midnight-list-examples`      | List example DApps          |
+| `midnight-get-latest-updates` | Recent commits across repos |
 
 ---
 

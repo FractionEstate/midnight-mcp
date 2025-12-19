@@ -64,31 +64,51 @@ Add `"GITHUB_TOKEN": "ghp_..."` to increase API rate limits from 60 to 5000 requ
 
 ## What's Included
 
-### Tools
+### Tools (14 total)
 
-| Tool                          | Description                             |
-| ----------------------------- | --------------------------------------- |
-| `midnight:search-compact`     | Search Compact contract code            |
-| `midnight:search-typescript`  | Search TypeScript SDK                   |
-| `midnight:search-docs`        | Search documentation                    |
-| `midnight:analyze-contract`   | Analyze contract structure and security |
-| `midnight:explain-circuit`    | Explain circuits in plain language      |
-| `midnight:get-file`           | Get files from Midnight repos           |
-| `midnight:list-examples`      | List example contracts                  |
-| `midnight:get-latest-updates` | Recent repo changes                     |
+| Tool                              | Description                             |
+| --------------------------------- | --------------------------------------- |
+| `midnight-search-compact`         | Search Compact contract code            |
+| `midnight-search-typescript`      | Search TypeScript SDK                   |
+| `midnight-search-docs`            | Search documentation                    |
+| `midnight-analyze-contract`       | Analyze contract structure and security |
+| `midnight-explain-circuit`        | Explain circuits in plain language      |
+| `midnight-get-file`               | Get files from Midnight repos           |
+| `midnight-list-examples`          | List example contracts                  |
+| `midnight-get-latest-updates`     | Recent repo changes                     |
+| `midnight-get-version-info`       | Get version and release info            |
+| `midnight-check-breaking-changes` | Check for breaking changes              |
+| `midnight-get-migration-guide`    | Migration guides between versions       |
+| `midnight-get-file-at-version`    | Get file at specific version            |
+| `midnight-compare-syntax`         | Compare files between versions          |
+| `midnight-get-latest-syntax`      | Latest syntax reference                 |
 
-### Resources
+### Resources (20 total)
 
-- `midnight://docs/*` — Documentation (Compact reference, SDK API, ZK concepts)
+- `midnight://docs/*` — Documentation (Compact reference, SDK API, ZK concepts, OpenZeppelin patterns)
 - `midnight://code/*` — Examples, patterns, and templates
 - `midnight://schema/*` — AST, transaction, and proof schemas
 
 ### Prompts
 
-- `midnight:create-contract` — Create new contracts
-- `midnight:review-contract` — Security review
-- `midnight:explain-concept` — Learn Midnight concepts
-- `midnight:debug-contract` — Debug issues
+- `midnight-create-contract` — Create new contracts
+- `midnight-review-contract` — Security review
+- `midnight-explain-concept` — Learn Midnight concepts
+- `midnight-debug-contract` — Debug issues
+
+---
+
+## How Environment Variables Work
+
+The npm package contains no secrets. **You provide your own credentials** via the `env` block in your config:
+
+| Variable         | Required | Without It                             | With It              |
+| ---------------- | -------- | -------------------------------------- | -------------------- |
+| `GITHUB_TOKEN`   | No       | 60 API calls/hour, may hit rate limits | 5,000 calls/hour     |
+| `OPENAI_API_KEY` | No       | Keyword search only (no embeddings)    | Semantic search      |
+| `CHROMA_URL`     | No       | In-memory search, no persistence       | Persistent vector DB |
+
+Your tokens stay on your machine and are only used to access services on your behalf.
 
 ---
 

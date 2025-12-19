@@ -21,7 +21,7 @@ Messages are JSON-RPC 2.0 formatted:
   "id": 1,
   "method": "tools/call",
   "params": {
-    "name": "midnight:analyze-contract",
+    "name": "midnight-analyze-contract",
     "arguments": { "code": "..." }
   }
 }
@@ -319,13 +319,13 @@ type LogLevel = "debug" | "info" | "warn" | "error";
 
 ```typescript
 logger.info("Tool called", {
-  tool: "midnight:analyze-contract",
+  tool: "midnight-analyze-contract",
   inputSize: code.length,
   timestamp: new Date().toISOString(),
 });
 
 // Output:
-// [INFO] Tool called {"tool":"midnight:analyze-contract","inputSize":1234,...}
+// [INFO] Tool called {"tool":"midnight-analyze-contract","inputSize":1234,...}
 ```
 
 ### Log Output

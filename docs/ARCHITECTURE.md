@@ -16,7 +16,7 @@ The Midnight MCP Server implements the [Model Context Protocol](https://modelcon
 │                      MCP Server Layer                            │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────────┐  │
 │  │   Tools     │  │  Resources  │  │        Prompts          │  │
-│  │ (14 tools)  │  │(16 resources│  │     (5 templates)       │  │
+│  │ (14 tools)  │  │(20 resources│  │     (5 templates)       │  │
 │  └─────────────┘  └─────────────┘  └─────────────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -25,19 +25,20 @@ The Midnight MCP Server implements the [Model Context Protocol](https://modelcon
 ┌───────────────┐    ┌───────────────┐    ┌───────────────┐
 │  Vector Store │    │    GitHub     │    │    Parser     │
 │  (ChromaDB)   │    │   (Octokit)   │    │   (Compact/   │
-│               │    │               │    │   TypeScript) │
+│  (optional)   │    │  (with cache) │    │   TypeScript) │
 └───────────────┘    └───────────────┘    └───────────────┘
         │
         ▼
 ┌───────────────┐
 │   Embeddings  │
 │   (OpenAI)    │
+│  (optional)   │
 └───────────────┘
 ```
 
 ## Indexed Repositories
 
-The server indexes 15 public repositories from the Midnight organization:
+The server indexes 16 repositories (15 from Midnight organization + 1 partner):
 
 ### Core Language & SDK
 
@@ -126,20 +127,20 @@ Fourteen tools exposed to AI assistants:
 
 | Tool                              | File          | Description                              |
 | --------------------------------- | ------------- | ---------------------------------------- |
-| `midnight:search-compact`         | search.ts     | Semantic search across Compact contracts |
-| `midnight:search-typescript`      | search.ts     | Search TypeScript SDK code               |
-| `midnight:search-docs`            | search.ts     | Search documentation                     |
-| `midnight:analyze-contract`       | analyze.ts    | Static analysis of Compact contracts     |
-| `midnight:explain-circuit`        | analyze.ts    | Plain-language circuit explanations      |
-| `midnight:get-file`               | repository.ts | Fetch files from GitHub repos            |
-| `midnight:list-examples`          | repository.ts | List example contracts/DApps             |
-| `midnight:get-latest-updates`     | repository.ts | Recent repository changes                |
-| `midnight:get-version-info`       | repository.ts | Get latest version and release info      |
-| `midnight:check-breaking-changes` | repository.ts | Check for breaking changes since version |
-| `midnight:get-migration-guide`    | repository.ts | Migration guide between versions         |
-| `midnight:get-file-at-version`    | repository.ts | Get file at specific version             |
-| `midnight:compare-syntax`         | repository.ts | Compare file between two versions        |
-| `midnight:get-latest-syntax`      | repository.ts | Get authoritative syntax reference       |
+| `midnight-search-compact`         | search.ts     | Semantic search across Compact contracts |
+| `midnight-search-typescript`      | search.ts     | Search TypeScript SDK code               |
+| `midnight-search-docs`            | search.ts     | Search documentation                     |
+| `midnight-analyze-contract`       | analyze.ts    | Static analysis of Compact contracts     |
+| `midnight-explain-circuit`        | analyze.ts    | Plain-language circuit explanations      |
+| `midnight-get-file`               | repository.ts | Fetch files from GitHub repos            |
+| `midnight-list-examples`          | repository.ts | List example contracts/DApps             |
+| `midnight-get-latest-updates`     | repository.ts | Recent repository changes                |
+| `midnight-get-version-info`       | repository.ts | Get latest version and release info      |
+| `midnight-check-breaking-changes` | repository.ts | Check for breaking changes since version |
+| `midnight-get-migration-guide`    | repository.ts | Migration guide between versions         |
+| `midnight-get-file-at-version`    | repository.ts | Get file at specific version             |
+| `midnight-compare-syntax`         | repository.ts | Compare file between two versions        |
+| `midnight-get-latest-syntax`      | repository.ts | Get authoritative syntax reference       |
 
 Each tool has:
 
@@ -182,11 +183,11 @@ Five prompt templates for common development tasks:
 
 | Prompt                        | Purpose                          |
 | ----------------------------- | -------------------------------- |
-| `midnight:create-contract`    | Guided contract creation         |
-| `midnight:review-contract`    | Security & best practices review |
-| `midnight:explain-concept`    | Educational explanations         |
-| `midnight:compare-approaches` | Implementation comparison        |
-| `midnight:debug-contract`     | Debug assistance                 |
+| `midnight-create-contract`    | Guided contract creation         |
+| `midnight-review-contract`    | Security & best practices review |
+| `midnight-explain-concept`    | Educational explanations         |
+| `midnight-compare-approaches` | Implementation comparison        |
+| `midnight-debug-contract`     | Debug assistance                 |
 
 ### 5. Pipeline (`src/pipeline/`)
 
@@ -248,7 +249,7 @@ const ConfigSchema = z.object({
 
 ```
 1. User asks Claude: "Find access control examples"
-2. Claude calls tool: midnight:search-compact
+2. Claude calls tool: midnight-search-compact
 3. Server receives request via stdio
 4. Query → OpenAI → Embedding vector
 5. Vector → ChromaDB → Similar documents
@@ -260,7 +261,7 @@ const ConfigSchema = z.object({
 
 ```
 1. User provides Compact code to Claude
-2. Claude calls tool: midnight:analyze-contract
+2. Claude calls tool: midnight-analyze-contract
 3. Server parses contract (no external deps)
 4. Static analysis:
    - Structure extraction (ledger, circuits, witnesses)
@@ -355,7 +356,7 @@ Tools return structured errors:
 
 ```typescript
 export const myToolDef = {
-  name: "midnight:my-tool",
+  name: "midnight-my-tool",
   description: "Description for AI",
   inputSchema: zodToJsonSchema(MyInputSchema),
   handler: myToolHandler,

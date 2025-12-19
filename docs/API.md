@@ -2,7 +2,7 @@
 
 ## Tools
 
-### midnight:search-compact
+### midnight-search-compact
 
 Search Compact smart contract code and patterns using semantic search.
 
@@ -46,7 +46,7 @@ Search Compact smart contract code and patterns using semantic search.
 
 ```json
 {
-  "name": "midnight:search-compact",
+  "name": "midnight-search-compact",
   "arguments": {
     "query": "access control pattern with authorization",
     "limit": 5
@@ -56,7 +56,7 @@ Search Compact smart contract code and patterns using semantic search.
 
 ---
 
-### midnight:search-typescript
+### midnight-search-typescript
 
 Search TypeScript SDK code, types, and API implementations.
 
@@ -75,7 +75,7 @@ Search TypeScript SDK code, types, and API implementations.
 
 ---
 
-### midnight:search-docs
+### midnight-search-docs
 
 Full-text search across Midnight documentation.
 
@@ -93,7 +93,7 @@ Full-text search across Midnight documentation.
 
 ---
 
-### midnight:analyze-contract
+### midnight-analyze-contract
 
 Analyze a Compact contract for structure, patterns, and security issues.
 
@@ -157,7 +157,7 @@ Analyze a Compact contract for structure, patterns, and security issues.
 
 ```json
 {
-  "name": "midnight:analyze-contract",
+  "name": "midnight-analyze-contract",
   "arguments": {
     "code": "ledger { counter: Counter }\ncircuit increment() { counter.increment() }",
     "checkSecurity": true
@@ -167,7 +167,7 @@ Analyze a Compact contract for structure, patterns, and security issues.
 
 ---
 
-### midnight:explain-circuit
+### midnight-explain-circuit
 
 Explain what a circuit does in plain language with ZK implications.
 
@@ -202,7 +202,7 @@ Explain what a circuit does in plain language with ZK implications.
 
 ---
 
-### midnight:get-file
+### midnight-get-file
 
 Retrieve a specific file from Midnight repositories.
 
@@ -231,7 +231,7 @@ Retrieve a specific file from Midnight repositories.
 
 ---
 
-### midnight:list-examples
+### midnight-list-examples
 
 List available example contracts and DApps.
 
@@ -263,7 +263,7 @@ List available example contracts and DApps.
 
 ---
 
-### midnight:get-latest-updates
+### midnight-get-latest-updates
 
 Retrieve recent changes across Midnight repositories.
 
@@ -295,7 +295,7 @@ Retrieve recent changes across Midnight repositories.
 
 ---
 
-### midnight:get-version-info
+### midnight-get-version-info
 
 Get the latest version and release information for a repository.
 
@@ -329,7 +329,7 @@ Get the latest version and release information for a repository.
 
 ---
 
-### midnight:check-breaking-changes
+### midnight-check-breaking-changes
 
 Check for breaking changes between your current version and the latest.
 
@@ -359,7 +359,7 @@ Check for breaking changes between your current version and the latest.
 
 ---
 
-### midnight:get-migration-guide
+### midnight-get-migration-guide
 
 Get a detailed migration guide for upgrading between versions.
 
@@ -395,7 +395,7 @@ Get a detailed migration guide for upgrading between versions.
 
 ---
 
-### midnight:get-file-at-version
+### midnight-get-file-at-version
 
 Get the exact content of a file at a specific version. **Critical for ensuring code recommendations match the user's version.**
 
@@ -423,7 +423,7 @@ Get the exact content of a file at a specific version. **Critical for ensuring c
 
 ---
 
-### midnight:compare-syntax
+### midnight-compare-syntax
 
 Compare a file between two versions to see what changed.
 
@@ -455,7 +455,7 @@ Compare a file between two versions to see what changed.
 
 ---
 
-### midnight:get-latest-syntax
+### midnight-get-latest-syntax
 
 Get the authoritative syntax reference for Compact at the latest version. **Use this as the source of truth when writing contracts.**
 
@@ -549,7 +549,7 @@ Resources are accessed via URI patterns. Use `resources/read` with the URI.
 
 Prompts are templates that guide AI assistants through common tasks.
 
-### midnight:create-contract
+### midnight-create-contract
 
 Guided prompt for creating new Compact contracts.
 
@@ -564,7 +564,7 @@ Guided prompt for creating new Compact contracts.
 }
 ```
 
-### midnight:review-contract
+### midnight-review-contract
 
 Security and best practices review for existing contracts.
 
@@ -577,7 +577,7 @@ Security and best practices review for existing contracts.
 }
 ```
 
-### midnight:explain-concept
+### midnight-explain-concept
 
 Educational prompt for explaining Midnight concepts.
 
@@ -590,7 +590,7 @@ Educational prompt for explaining Midnight concepts.
 }
 ```
 
-### midnight:compare-approaches
+### midnight-compare-approaches
 
 Compare different implementation approaches.
 
@@ -603,7 +603,7 @@ Compare different implementation approaches.
 }
 ```
 
-### midnight:debug-contract
+### midnight-debug-contract
 
 Help debug issues with a Compact contract.
 
@@ -624,7 +624,7 @@ Help debug issues with a Compact contract.
 {
   "method": "prompts/get",
   "params": {
-    "name": "midnight:create-contract",
+    "name": "midnight-create-contract",
     "arguments": {
       "name": "TokenVault",
       "purpose": "Store and transfer tokens with privacy",
