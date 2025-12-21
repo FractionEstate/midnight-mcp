@@ -260,10 +260,32 @@ Respond in JSON format:
       }
     );
 
-    // Parse JSON response
+    // Parse JSON response with error handling
     const jsonMatch = response.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      try {
+        const parsed = JSON.parse(jsonMatch[0]);
+        // Validate expected structure
+        return {
+          summary:
+            typeof parsed.summary === "string"
+              ? parsed.summary
+              : "Review complete",
+          issues: Array.isArray(parsed.issues) ? parsed.issues : [],
+          improvedCode:
+            typeof parsed.improvedCode === "string"
+              ? parsed.improvedCode
+              : undefined,
+        };
+      } catch (parseError) {
+        logger.warn("Failed to parse JSON from LLM response", {
+          error: String(parseError),
+        });
+        return {
+          summary: response,
+          issues: [],
+        };
+      }
     }
 
     return {

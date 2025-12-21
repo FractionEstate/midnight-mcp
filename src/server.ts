@@ -39,6 +39,14 @@ const SERVER_INFO = {
 // Resource subscriptions tracking
 const resourceSubscriptions = new Set<string>();
 
+/**
+ * Clear all subscriptions (useful for server restart/testing)
+ */
+export function clearSubscriptions(): void {
+  resourceSubscriptions.clear();
+  logger.debug("Subscriptions cleared");
+}
+
 // Resource templates for parameterized resources (RFC 6570 URI Templates)
 const resourceTemplates: ResourceTemplate[] = [
   {
@@ -353,7 +361,9 @@ function registerSubscriptionHandlers(server: Server): void {
 
     if (!isValid) {
       logger.warn(`Invalid subscription URI: ${uri}`);
-      return {};
+      throw new Error(
+        `Invalid subscription URI: ${uri}. Valid prefixes: ${validPrefixes.join(", ")}`
+      );
     }
 
     resourceSubscriptions.add(uri);
@@ -425,7 +435,17 @@ function setupSampling(server: Server): void {
         },
         // Use a schema that matches the expected response
         {
-          parse: (data: unknown) => data as SamplingResponse,
+          parse: (data: unknown) => {
+            const response = data as SamplingResponse;
+            // Basic validation of expected response structure
+            if (!response || typeof response !== "object") {
+              throw new Error("Invalid sampling response: expected object");
+            }
+            if (!response.content || typeof response.content !== "object") {
+              throw new Error("Invalid sampling response: missing content");
+            }
+            return response;
+          },
           _def: { typeName: "SamplingResponse" },
         } as never
       );

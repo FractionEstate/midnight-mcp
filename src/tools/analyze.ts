@@ -305,46 +305,77 @@ function getPrivacyConsiderations(circuit: CodeUnit): string[] {
   return considerations;
 }
 
-// Output schemas for analysis tools
+// Output schemas for analysis tools - aligned with actual function return types
 const analyzeContractOutputSchema: OutputSchema = {
   type: "object",
   properties: {
-    name: { type: "string", description: "Contract name" },
-    summary: { type: "string", description: "Brief contract summary" },
-    ledgerState: {
-      type: "array",
-      description: "Ledger state fields",
-      items: {
-        type: "object",
-        properties: {
-          name: { type: "string" },
-          type: { type: "string" },
-          isPrivate: { type: "boolean" },
-        },
+    summary: {
+      type: "object",
+      description: "Summary statistics of the contract",
+      properties: {
+        hasLedger: { type: "boolean" },
+        hasCircuits: { type: "boolean" },
+        hasWitnesses: { type: "boolean" },
+        totalLines: { type: "number" },
+        publicCircuits: { type: "number" },
+        privateCircuits: { type: "number" },
+        publicState: { type: "number" },
+        privateState: { type: "number" },
       },
     },
-    circuits: {
-      type: "array",
-      description: "Circuit definitions",
-      items: {
-        type: "object",
-        properties: {
-          name: { type: "string" },
-          isPublic: { type: "boolean" },
-          parameters: { type: "array", items: { type: "object" } },
-          purpose: { type: "string" },
+    structure: {
+      type: "object",
+      description: "Contract structure breakdown",
+      properties: {
+        imports: { type: "array", items: { type: "string" } },
+        exports: { type: "array", items: { type: "string" } },
+        ledger: {
+          type: "array",
+          description: "Ledger state fields",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              type: { type: "string" },
+              isPrivate: { type: "boolean" },
+            },
+          },
         },
-      },
-    },
-    witnesses: {
-      type: "array",
-      description: "Witness functions",
-      items: {
-        type: "object",
-        properties: {
-          name: { type: "string" },
-          returnType: { type: "string" },
-          purpose: { type: "string" },
+        circuits: {
+          type: "array",
+          description: "Circuit definitions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              isPublic: { type: "boolean" },
+              parameters: { type: "array", items: { type: "object" } },
+              returnType: { type: "string" },
+            },
+          },
+        },
+        witnesses: {
+          type: "array",
+          description: "Witness functions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              parameters: { type: "array", items: { type: "object" } },
+              returnType: { type: "string" },
+            },
+          },
+        },
+        types: {
+          type: "array",
+          description: "Type definitions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              definition: { type: "string" },
+            },
+          },
         },
       },
     },
@@ -369,32 +400,15 @@ const analyzeContractOutputSchema: OutputSchema = {
       description: "Recommendations for improvement",
     },
   },
-  required: ["summary", "circuits"],
+  required: ["summary", "structure", "securityFindings", "recommendations"],
   description: "Detailed contract analysis with security findings",
 };
 
 const explainCircuitOutputSchema: OutputSchema = {
   type: "object",
   properties: {
-    name: { type: "string", description: "Circuit name" },
-    type: {
-      type: "string",
-      description: "Type: circuit or witness",
-    },
+    circuitName: { type: "string", description: "Circuit name" },
     isPublic: { type: "boolean", description: "Whether it's exported" },
-    plainEnglishExplanation: {
-      type: "string",
-      description: "Plain language explanation",
-    },
-    zkProofImplications: {
-      type: "string",
-      description: "Zero-knowledge proof implications",
-    },
-    privacyConsiderations: {
-      type: "array",
-      items: { type: "string" },
-      description: "Privacy-related considerations",
-    },
     parameters: {
       type: "array",
       items: {
@@ -402,13 +416,37 @@ const explainCircuitOutputSchema: OutputSchema = {
         properties: {
           name: { type: "string" },
           type: { type: "string" },
-          description: { type: "string" },
         },
       },
+      description: "Circuit parameters",
     },
-    returnType: { type: "string" },
+    returnType: { type: "string", description: "Return type" },
+    explanation: {
+      type: "string",
+      description: "Plain language explanation",
+    },
+    operations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Operations performed by the circuit",
+    },
+    zkImplications: {
+      type: "array",
+      items: { type: "string" },
+      description: "Zero-knowledge proof implications",
+    },
+    privacyConsiderations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Privacy-related considerations",
+    },
   },
-  required: ["name", "plainEnglishExplanation"],
+  required: [
+    "circuitName",
+    "explanation",
+    "zkImplications",
+    "privacyConsiderations",
+  ],
   description: "Detailed circuit explanation with privacy analysis",
 };
 
