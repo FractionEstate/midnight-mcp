@@ -52,6 +52,9 @@ if (!GITHUB_TOKEN) {
 
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
+// Check if force reindex is requested
+const FORCE_REINDEX = process.env.FORCE_REINDEX === "true";
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -199,6 +202,11 @@ interface FileCache {
 }
 
 async function getFileCache(repoKey: string): Promise<FileCache> {
+  // Skip cache if force reindex is requested
+  if (FORCE_REINDEX) {
+    return {};
+  }
+  
   try {
     const url = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/storage/kv/namespaces/${KV_NAMESPACE_ID}/values/index-cache:${repoKey}`;
     const response = await fetch(url, {
@@ -610,8 +618,11 @@ async function main() {
   console.log(`Target: Cloudflare Vectorize index '${VECTORIZE_INDEX}'`);
   console.log(`Time: ${new Date().toISOString()}`);
   console.log(`Repos to index: ${REPOSITORIES.length}`);
+  if (FORCE_REINDEX) {
+    console.log(`⚠️  FORCE REINDEX enabled - ignoring cache, reprocessing all files`);
+  }
   console.log(
-    `Optimizations: Tarball download, Batch embeddings, Incremental\n`
+    `Optimizations: Tarball download, Batch embeddings${FORCE_REINDEX ? "" : ", Incremental"}\n`
   );
 
   const results: IndexResult[] = [];
