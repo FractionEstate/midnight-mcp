@@ -92,6 +92,21 @@ const REPOSITORIES = [
   { owner: "midnightntwrk", repo: "midnight-awesome-dapps", branch: "main" },
   { owner: "midnightntwrk", repo: "create-mn-app", branch: "main" },
 
+  // ZK & cryptography
+  { owner: "midnightntwrk", repo: "halo2", branch: "main" },
+  { owner: "midnightntwrk", repo: "midnight-trusted-setup", branch: "main" },
+  { owner: "midnightntwrk", repo: "rs-merkle", branch: "main" },
+
+  // Developer tools
+  { owner: "midnightntwrk", repo: "compact-tree-sitter", branch: "main" },
+  { owner: "midnightntwrk", repo: "compact-zed", branch: "main" },
+  { owner: "midnightntwrk", repo: "setup-compact-action", branch: "main" },
+  { owner: "midnightntwrk", repo: "midnight-node-docker", branch: "main" },
+
+  // Community & governance
+  { owner: "midnightntwrk", repo: "contributor-hub", branch: "main" },
+  { owner: "midnightntwrk", repo: "night-token-distribution", branch: "main" },
+
   // Third-party libraries
   { owner: "OpenZeppelin", repo: "compact-contracts", branch: "main" },
 ];
