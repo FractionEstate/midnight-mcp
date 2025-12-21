@@ -84,6 +84,9 @@ const REPOSITORIES = [
   { owner: "OpenZeppelin", repo: "compact-contracts", branch: "main" },
 ];
 
+// Timestamp for when this indexing run started
+const INDEXED_AT = new Date().toISOString();
+
 interface Document {
   id: string;
   content: string;
@@ -93,6 +96,7 @@ interface Document {
     language: string;
     startLine: number;
     endLine: number;
+    indexedAt: string;
   };
 }
 
@@ -264,6 +268,7 @@ async function indexRepository(owner: string, repo: string, branch: string) {
           language,
           startLine: i * 50, // Approximate
           endLine: (i + 1) * 50,
+          indexedAt: INDEXED_AT,
         },
       });
     }

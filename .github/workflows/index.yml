@@ -10,15 +10,19 @@ on:
         default: "false"
         type: boolean
 
-  # Weekly schedule (every Monday at 6am UTC)
+  # Webhook trigger (for release notifications)
+  repository_dispatch:
+    types: [midnight-release, reindex]
+
+  # Daily schedule (every day at 6am UTC)
   schedule:
-    - cron: "0 6 * * 1"
+    - cron: "0 6 * * *"
 
 jobs:
   index:
     runs-on: ubuntu-latest
     timeout-minutes: 60 # Prevent runaway jobs
-    environment: CLOUDFLARE  # Use the CLOUDFLARE environment for secrets
+    environment: CLOUDFLARE # Use the CLOUDFLARE environment for secrets
 
     steps:
       - uses: actions/checkout@v4

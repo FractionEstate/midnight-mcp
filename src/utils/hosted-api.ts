@@ -28,6 +28,7 @@ export interface HostedSearchResponse {
   query: string;
   category?: string;
   warnings?: string[];
+  lastIndexed?: string | null;
 }
 
 export interface HostedSearchFilter {
