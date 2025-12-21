@@ -1,0 +1,84 @@
+name: Watch Midnight Releases
+
+on:
+  # Check for new releases every 6 hours
+  schedule:
+    - cron: "0 */6 * * *"
+  
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  check-releases:
+    runs-on: ubuntu-latest
+    outputs:
+      should_reindex: ${{ steps.check.outputs.should_reindex }}
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Check for recent releases
+        id: check
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Repos to monitor
+          REPOS="midnightntwrk/compact midnightntwrk/midnight-js midnightntwrk/midnight-docs"
+          
+          SHOULD_REINDEX="false"
+          SIX_HOURS_AGO=$(date -u -d '6 hours ago' +%Y-%m-%dT%H:%M:%SZ 2>/dev/null || date -u -v-6H +%Y-%m-%dT%H:%M:%SZ)
+          
+          echo "Checking for releases since $SIX_HOURS_AGO"
+          
+          for REPO in $REPOS; do
+            echo "Checking $REPO..."
+            
+            # Get latest release
+            RELEASE_DATE=$(gh api repos/$REPO/releases/latest --jq '.published_at' 2>/dev/null || echo "")
+            
+            if [ -n "$RELEASE_DATE" ]; then
+              echo "  Latest release: $RELEASE_DATE"
+              
+              # Check if release is recent (within last 6 hours)
+              if [[ "$RELEASE_DATE" > "$SIX_HOURS_AGO" ]]; then
+                echo "  ✅ New release detected!"
+                SHOULD_REINDEX="true"
+              fi
+            fi
+            
+            # Also check for recent commits to main (in case no formal release)
+            LATEST_COMMIT=$(gh api repos/$REPO/commits/main --jq '.commit.committer.date' 2>/dev/null || echo "")
+            if [ -n "$LATEST_COMMIT" ] && [[ "$LATEST_COMMIT" > "$SIX_HOURS_AGO" ]]; then
+              echo "  ✅ Recent commits detected: $LATEST_COMMIT"
+              SHOULD_REINDEX="true"
+            fi
+          done
+          
+          echo "should_reindex=$SHOULD_REINDEX" >> $GITHUB_OUTPUT
+          
+          if [ "$SHOULD_REINDEX" = "true" ]; then
+            echo "🔄 Will trigger reindex"
+          else
+            echo "✅ No new releases, skipping reindex"
+          fi
+
+  trigger-reindex:
+    needs: check-releases
+    if: needs.check-releases.outputs.should_reindex == 'true'
+    runs-on: ubuntu-latest
+    
+    # Prevent concurrent indexing runs
+    concurrency:
+      group: midnight-indexing
+      cancel-in-progress: false  # Don't cancel running jobs, just skip new ones
+    
+    steps:
+      - name: Trigger indexing workflow
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "Triggering reindex..."
+          gh api repos/${{ github.repository }}/dispatches \
+            -f event_type=reindex \
+            --method POST
+          echo "✅ Reindex triggered"

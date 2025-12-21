@@ -18,6 +18,11 @@ on:
   schedule:
     - cron: "0 6 * * *"
 
+# Prevent multiple indexing runs at the same time
+concurrency:
+  group: midnight-indexing
+  cancel-in-progress: false  # Let running jobs finish, skip new triggers
+
 jobs:
   index:
     runs-on: ubuntu-latest
