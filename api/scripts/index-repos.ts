@@ -300,21 +300,78 @@ async function indexRepository(owner: string, repo: string, branch: string) {
   }
 
   console.log(`  ✓ Indexed ${documents.length} documents`);
+  return { success: true, documents: documents.length };
+}
+
+interface IndexResult {
+  repo: string;
+  success: boolean;
+  documents: number;
+  error?: string;
 }
 
 async function main() {
   console.log("Starting Midnight repository indexing...");
   console.log(`Target: Cloudflare Vectorize index '${VECTORIZE_INDEX}'`);
+  console.log(`Time: ${new Date().toISOString()}\n`);
+
+  const results: IndexResult[] = [];
+  let totalDocs = 0;
+  let failedRepos: string[] = [];
 
   for (const { owner, repo, branch } of REPOSITORIES) {
+    const repoName = `${owner}/${repo}`;
     try {
-      await indexRepository(owner, repo, branch);
+      const result = await indexRepository(owner, repo, branch);
+      results.push({
+        repo: repoName,
+        success: true,
+        documents: result.documents,
+      });
+      totalDocs += result.documents;
     } catch (error) {
-      console.error(`Failed to index ${owner}/${repo}:`, error);
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`\n❌ Failed to index ${repoName}: ${errorMsg}`);
+      results.push({
+        repo: repoName,
+        success: false,
+        documents: 0,
+        error: errorMsg,
+      });
+      failedRepos.push(repoName);
+      // Continue with next repo instead of stopping
     }
   }
 
-  console.log("\n✓ Indexing complete!");
+  // Print summary
+  console.log("\n" + "=".repeat(50));
+  console.log("📊 INDEXING SUMMARY");
+  console.log("=".repeat(50));
+
+  for (const result of results) {
+    const status = result.success ? "✅" : "❌";
+    const docs = result.success
+      ? `${result.documents} docs`
+      : result.error?.substring(0, 50);
+    console.log(`${status} ${result.repo}: ${docs}`);
+  }
+
+  console.log("-".repeat(50));
+  console.log(`Total documents indexed: ${totalDocs}`);
+  console.log(
+    `Successful repos: ${results.filter((r) => r.success).length}/${REPOSITORIES.length}`
+  );
+
+  if (failedRepos.length > 0) {
+    console.log(`\n⚠️  Failed repos: ${failedRepos.join(", ")}`);
+    // Exit with error code if any repos failed (for CI notification)
+    process.exit(1);
+  }
+
+  console.log("\n✅ Indexing complete!");
 }
 
-main().catch(console.error);
+main().catch((error) => {
+  console.error("\n💥 Fatal error:", error);
+  process.exit(1);
+});

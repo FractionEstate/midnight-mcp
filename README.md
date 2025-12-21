@@ -1,5 +1,9 @@
 # Midnight MCP Server
 
+[![npm version](https://badge.fury.io/js/midnight-mcp.svg)](https://www.npmjs.com/package/midnight-mcp)
+[![Index Repositories](https://github.com/idriss-xyz/midnight-mcp/actions/workflows/index.yml/badge.svg)](https://github.com/idriss-xyz/midnight-mcp/actions/workflows/index.yml)
+[![CI](https://github.com/idriss-xyz/midnight-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/idriss-xyz/midnight-mcp/actions/workflows/ci.yml)
+
 MCP server that gives AI assistants access to Midnight blockchain—search contracts, analyze code, and explore documentation.
 
 ## Quick Start

@@ -3,6 +3,12 @@ name: Index Repositories
 on:
   # Manual trigger
   workflow_dispatch:
+    inputs:
+      force_full_reindex:
+        description: "Force full reindex (ignore cache)"
+        required: false
+        default: "false"
+        type: boolean
 
   # Weekly schedule (every Monday at 6am UTC)
   schedule:
@@ -11,6 +17,7 @@ on:
 jobs:
   index:
     runs-on: ubuntu-latest
+    timeout-minutes: 60 # Prevent runaway jobs
 
     steps:
       - uses: actions/checkout@v4
@@ -27,6 +34,7 @@ jobs:
         run: npm ci
 
       - name: Run indexing
+        id: indexing
         working-directory: api
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -34,3 +42,62 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run index
+
+      - name: Create job summary
+        if: always()
+        run: |
+          echo "## 📊 Indexing Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.indexing.outcome }}" == "success" ]; then
+            echo "✅ **Status:** Success" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "❌ **Status:** Failed" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Triggered by:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run at:** $(date -u '+%Y-%m-%d %H:%M:%S UTC')" >> $GITHUB_STEP_SUMMARY
+
+  # Notification job - runs after indexing completes
+  notify:
+    needs: index
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Create failure issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `⚠️ Weekly Indexing Failed - ${new Date().toISOString().split('T')[0]}`;
+            const body = `## Indexing Workflow Failed
+
+            The weekly repository indexing job failed.
+
+            **Workflow Run:** [View Details](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            **Triggered:** ${{ github.event_name }}
+            **Time:** ${new Date().toISOString()}
+
+            ### Next Steps
+            1. Check the workflow logs for errors
+            2. Verify API keys are still valid (OpenAI, Cloudflare)
+            3. Check if any repos have changed structure
+            4. Re-run manually after fixing
+
+            /cc @${{ github.repository_owner }}`;
+
+            // Check for existing open issue
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'indexing-failure'
+            });
+
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['indexing-failure', 'automated']
+              });
+            }
