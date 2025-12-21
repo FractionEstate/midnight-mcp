@@ -1,152 +1,154 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-import { logger } from "hono/logger";
-import { serve } from "@hono/node-server";
-import { config, validateConfig } from "./config.js";
-import { search, getStats, SearchFilter } from "./vectorstore.js";
 
-const app = new Hono();
+type Bindings = {
+  VECTORIZE: VectorizeIndex;
+  OPENAI_API_KEY: string;
+  ENVIRONMENT: string;
+};
 
-// Middleware
-app.use("*", logger());
-app.use("*", cors());
+const app = new Hono<{ Bindings: Bindings }>();
 
-// Simple in-memory rate limiting
-const rateLimits = new Map<string, { count: number; resetAt: number }>();
-
-app.use("*", async (c, next) => {
-  const ip = c.req.header("x-forwarded-for") || "unknown";
-  const now = Date.now();
-  const windowMs = 60 * 1000; // 1 minute
-
-  let record = rateLimits.get(ip);
-  if (!record || now > record.resetAt) {
-    record = { count: 0, resetAt: now + windowMs };
-    rateLimits.set(ip, record);
-  }
-
-  record.count++;
-
-  if (record.count > config.rateLimitPerMinute) {
-    return c.json(
-      {
-        error: "Rate limit exceeded",
-        retryAfter: Math.ceil((record.resetAt - now) / 1000),
-      },
-      429
-    );
-  }
-
-  // Add rate limit headers
-  c.header("X-RateLimit-Limit", config.rateLimitPerMinute.toString());
-  c.header(
-    "X-RateLimit-Remaining",
-    (config.rateLimitPerMinute - record.count).toString()
-  );
-  c.header("X-RateLimit-Reset", record.resetAt.toString());
-
-  await next();
-});
+// CORS - restrict to known origins in production
+app.use(
+  "*",
+  cors({
+    origin: "*", // Allow all origins for public API
+    allowMethods: ["GET", "POST", "OPTIONS"],
+    allowHeaders: ["Content-Type"],
+    maxAge: 86400, // 24 hours
+  })
+);
 
 // Health check
-app.get("/", (c) => {
-  return c.json({
-    service: "midnight-mcp-api",
-    version: "0.0.1",
+app.get("/", (c) => c.json({ status: "ok", service: "midnight-mcp-api" }));
+
+app.get("/health", (c) =>
+  c.json({
     status: "healthy",
+    environment: c.env.ENVIRONMENT,
+    vectorize: !!c.env.VECTORIZE,
+  })
+);
+
+// Generate embedding using OpenAI
+async function getEmbedding(text: string, apiKey: string): Promise<number[]> {
+  // Truncate input to prevent abuse (max ~8k tokens)
+  const truncatedText = text.slice(0, 8000);
+
+  const response = await fetch("https://api.openai.com/v1/embeddings", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "text-embedding-3-small",
+      input: truncatedText,
+    }),
   });
-});
 
-app.get("/health", async (c) => {
-  try {
-    const stats = await getStats();
-    return c.json({
-      status: "healthy",
-      vectorStore: {
-        documentsIndexed: stats.count,
-      },
-    });
-  } catch (error) {
-    return c.json(
-      {
-        status: "unhealthy",
-        error: String(error),
-      },
-      500
-    );
+  if (!response.ok) {
+    throw new Error(`OpenAI API error: ${response.status}`);
   }
-});
 
-// Search endpoints
+  const data = (await response.json()) as {
+    data: Array<{ embedding: number[] }>;
+  };
+  return data.data[0].embedding;
+}
+
+// Helper to format search results consistently
+function formatResults(
+  matches: VectorizeMatches["matches"],
+  query: string
+): object {
+  return {
+    results: matches.map((match) => ({
+      content: match.metadata?.content || "",
+      relevanceScore: match.score,
+      source: {
+        repository: match.metadata?.repository || "",
+        filePath: match.metadata?.filePath || "",
+        lines: match.metadata?.startLine
+          ? `${match.metadata.startLine}-${match.metadata.endLine}`
+          : undefined,
+      },
+      codeType: match.metadata?.language,
+    })),
+    query,
+    totalResults: matches.length,
+  };
+}
+
+// Validate and sanitize query
+function validateQuery(query: unknown): string | null {
+  if (typeof query !== "string") return null;
+  const trimmed = query.trim();
+  if (trimmed.length === 0 || trimmed.length > 1000) return null;
+  return trimmed;
+}
+
+// Validate limit
+function validateLimit(limit: unknown): number {
+  if (typeof limit !== "number") return 10;
+  return Math.min(Math.max(1, limit), 50); // Between 1 and 50
+}
+
+// Search endpoint
 app.post("/v1/search", async (c) => {
   try {
-    const body = await c.req.json();
-    const {
-      query,
-      limit = 10,
-      filter,
-    } = body as {
+    const body = await c.req.json<{
       query: string;
       limit?: number;
-      filter?: SearchFilter;
-    };
+      filter?: { language?: string };
+    }>();
 
-    if (!query || typeof query !== "string") {
-      return c.json({ error: "Query is required" }, 400);
+    const query = validateQuery(body.query);
+    if (!query) {
+      return c.json({ error: "query is required (1-1000 chars)" }, 400);
     }
 
-    if (query.length < 2) {
-      return c.json({ error: "Query must be at least 2 characters" }, 400);
-    }
+    const limit = validateLimit(body.limit);
+    const embedding = await getEmbedding(query, c.env.OPENAI_API_KEY);
 
-    if (query.length > 1000) {
-      return c.json({ error: "Query must be less than 1000 characters" }, 400);
-    }
-
-    const results = await search(query, Math.min(limit, 50), filter);
-
-    return c.json({
-      results,
-      query,
-      totalResults: results.length,
+    const results = await c.env.VECTORIZE.query(embedding, {
+      topK: limit,
+      returnMetadata: "all",
+      filter: body.filter?.language
+        ? { language: body.filter.language }
+        : undefined,
     });
+
+    return c.json(formatResults(results.matches, query));
   } catch (error) {
     console.error("Search error:", error);
-    return c.json({ error: "Search failed", details: String(error) }, 500);
+    return c.json({ error: "Search failed" }, 500);
   }
 });
 
 // Search Compact code
 app.post("/v1/search/compact", async (c) => {
   try {
-    const body = await c.req.json();
-    const { query, limit = 10 } = body as { query: string; limit?: number };
+    const body = await c.req.json<{ query: string; limit?: number }>();
 
+    const query = validateQuery(body.query);
     if (!query) {
-      return c.json({ error: "Query is required" }, 400);
+      return c.json({ error: "query is required (1-1000 chars)" }, 400);
     }
 
-    const results = await search(query, Math.min(limit, 50), {
-      language: "compact",
+    const limit = validateLimit(body.limit);
+    const embedding = await getEmbedding(query, c.env.OPENAI_API_KEY);
+
+    const results = await c.env.VECTORIZE.query(embedding, {
+      topK: limit,
+      returnMetadata: "all",
+      filter: { language: "compact" },
     });
 
-    return c.json({
-      results: results.map((r) => ({
-        code: r.content,
-        relevanceScore: r.score,
-        source: {
-          repository: r.metadata.repository,
-          filePath: r.metadata.filePath,
-          lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
-        },
-        codeType: r.metadata.codeType,
-        name: r.metadata.codeName,
-      })),
-      totalResults: results.length,
-      query,
-    });
+    return c.json(formatResults(results.matches, query));
   } catch (error) {
-    console.error("Search error:", error);
+    console.error("Search compact error:", error);
     return c.json({ error: "Search failed" }, 500);
   }
 });
@@ -154,122 +156,62 @@ app.post("/v1/search/compact", async (c) => {
 // Search TypeScript code
 app.post("/v1/search/typescript", async (c) => {
   try {
-    const body = await c.req.json();
-    const {
-      query,
-      limit = 10,
-      includeTypes = true,
-    } = body as {
-      query: string;
-      limit?: number;
-      includeTypes?: boolean;
-    };
+    const body = await c.req.json<{ query: string; limit?: number }>();
 
+    const query = validateQuery(body.query);
     if (!query) {
-      return c.json({ error: "Query is required" }, 400);
+      return c.json({ error: "query is required (1-1000 chars)" }, 400);
     }
 
-    let results = await search(query, Math.min(limit, 50), {
-      language: "typescript",
+    const limit = validateLimit(body.limit);
+    const embedding = await getEmbedding(query, c.env.OPENAI_API_KEY);
+
+    const results = await c.env.VECTORIZE.query(embedding, {
+      topK: limit,
+      returnMetadata: "all",
+      filter: { language: "typescript" },
     });
 
-    if (!includeTypes) {
-      results = results.filter(
-        (r) =>
-          r.metadata.codeType !== "type" && r.metadata.codeType !== "interface"
-      );
-    }
-
-    return c.json({
-      results: results.map((r) => ({
-        code: r.content,
-        relevanceScore: r.score,
-        source: {
-          repository: r.metadata.repository,
-          filePath: r.metadata.filePath,
-          lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
-        },
-        codeType: r.metadata.codeType,
-        name: r.metadata.codeName,
-        isExported: r.metadata.isPublic,
-      })),
-      totalResults: results.length,
-      query,
-    });
+    return c.json(formatResults(results.matches, query));
   } catch (error) {
-    console.error("Search error:", error);
+    console.error("Search typescript error:", error);
     return c.json({ error: "Search failed" }, 500);
   }
 });
 
-// Search documentation
+// Search docs
 app.post("/v1/search/docs", async (c) => {
   try {
-    const body = await c.req.json();
-    const {
-      query,
-      limit = 10,
-      category = "all",
-    } = body as {
-      query: string;
-      limit?: number;
-      category?: string;
-    };
+    const body = await c.req.json<{ query: string; limit?: number }>();
 
+    const query = validateQuery(body.query);
     if (!query) {
-      return c.json({ error: "Query is required" }, 400);
+      return c.json({ error: "query is required (1-1000 chars)" }, 400);
     }
 
-    const filter: SearchFilter = { language: "markdown" };
-    if (category !== "all") {
-      filter.repository = "midnightntwrk/midnight-docs";
-    }
+    const limit = validateLimit(body.limit);
+    const embedding = await getEmbedding(query, c.env.OPENAI_API_KEY);
 
-    const results = await search(query, Math.min(limit, 50), filter);
-
-    return c.json({
-      results: results.map((r) => ({
-        content: r.content,
-        relevanceScore: r.score,
-        source: {
-          repository: r.metadata.repository,
-          filePath: r.metadata.filePath,
-          section: r.metadata.codeName,
-        },
-      })),
-      totalResults: results.length,
-      query,
-      category,
+    const results = await c.env.VECTORIZE.query(embedding, {
+      topK: limit,
+      returnMetadata: "all",
+      filter: { language: "markdown" },
     });
+
+    return c.json(formatResults(results.matches, query));
   } catch (error) {
-    console.error("Search error:", error);
+    console.error("Search docs error:", error);
     return c.json({ error: "Search failed" }, 500);
   }
 });
 
 // Stats endpoint
 app.get("/v1/stats", async (c) => {
-  try {
-    const stats = await getStats();
-    return c.json({
-      documentsIndexed: stats.count,
-      repositories: config.repositories.length,
-    });
-  } catch (error) {
-    return c.json({ error: "Failed to get stats" }, 500);
-  }
+  return c.json({
+    service: "midnight-mcp-api",
+    environment: c.env.ENVIRONMENT,
+    vectorize: "connected",
+  });
 });
 
-// Start server
-const validation = validateConfig();
-if (!validation.valid) {
-  console.error("Configuration errors:", validation.errors);
-  process.exit(1);
-}
-
-console.log(`Starting Midnight MCP API on port ${config.port}...`);
-serve({
-  fetch: app.fetch,
-  port: config.port,
-});
-console.log(`Server running at http://localhost:${config.port}`);
+export default app;

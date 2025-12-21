@@ -3,31 +3,31 @@ name: Index Repositories
 on:
   # Manual trigger
   workflow_dispatch:
-  
+
   # Weekly schedule (every Monday at 6am UTC)
   schedule:
-    - cron: '0 6 * * 1'
+    - cron: "0 6 * * 1"
 
 jobs:
   index:
     runs-on: ubuntu-latest
-    
+
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
-          cache-dependency-path: api-cloudflare/package-lock.json
-      
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: api/package-lock.json
+
       - name: Install dependencies
-        working-directory: api-cloudflare
+        working-directory: api
         run: npm ci
-      
+
       - name: Run indexing
-        working-directory: api-cloudflare
+        working-directory: api
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

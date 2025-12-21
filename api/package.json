@@ -1,29 +1,24 @@
 {
   "name": "midnight-mcp-api",
-  "version": "0.0.1",
-  "description": "Hosted API backend for Midnight MCP semantic search",
-  "type": "module",
-  "main": "dist/index.js",
+  "version": "1.0.0",
+  "private": true,
   "scripts": {
-    "dev": "tsx watch src/index.ts",
-    "build": "tsc",
-    "start": "node dist/index.js",
-    "index": "tsx src/scripts/index-repos.ts"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "create-index": "wrangler vectorize create midnight-code --dimensions=1536 --metric=cosine",
+    "delete-index": "wrangler vectorize delete midnight-code",
+    "index": "npx tsx scripts/index-repos.ts"
   },
   "dependencies": {
-    "hono": "^4.3.0",
-    "@hono/node-server": "^1.11.0",
-    "chromadb": "^1.8.1",
-    "openai": "^4.20.1",
-    "octokit": "^3.1.2",
-    "dotenv": "^16.3.1"
+    "hono": "^4.0.0"
   },
   "devDependencies": {
-    "@types/node": "^20.10.0",
-    "tsx": "^4.6.2",
-    "typescript": "^5.3.2"
-  },
-  "engines": {
-    "node": ">=20.0.0"
+    "@cloudflare/workers-types": "^4.20241205.0",
+    "dotenv": "^16.3.0",
+    "wrangler": "^3.99.0",
+    "typescript": "^5.3.0",
+    "tsx": "^4.6.0",
+    "openai": "^4.20.0",
+    "octokit": "^3.1.0"
   }
 }

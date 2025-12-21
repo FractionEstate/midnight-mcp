@@ -108,9 +108,23 @@ npm run build
 npm test
 ```
 
+### Testing with Local API
+
+To test against a local API server instead of production:
+
+```bash
+# Terminal 1: Start local API
+cd api
+npm install
+npm run dev  # Starts at http://localhost:8787
+
+# Terminal 2: Run MCP with local API
+MIDNIGHT_API_URL=http://localhost:8787 npm start
+```
+
 ### API Backend
 
-The hosted API lives in the `api/` folder. See [api/README.md](./api/README.md) for setup instructions.
+The hosted API runs on Cloudflare Workers + Vectorize. See [api/README.md](./api/README.md) for deployment and development instructions.
 
 ## License
 

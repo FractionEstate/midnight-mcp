@@ -1,50 +1,97 @@
-# Midnight MCP API
+# Midnight MCP API (Cloudflare Workers)
 
-Backend API for Midnight MCP semantic search.
+Cloudflare Workers + Vectorize backend for midnight-mcp semantic search.
 
-## Quick Start
+## Quick Start (Local Development)
 
 ```bash
-# Install dependencies
+cd api
 npm install
-
-# Set up environment
-cp .env.example .env
-# Add your OPENAI_API_KEY to .env
-
-# Start ChromaDB
-docker run -d -p 8000:8000 chromadb/chroma
-
-# Index repositories
-npm run index
-
-# Start server
-npm run dev
+npm run dev  # Starts local server at http://localhost:8787
 ```
 
-## Environment Variables
+Then in another terminal, test it:
 
-| Variable         | Required | Default   | Description                   |
-| ---------------- | -------- | --------- | ----------------------------- |
-| `OPENAI_API_KEY` | Yes      | -         | OpenAI API key for embeddings |
-| `GITHUB_TOKEN`   | No       | -         | GitHub token for indexing     |
-| `CHROMA_HOST`    | No       | localhost | ChromaDB host                 |
-| `CHROMA_PORT`    | No       | 8000      | ChromaDB port                 |
-| `PORT`           | No       | 3000      | Server port                   |
+```bash
+curl -X POST http://localhost:8787/v1/search/compact \
+  -H "Content-Type: application/json" \
+  -d '{"query": "token transfer", "limit": 5}'
+```
+
+> **Note:** Local dev uses Vectorize emulation. For full functionality, deploy to Cloudflare.
+
+## Full Setup (for deployment)
+
+### 1. Create Vectorize Index
+
+```bash
+npm run create-index
+```
+
+### 2. Add OpenAI API Key
+
+```bash
+npx wrangler secret put OPENAI_API_KEY
+# Enter your OpenAI API key when prompted
+```
+
+### 3. Index Repositories
+
+The indexing script loads from `../.env` automatically:
+
+```bash
+# Add to ../.env (project root):
+CLOUDFLARE_ACCOUNT_ID=your_account_id
+CLOUDFLARE_API_TOKEN=your_api_token
+OPENAI_API_KEY=your_openai_key
+GITHUB_TOKEN=your_github_token  # Optional, increases rate limit 60 → 5000 req/hr
+
+# Run indexing
+npm run index
+```
+
+### 4. Deploy
+
+```bash
+npm run deploy
+```
 
 ## Endpoints
 
-| Endpoint                | Method | Description            |
-| ----------------------- | ------ | ---------------------- |
-| `/health`               | GET    | Health check           |
-| `/v1/search/compact`    | POST   | Search Compact code    |
-| `/v1/search/typescript` | POST   | Search TypeScript code |
-| `/v1/search/docs`       | POST   | Search documentation   |
+| Endpoint                | Method | Description          |
+| ----------------------- | ------ | -------------------- |
+| `/health`               | GET    | Health check         |
+| `/v1/search`            | POST   | Generic search       |
+| `/v1/search/compact`    | POST   | Search Compact code  |
+| `/v1/search/typescript` | POST   | Search TypeScript    |
+| `/v1/search/docs`       | POST   | Search documentation |
 
-## Example
+### Request Format
 
-```bash
-curl -X POST http://localhost:3000/v1/search/compact \
-  -H "Content-Type: application/json" \
-  -d '{"query": "private state", "limit": 5}'
+```json
+{
+  "query": "your search query",
+  "limit": 10
+}
+```
+
+### Response Format
+
+```json
+{
+  "results": [
+    {
+      "content": "code or documentation content",
+      "relevanceScore": 0.85,
+      "source": {
+        "repository": "owner/repo",
+        "filePath": "path/to/file.ts",
+        "lines": "10-50"
+      },
+      "codeType": "compact|typescript|markdown"
+    }
+  ],
+  "query": "your search query",
+  "totalResults": 10
+}
 ```

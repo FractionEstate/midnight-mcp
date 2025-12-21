@@ -53,7 +53,7 @@ The hosted API for midnight-mcp runs on Cloudflare Workers with Vectorize for ve
 
 ## Components
 
-### Workers (`api-cloudflare/`)
+### Workers (`api/`)
 
 Serverless API handling search requests:
 
@@ -95,7 +95,7 @@ Repositories indexed:
 ### Setup
 
 ```bash
-cd api-cloudflare
+cd api
 
 # Install dependencies
 npm install
@@ -196,7 +196,7 @@ View logs and analytics:
 Re-run indexing when Midnight repos are updated:
 
 ```bash
-cd api-cloudflare
+cd api
 npm run index
 ```
 
