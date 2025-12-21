@@ -123,26 +123,42 @@ Add `"GITHUB_TOKEN": "ghp_..."` for higher GitHub API rate limits (60 → 5000 r
 
 ## Features
 
-### Tools (16)
+### Tools (19)
 
-| Tool                              | Description                             |
-| --------------------------------- | --------------------------------------- |
-| `midnight-search-compact`         | Search Compact contract code            |
-| `midnight-search-typescript`      | Search TypeScript SDK                   |
-| `midnight-search-docs`            | Search documentation                    |
-| `midnight-analyze-contract`       | Analyze contract structure and security |
-| `midnight-explain-circuit`        | Explain circuits in plain language      |
-| `midnight-get-file`               | Get files from Midnight repos           |
-| `midnight-list-examples`          | List example contracts                  |
-| `midnight-get-latest-updates`     | Recent repo changes                     |
-| `midnight-get-version-info`       | Get version and release info            |
-| `midnight-check-breaking-changes` | Check for breaking changes              |
-| `midnight-get-migration-guide`    | Migration guides between versions       |
-| `midnight-get-file-at-version`    | Get file at specific version            |
-| `midnight-compare-syntax`         | Compare files between versions          |
-| `midnight-get-latest-syntax`      | Latest syntax reference                 |
-| `midnight-health-check`           | Check server health status              |
-| `midnight-get-status`             | Get rate limits and cache stats         |
+| Tool                              | Description                                 |
+| --------------------------------- | ------------------------------------------- |
+| `midnight-search-compact`         | Search Compact contract code                |
+| `midnight-search-typescript`      | Search TypeScript SDK                       |
+| `midnight-search-docs`            | Search documentation                        |
+| `midnight-analyze-contract`       | Analyze contract structure and security     |
+| `midnight-explain-circuit`        | Explain circuits in plain language          |
+| `midnight-get-file`               | Get files from Midnight repos               |
+| `midnight-list-examples`          | List example contracts                      |
+| `midnight-get-latest-updates`     | Recent repo changes                         |
+| `midnight-get-version-info`       | Get version and release info                |
+| `midnight-check-breaking-changes` | Check for breaking changes                  |
+| `midnight-get-migration-guide`    | Migration guides between versions           |
+| `midnight-get-file-at-version`    | Get file at specific version                |
+| `midnight-compare-syntax`         | Compare files between versions              |
+| `midnight-get-latest-syntax`      | Latest syntax reference                     |
+| `midnight-health-check`           | Check server health status                  |
+| `midnight-get-status`             | Get rate limits and cache stats             |
+| `midnight-generate-contract` ✨   | AI-generate contracts from natural language |
+| `midnight-review-contract` ✨     | AI-powered security review of contracts     |
+| `midnight-document-contract` ✨   | AI-generate documentation for contracts     |
+
+> **✨ New AI-Powered Tools** require a client with [MCP Sampling](https://spec.modelcontextprotocol.io/specification/client/sampling/) support (e.g., Claude Desktop). Without sampling, these tools will return a helpful message instead.
+
+### Resource Templates (4)
+
+Dynamic access to any resource using URI templates:
+
+| Template                                | Description                    |
+| --------------------------------------- | ------------------------------ |
+| `midnight://code/{owner}/{repo}/{path}` | Any code file from any repo    |
+| `midnight://docs/{section}/{topic}`     | Documentation by section/topic |
+| `midnight://examples/{category}/{name}` | Example contracts by category  |
+| `midnight://schema/{type}`              | JSON schemas (AST, tx, proofs) |
 
 ### Resources (20)
 

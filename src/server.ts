@@ -7,6 +7,9 @@ import {
   ReadResourceRequestSchema,
   ListPromptsRequestSchema,
   GetPromptRequestSchema,
+  ListResourceTemplatesRequestSchema,
+  SubscribeRequestSchema,
+  UnsubscribeRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
 import { logger, formatErrorResponse } from "./utils/index.js";
@@ -19,6 +22,12 @@ import {
   getSchema,
 } from "./resources/index.js";
 import { promptDefinitions, generatePrompt } from "./prompts/index.js";
+import { registerSamplingCallback } from "./services/index.js";
+import type {
+  ResourceTemplate,
+  SamplingRequest,
+  SamplingResponse,
+} from "./types/index.js";
 
 // Server information
 const SERVER_INFO = {
@@ -27,13 +36,54 @@ const SERVER_INFO = {
   description: "MCP Server for Midnight Blockchain Development",
 };
 
+// Resource subscriptions tracking
+const resourceSubscriptions = new Set<string>();
+
+// Resource templates for parameterized resources (RFC 6570 URI Templates)
+const resourceTemplates: ResourceTemplate[] = [
+  {
+    uriTemplate: "midnight://code/{owner}/{repo}/{path}",
+    name: "Repository Code",
+    title: "📄 Repository Code Files",
+    description:
+      "Access code files from any Midnight repository by specifying owner, repo, and file path",
+    mimeType: "text/plain",
+  },
+  {
+    uriTemplate: "midnight://docs/{section}/{topic}",
+    name: "Documentation",
+    title: "📚 Documentation Sections",
+    description:
+      "Access documentation by section (guides, api, concepts) and topic",
+    mimeType: "text/markdown",
+  },
+  {
+    uriTemplate: "midnight://examples/{category}/{name}",
+    name: "Example Contracts",
+    title: "📝 Example Contracts",
+    description:
+      "Access example contracts by category (counter, bboard, token, voting) and name",
+    mimeType: "text/x-compact",
+  },
+  {
+    uriTemplate: "midnight://schema/{type}",
+    name: "Schema Definitions",
+    title: "🔧 Schema Definitions",
+    description:
+      "Access JSON schemas for contract AST, transactions, and proofs",
+    mimeType: "application/json",
+  },
+];
+
 /**
  * Create and configure the MCP server
  */
 export function createServer(): Server {
   const server = new Server(SERVER_INFO, {
     capabilities: {
-      tools: {},
+      tools: {
+        listChanged: true,
+      },
       resources: {
         subscribe: true,
         listChanged: true,
@@ -53,6 +103,12 @@ export function createServer(): Server {
   // Register prompt handlers
   registerPromptHandlers(server);
 
+  // Register subscription handlers
+  registerSubscriptionHandlers(server);
+
+  // Setup sampling callback if available
+  setupSampling(server);
+
   return server;
 }
 
@@ -60,7 +116,7 @@ export function createServer(): Server {
  * Register tool handlers
  */
 function registerToolHandlers(server: Server): void {
-  // List available tools
+  // List available tools with annotations and output schemas
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     logger.debug("Listing tools");
     return {
@@ -68,6 +124,10 @@ function registerToolHandlers(server: Server): void {
         name: tool.name,
         description: tool.description,
         inputSchema: tool.inputSchema,
+        // Include output schema if defined
+        ...(tool.outputSchema && { outputSchema: tool.outputSchema }),
+        // Include annotations if defined
+        ...(tool.annotations && { annotations: tool.annotations }),
       })),
     };
   });
@@ -141,6 +201,20 @@ function registerResourceHandlers(server: Server): void {
         name: resource.name,
         description: resource.description,
         mimeType: resource.mimeType,
+      })),
+    };
+  });
+
+  // List resource templates (RFC 6570 URI Templates)
+  server.setRequestHandler(ListResourceTemplatesRequestSchema, async () => {
+    logger.debug("Listing resource templates");
+    return {
+      resourceTemplates: resourceTemplates.map((template) => ({
+        uriTemplate: template.uriTemplate,
+        name: template.name,
+        title: template.title,
+        description: template.description,
+        mimeType: template.mimeType,
       })),
     };
   });
@@ -258,6 +332,114 @@ function registerPromptHandlers(server: Server): void {
       })),
     };
   });
+}
+
+/**
+ * Register resource subscription handlers
+ */
+function registerSubscriptionHandlers(server: Server): void {
+  // Handle subscribe requests
+  server.setRequestHandler(SubscribeRequestSchema, async (request) => {
+    const { uri } = request.params;
+    logger.info(`Subscribing to resource: ${uri}`);
+
+    // Validate that the URI is a valid resource
+    const validPrefixes = [
+      "midnight://docs/",
+      "midnight://code/",
+      "midnight://schema/",
+    ];
+    const isValid = validPrefixes.some((prefix) => uri.startsWith(prefix));
+
+    if (!isValid) {
+      logger.warn(`Invalid subscription URI: ${uri}`);
+      return {};
+    }
+
+    resourceSubscriptions.add(uri);
+    logger.debug(`Active subscriptions: ${resourceSubscriptions.size}`);
+
+    return {};
+  });
+
+  // Handle unsubscribe requests
+  server.setRequestHandler(UnsubscribeRequestSchema, async (request) => {
+    const { uri } = request.params;
+    logger.info(`Unsubscribing from resource: ${uri}`);
+
+    resourceSubscriptions.delete(uri);
+    logger.debug(`Active subscriptions: ${resourceSubscriptions.size}`);
+
+    return {};
+  });
+}
+
+/**
+ * Notify subscribers when a resource changes
+ * Call this when re-indexing or when docs are updated
+ */
+export function notifyResourceUpdate(server: Server, uri: string): void {
+  if (resourceSubscriptions.has(uri)) {
+    logger.info(`Notifying subscribers of update: ${uri}`);
+    // Send notification via the server
+    server.notification({
+      method: "notifications/resources/updated",
+      params: { uri },
+    });
+  }
+}
+
+/**
+ * Get the list of active subscriptions
+ */
+export function getActiveSubscriptions(): string[] {
+  return Array.from(resourceSubscriptions);
+}
+
+/**
+ * Setup sampling capability
+ * Registers a callback that allows the server to request LLM completions
+ */
+function setupSampling(server: Server): void {
+  // Create a sampling callback that uses the server's request method
+  const samplingCallback = async (
+    request: SamplingRequest
+  ): Promise<SamplingResponse> => {
+    logger.debug("Requesting sampling from client", {
+      messageCount: request.messages.length,
+      maxTokens: request.maxTokens,
+    });
+
+    try {
+      // Request completion from the client
+      const response = await server.request(
+        {
+          method: "sampling/createMessage",
+          params: {
+            messages: request.messages,
+            systemPrompt: request.systemPrompt,
+            maxTokens: request.maxTokens || 2048,
+            temperature: request.temperature,
+            modelPreferences: request.modelPreferences,
+          },
+        },
+        // Use a schema that matches the expected response
+        {
+          parse: (data: unknown) => data as SamplingResponse,
+          _def: { typeName: "SamplingResponse" },
+        } as never
+      );
+
+      return response;
+    } catch (error) {
+      logger.error("Sampling request failed", { error: String(error) });
+      throw error;
+    }
+  };
+
+  // Register the callback
+  registerSamplingCallback(samplingCallback);
+  logger.info("Sampling capability configured");
 }
 
 /**

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { parseCompactFile, CodeUnit } from "../pipeline/index.js";
 import { logger } from "../utils/index.js";
+import type { ExtendedToolDefinition, OutputSchema } from "../types/index.js";
 
 // Schema definitions
 export const AnalyzeContractInputSchema = z.object({
@@ -304,8 +305,115 @@ function getPrivacyConsiderations(circuit: CodeUnit): string[] {
   return considerations;
 }
 
+// Output schemas for analysis tools
+const analyzeContractOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string", description: "Contract name" },
+    summary: { type: "string", description: "Brief contract summary" },
+    ledgerState: {
+      type: "array",
+      description: "Ledger state fields",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          type: { type: "string" },
+          isPrivate: { type: "boolean" },
+        },
+      },
+    },
+    circuits: {
+      type: "array",
+      description: "Circuit definitions",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          isPublic: { type: "boolean" },
+          parameters: { type: "array", items: { type: "object" } },
+          purpose: { type: "string" },
+        },
+      },
+    },
+    witnesses: {
+      type: "array",
+      description: "Witness functions",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          returnType: { type: "string" },
+          purpose: { type: "string" },
+        },
+      },
+    },
+    securityFindings: {
+      type: "array",
+      description: "Security analysis findings",
+      items: {
+        type: "object",
+        properties: {
+          severity: {
+            type: "string",
+            enum: ["info", "warning", "error"],
+          },
+          message: { type: "string" },
+          suggestion: { type: "string" },
+        },
+      },
+    },
+    recommendations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Recommendations for improvement",
+    },
+  },
+  required: ["summary", "circuits"],
+  description: "Detailed contract analysis with security findings",
+};
+
+const explainCircuitOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    name: { type: "string", description: "Circuit name" },
+    type: {
+      type: "string",
+      description: "Type: circuit or witness",
+    },
+    isPublic: { type: "boolean", description: "Whether it's exported" },
+    plainEnglishExplanation: {
+      type: "string",
+      description: "Plain language explanation",
+    },
+    zkProofImplications: {
+      type: "string",
+      description: "Zero-knowledge proof implications",
+    },
+    privacyConsiderations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Privacy-related considerations",
+    },
+    parameters: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          type: { type: "string" },
+          description: { type: "string" },
+        },
+      },
+    },
+    returnType: { type: "string" },
+  },
+  required: ["name", "plainEnglishExplanation"],
+  description: "Detailed circuit explanation with privacy analysis",
+};
+
 // Tool definitions for MCP
-export const analyzeTools = [
+export const analyzeTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-analyze-contract",
     description:
@@ -324,6 +432,12 @@ export const analyzeTools = [
       },
       required: ["code"],
     },
+    outputSchema: analyzeContractOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Analyze Compact Contract",
+    },
     handler: analyzeContract,
   },
   {
@@ -339,6 +453,12 @@ export const analyzeTools = [
         },
       },
       required: ["circuitCode"],
+    },
+    outputSchema: explainCircuitOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Explain Circuit",
     },
     handler: explainCircuit,
   },

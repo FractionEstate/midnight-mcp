@@ -10,6 +10,7 @@ import {
   formatRateLimitStatus,
 } from "../utils/index.js";
 import { searchCache, fileCache, metadataCache } from "../utils/cache.js";
+import type { ExtendedToolDefinition, OutputSchema } from "../types/index.js";
 
 // Schema definitions
 export const HealthCheckInputSchema = z.object({
@@ -77,8 +78,69 @@ export async function getStatus(_input: GetStatusInput) {
   };
 }
 
+// Output schemas for health tools
+const healthCheckOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    status: {
+      type: "string",
+      enum: ["healthy", "degraded", "unhealthy"],
+      description: "Overall health status",
+    },
+    version: { type: "string", description: "Server version" },
+    rateLimit: {
+      type: "object",
+      properties: {
+        remaining: { type: "number" },
+        limit: { type: "number" },
+        percentUsed: { type: "number" },
+        status: { type: "string" },
+      },
+    },
+    cacheStats: {
+      type: "object",
+      properties: {
+        search: { type: "object" },
+        file: { type: "object" },
+        metadata: { type: "object" },
+      },
+    },
+  },
+  required: ["status"],
+  description: "Server health status with optional detailed diagnostics",
+};
+
+const getStatusOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    server: { type: "string", description: "Server name" },
+    status: { type: "string", description: "Running status" },
+    timestamp: { type: "string", description: "ISO timestamp" },
+    rateLimit: {
+      type: "object",
+      properties: {
+        remaining: { type: "number" },
+        limit: { type: "number" },
+        percentUsed: { type: "number" },
+        status: { type: "string" },
+        message: { type: "string" },
+      },
+    },
+    cache: {
+      type: "object",
+      properties: {
+        search: { type: "object" },
+        file: { type: "object" },
+        metadata: { type: "object" },
+      },
+    },
+  },
+  required: ["server", "status", "timestamp"],
+  description: "Current server status and statistics",
+};
+
 // Tool definitions for MCP server
-export const healthTools = [
+export const healthTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-health-check",
     description:
@@ -94,6 +156,12 @@ export const healthTools = [
         },
       },
     },
+    outputSchema: healthCheckOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Health Check",
+    },
     handler: healthCheck,
   },
   {
@@ -103,6 +171,12 @@ export const healthTools = [
     inputSchema: {
       type: "object" as const,
       properties: {},
+    },
+    outputSchema: getStatusOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Get Server Status",
     },
     handler: getStatus,
   },
