@@ -109,9 +109,9 @@ export function createUserError(error: unknown, context?: string): MCPError {
     );
   }
 
-  // Default error
+  // Default error - don't leak internal details
   return new MCPError(
-    `An error occurred${ctx}: ${message}`,
+    `An error occurred${ctx}`,
     "UNKNOWN_ERROR",
     "If this problem persists, please report it at https://github.com/Olanetsoft/midnight-mcp/issues"
   );

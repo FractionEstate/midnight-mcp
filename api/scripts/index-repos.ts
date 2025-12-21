@@ -18,18 +18,19 @@ config({ path: resolve(__dirname, "../../.env") });
 import { Octokit } from "octokit";
 import OpenAI from "openai";
 
-const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID!;
-const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN!;
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY!;
-const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
-
 const VECTORIZE_INDEX = "midnight-code";
+
+// Validate required environment variables
+const CLOUDFLARE_ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
+const CLOUDFLARE_API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 
 if (!CLOUDFLARE_ACCOUNT_ID || !CLOUDFLARE_API_TOKEN || !OPENAI_API_KEY) {
   console.error("Missing required environment variables:");
-  console.error("- CLOUDFLARE_ACCOUNT_ID");
-  console.error("- CLOUDFLARE_API_TOKEN");
-  console.error("- OPENAI_API_KEY");
+  if (!CLOUDFLARE_ACCOUNT_ID) console.error("- CLOUDFLARE_ACCOUNT_ID");
+  if (!CLOUDFLARE_API_TOKEN) console.error("- CLOUDFLARE_API_TOKEN");
+  if (!OPENAI_API_KEY) console.error("- OPENAI_API_KEY");
   process.exit(1);
 }
 
