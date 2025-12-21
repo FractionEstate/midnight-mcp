@@ -10,6 +10,11 @@ ENVIRONMENT = "production"
 binding = "VECTORIZE"
 index_name = "midnight-code"
 
+# KV namespace for metrics storage
+[[kv_namespaces]]
+binding = "METRICS"
+id = "adc06e61998c417684ee353791077992"
+
 # Rate limiting
 # [[unsafe.bindings]]
 # name = "RATE_LIMITER"

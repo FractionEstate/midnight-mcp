@@ -91,6 +91,8 @@ By default, the MCP uses a **hosted API** for semantic search:
 - ✅ **Semantic search** works immediately
 - ✅ **No API keys** needed
 
+> **📊 Quality Metrics**: To ensure the MCP stays accurate as Midnight's codebase evolves rapidly, we collect anonymous usage metrics (query counts, relevance scores) to monitor search quality. No query content or personal data is stored. This helps us identify when re-indexing is needed and improve results over time.
+
 ### Local Mode (Optional)
 
 Run everything locally for privacy or offline use:
