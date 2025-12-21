@@ -95,3 +95,53 @@ npm run deploy
   "totalResults": 10
 }
 ```
+
+## Indexing
+
+The indexing process downloads all Midnight repositories and indexes them into Cloudflare Vectorize.
+
+### Features
+
+- **Tarball download** — Downloads repo archives instead of cloning (10x faster)
+- **Batch embeddings** — Processes embeddings in parallel batches
+- **Incremental indexing** — Only re-indexes changed files (uses KV cache)
+- **Hybrid search** — Combines vector similarity with keyword boosting
+
+### Configuration
+
+| Setting | Value | Description |
+|---------|-------|-------------|
+| Chunk size | 1000 chars | Smaller chunks for precise results |
+| Chunk overlap | 200 chars | Context continuity between chunks |
+| Keyword boost | Up to 20% | Boosts exact matches in content/filepath |
+
+### Manual Re-indexing
+
+To force a full re-index (ignoring cache):
+
+1. Go to **Actions** → **Index Repositories**
+2. Click **Run workflow**
+3. Check **"Force full reindex (ignore cache)"**
+4. Click **Run workflow**
+
+This is useful when chunk settings change or you want fresh embeddings.
+
+### Automated Triggers
+
+- **Daily**: Runs at 6am UTC
+- **On release**: Webhook trigger via `repository_dispatch`
+- **Manual**: Via GitHub Actions UI
+
+## Dashboard
+
+View search quality metrics at:
+
+```
+https://midnight-mcp-api.midnightmcp.workers.dev/dashboard
+```
+
+Shows:
+- Query volume (24h / 7d / 30d)
+- Average relevance scores
+- Quality distribution (High/Medium/Low)
+- Top queries and search trends

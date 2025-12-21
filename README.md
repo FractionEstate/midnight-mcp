@@ -190,6 +190,16 @@ MIDNIGHT_API_URL=http://localhost:8787 npm start
 
 The hosted API runs on Cloudflare Workers + Vectorize. See [api/README.md](./api/README.md) for deployment and development instructions.
 
+### Search Quality
+
+The API uses several techniques to improve search relevance:
+
+- **Optimized chunking** — 1000-char chunks with 200-char overlap for precise, contextual results
+- **Hybrid search** — Combines vector similarity with keyword boosting (up to 20% boost for exact matches)
+- **Incremental indexing** — Daily updates via tarball download + batch embeddings (~5 min)
+
+View live metrics at the [Dashboard](https://midnight-mcp-api.midnightmcp.workers.dev/dashboard).
+
 ## License
 
 MIT
