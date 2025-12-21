@@ -164,6 +164,8 @@ async function getRepoFiles(
         if (item.type === "dir") {
           if (!["node_modules", "dist", "build", ".git"].includes(item.name)) {
             await fetchDir(item.path);
+            // Small delay between directory fetches to avoid rate limits
+            await sleep(100);
           }
         } else if (item.type === "file") {
           const ext = item.name.substring(item.name.lastIndexOf("."));
@@ -187,6 +189,10 @@ async function getRepoFiles(
                 fileCount++;
                 if (fileCount % 50 === 0) {
                   process.stdout.write(`\r    ${fileCount} files fetched...`);
+                }
+                // Delay every 10 files to stay well under rate limit
+                if (fileCount % 10 === 0) {
+                  await sleep(200);
                 }
               }
             } catch (e: any) {
@@ -348,7 +354,30 @@ interface IndexResult {
 async function main() {
   console.log("Starting Midnight repository indexing...");
   console.log(`Target: Cloudflare Vectorize index '${VECTORIZE_INDEX}'`);
-  console.log(`Time: ${new Date().toISOString()}\n`);
+  console.log(`Time: ${new Date().toISOString()}`);
+  console.log(`Repos to index: ${REPOSITORIES.length}\n`);
+
+  // Check rate limit before starting
+  try {
+    const { data: rateLimit } = await octokit.rest.rateLimit.get();
+    const remaining = rateLimit.rate.remaining;
+    const resetTime = new Date(rateLimit.rate.reset * 1000);
+    console.log(
+      `GitHub API rate limit: ${remaining}/${rateLimit.rate.limit} remaining`
+    );
+    console.log(`Resets at: ${resetTime.toISOString()}\n`);
+
+    if (remaining < 500) {
+      console.warn(`⚠️  Low rate limit! Waiting until reset...`);
+      const waitMs = rateLimit.rate.reset * 1000 - Date.now() + 5000;
+      if (waitMs > 0) {
+        console.log(`   Waiting ${Math.ceil(waitMs / 60000)} minutes...`);
+        await sleep(waitMs);
+      }
+    }
+  } catch (e) {
+    console.warn("Could not check rate limit, proceeding anyway...");
+  }
 
   const results: IndexResult[] = [];
   let totalDocs = 0;
@@ -364,6 +393,12 @@ async function main() {
         documents: result.documents,
       });
       totalDocs += result.documents;
+
+      // Delay between repos to spread out GitHub API usage
+      console.log(
+        `  ⏳ Waiting 30s before next repo to respect rate limits...`
+      );
+      await sleep(30000);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : String(error);
       console.error(`\n❌ Failed to index ${repoName}: ${errorMsg}`);
