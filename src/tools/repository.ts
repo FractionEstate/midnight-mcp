@@ -220,8 +220,12 @@ const EXAMPLES: ExampleDefinition[] = [
 /**
  * Resolve repository name alias to owner/repo
  */
-function resolveRepo(repoName: string): { owner: string; repo: string } | null {
-  const normalized = repoName.toLowerCase().replace(/^midnightntwrk\//, "");
+function resolveRepo(
+  repoName?: string
+): { owner: string; repo: string } | null {
+  // Default to compact if not provided
+  const name = repoName || "compact";
+  const normalized = name.toLowerCase().replace(/^midnightntwrk\//, "");
   const alias = REPO_ALIASES[normalized];
   if (alias) return alias;
 
@@ -233,8 +237,8 @@ function resolveRepo(repoName: string): { owner: string; repo: string } | null {
   }
 
   // Assume it's a full org/repo name
-  if (repoName.includes("/")) {
-    const [owner, repo] = repoName.split("/");
+  if (name.includes("/")) {
+    const [owner, repo] = name.split("/");
     return { owner, repo };
   }
 
