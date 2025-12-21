@@ -16,7 +16,8 @@
 
 import { config } from "dotenv";
 import { resolve } from "path";
-import * as tar from "tar";
+import * as tarStream from "tar-stream";
+import { createGunzip } from "zlib";
 import { Readable } from "stream";
 import { createHash } from "crypto";
 
@@ -288,29 +289,17 @@ async function getRepoFilesFast(
     `  📦 Downloaded ${(buffer.length / 1024 / 1024).toFixed(2)} MB, extracting...`
   );
 
-  // Parse tarball in memory
+  // Parse tarball in memory using tar-stream
   return new Promise((resolve, reject) => {
     const entries: Array<{ path: string; content: string }> = [];
 
-    const extract = tar.extract();
+    const extract = tarStream.extract();
 
     extract.on("entry", (header, stream, next) => {
-      // Handle cases where stream is undefined
-      if (!stream) {
-        next();
-        return;
-      }
-
       const chunks: Buffer[] = [];
 
       // Remove the repo-branch prefix from path (e.g., "compact-main/src/..." -> "src/...")
-      const fullPath = header.path || header.name || "";
-      if (!fullPath) {
-        stream.on("end", next);
-        stream.resume();
-        return;
-      }
-
+      const fullPath = header.name || "";
       const pathParts = fullPath.split("/");
       pathParts.shift(); // Remove first segment (repo-branch)
       const relativePath = pathParts.join("/");
@@ -340,10 +329,12 @@ async function getRepoFilesFast(
           }
           next();
         });
+        stream.on("error", next);
       } else {
+        // Drain the stream and move to next entry
         stream.on("end", next);
+        stream.resume();
       }
-      stream.resume();
     });
 
     extract.on("finish", () => {
@@ -356,7 +347,6 @@ async function getRepoFilesFast(
     extract.on("error", reject);
 
     // Pipe buffer through gunzip then tar extract
-    const { createGunzip } = require("zlib");
     const gunzip = createGunzip();
 
     const readable = new Readable();
