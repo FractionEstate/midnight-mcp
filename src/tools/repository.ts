@@ -2,6 +2,7 @@ import { z } from "zod";
 import { githubClient, GitHubCommit } from "../pipeline/index.js";
 import { releaseTracker } from "../pipeline/releases.js";
 import { logger, DEFAULT_REPOSITORIES } from "../utils/index.js";
+import type { ExtendedToolDefinition } from "../types/index.js";
 
 // Schema definitions
 export const GetFileInputSchema = z.object({
@@ -639,7 +640,7 @@ export async function getLatestSyntax(input: GetLatestSyntaxInput) {
 }
 
 // Tool definitions for MCP
-export const repositoryTools = [
+export const repositoryTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-get-file",
     description:
@@ -663,6 +664,11 @@ export const repositoryTools = [
       },
       required: ["repo", "path"],
     },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Get Repository File",
+    },
     handler: getFile,
   },
   {
@@ -679,6 +685,11 @@ export const repositoryTools = [
         },
       },
       required: [],
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "List Example Contracts",
     },
     handler: listExamples,
   },
@@ -702,6 +713,11 @@ export const repositoryTools = [
       },
       required: [],
     },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Get Latest Updates",
+    },
     handler: getLatestUpdates,
   },
   {
@@ -718,6 +734,11 @@ export const repositoryTools = [
         },
       },
       required: ["repo"],
+    },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Get Version Info",
     },
     handler: getVersionInfo,
   },
@@ -739,6 +760,11 @@ export const repositoryTools = [
         },
       },
       required: ["repo", "currentVersion"],
+    },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Check Breaking Changes",
     },
     handler: checkBreakingChanges,
   },
@@ -764,6 +790,11 @@ export const repositoryTools = [
       },
       required: ["repo", "fromVersion"],
     },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Get Migration Guide",
+    },
     handler: getMigrationGuide,
   },
   {
@@ -787,6 +818,12 @@ export const repositoryTools = [
         },
       },
       required: ["repo", "path", "version"],
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: true,
+      title: "Get File at Version",
     },
     handler: getFileAtVersion,
   },
@@ -816,6 +853,12 @@ export const repositoryTools = [
       },
       required: ["repo", "path", "oldVersion"],
     },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: true,
+      title: "Compare Syntax Between Versions",
+    },
     handler: compareSyntax,
   },
   {
@@ -831,6 +874,11 @@ export const repositoryTools = [
         },
       },
       required: [],
+    },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true,
+      title: "Get Latest Syntax Reference",
     },
     handler: getLatestSyntax,
   },

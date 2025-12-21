@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { parseCompactFile, CodeUnit } from "../pipeline/index.js";
 import { logger } from "../utils/index.js";
+import type { ExtendedToolDefinition, OutputSchema } from "../types/index.js";
 
 // Schema definitions
 export const AnalyzeContractInputSchema = z.object({
@@ -304,8 +305,153 @@ function getPrivacyConsiderations(circuit: CodeUnit): string[] {
   return considerations;
 }
 
+// Output schemas for analysis tools - aligned with actual function return types
+const analyzeContractOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    summary: {
+      type: "object",
+      description: "Summary statistics of the contract",
+      properties: {
+        hasLedger: { type: "boolean" },
+        hasCircuits: { type: "boolean" },
+        hasWitnesses: { type: "boolean" },
+        totalLines: { type: "number" },
+        publicCircuits: { type: "number" },
+        privateCircuits: { type: "number" },
+        publicState: { type: "number" },
+        privateState: { type: "number" },
+      },
+    },
+    structure: {
+      type: "object",
+      description: "Contract structure breakdown",
+      properties: {
+        imports: { type: "array", items: { type: "string" } },
+        exports: { type: "array", items: { type: "string" } },
+        ledger: {
+          type: "array",
+          description: "Ledger state fields",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              type: { type: "string" },
+              isPrivate: { type: "boolean" },
+            },
+          },
+        },
+        circuits: {
+          type: "array",
+          description: "Circuit definitions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              isPublic: { type: "boolean" },
+              parameters: { type: "array", items: { type: "object" } },
+              returnType: { type: "string" },
+            },
+          },
+        },
+        witnesses: {
+          type: "array",
+          description: "Witness functions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              parameters: { type: "array", items: { type: "object" } },
+              returnType: { type: "string" },
+            },
+          },
+        },
+        types: {
+          type: "array",
+          description: "Type definitions",
+          items: {
+            type: "object",
+            properties: {
+              name: { type: "string" },
+              definition: { type: "string" },
+            },
+          },
+        },
+      },
+    },
+    securityFindings: {
+      type: "array",
+      description: "Security analysis findings",
+      items: {
+        type: "object",
+        properties: {
+          severity: {
+            type: "string",
+            enum: ["info", "warning", "error"],
+          },
+          message: { type: "string" },
+          suggestion: { type: "string" },
+        },
+      },
+    },
+    recommendations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Recommendations for improvement",
+    },
+  },
+  required: ["summary", "structure", "securityFindings", "recommendations"],
+  description: "Detailed contract analysis with security findings",
+};
+
+const explainCircuitOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    circuitName: { type: "string", description: "Circuit name" },
+    isPublic: { type: "boolean", description: "Whether it's exported" },
+    parameters: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          name: { type: "string" },
+          type: { type: "string" },
+        },
+      },
+      description: "Circuit parameters",
+    },
+    returnType: { type: "string", description: "Return type" },
+    explanation: {
+      type: "string",
+      description: "Plain language explanation",
+    },
+    operations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Operations performed by the circuit",
+    },
+    zkImplications: {
+      type: "array",
+      items: { type: "string" },
+      description: "Zero-knowledge proof implications",
+    },
+    privacyConsiderations: {
+      type: "array",
+      items: { type: "string" },
+      description: "Privacy-related considerations",
+    },
+  },
+  required: [
+    "circuitName",
+    "explanation",
+    "zkImplications",
+    "privacyConsiderations",
+  ],
+  description: "Detailed circuit explanation with privacy analysis",
+};
+
 // Tool definitions for MCP
-export const analyzeTools = [
+export const analyzeTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-analyze-contract",
     description:
@@ -324,6 +470,12 @@ export const analyzeTools = [
       },
       required: ["code"],
     },
+    outputSchema: analyzeContractOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Analyze Compact Contract",
+    },
     handler: analyzeContract,
   },
   {
@@ -339,6 +491,12 @@ export const analyzeTools = [
         },
       },
       required: ["circuitCode"],
+    },
+    outputSchema: explainCircuitOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "Explain Circuit",
     },
     handler: explainCircuit,
   },

@@ -28,15 +28,27 @@ export type {
 export { healthTools, healthCheck, getStatus } from "./health.js";
 export type { HealthCheckInput, GetStatusInput } from "./health.js";
 
+export { generationTools, generationHandlers } from "./generation.js";
+
+// Re-export types
+export type {
+  ExtendedToolDefinition,
+  ToolAnnotations,
+  OutputSchema,
+} from "../types/index.js";
+
 // Combined tool list for MCP server
 import { searchTools } from "./search.js";
 import { analyzeTools } from "./analyze.js";
 import { repositoryTools } from "./repository.js";
 import { healthTools } from "./health.js";
+import { generationTools } from "./generation.js";
+import type { ExtendedToolDefinition } from "../types/index.js";
 
-export const allTools = [
+export const allTools: ExtendedToolDefinition[] = [
   ...searchTools,
   ...analyzeTools,
   ...repositoryTools,
   ...healthTools,
+  ...generationTools,
 ];

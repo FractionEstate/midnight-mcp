@@ -11,6 +11,71 @@ import {
   searchTypeScriptHosted,
   searchDocsHosted,
 } from "../utils/index.js";
+import type {
+  ExtendedToolDefinition,
+  ToolAnnotations,
+  OutputSchema,
+} from "../types/index.js";
+
+// ============================================================================
+// Common Output Schema for Search Results
+// ============================================================================
+
+const searchResultSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    results: {
+      type: "array",
+      description: "Array of search results",
+      items: {
+        type: "object",
+        properties: {
+          code: { type: "string", description: "The matched code content" },
+          relevanceScore: {
+            type: "number",
+            description: "Relevance score from 0 to 1",
+          },
+          source: {
+            type: "object",
+            description: "Source location information",
+            properties: {
+              repository: { type: "string", description: "Repository name" },
+              filePath: { type: "string", description: "File path" },
+              lines: {
+                type: "string",
+                description: "Line range (e.g., 10-50)",
+              },
+            },
+          },
+          codeType: {
+            type: "string",
+            description: "Type of code (compact, typescript, markdown)",
+          },
+          name: { type: "string", description: "Name of the code element" },
+        },
+      },
+    },
+    totalResults: {
+      type: "number",
+      description: "Total number of results returned",
+    },
+    query: { type: "string", description: "The search query used" },
+    warnings: {
+      type: "array",
+      description: "Any warnings about the search",
+      items: { type: "string" },
+    },
+  },
+  required: ["results", "totalResults", "query"],
+  description: "Search results with relevance scores and source information",
+};
+
+// Common annotations for search tools
+const searchToolAnnotations: ToolAnnotations = {
+  readOnlyHint: true,
+  idempotentHint: true,
+  openWorldHint: true,
+};
 
 // ============================================================================
 // Common Search Infrastructure
@@ -385,7 +450,7 @@ export async function searchDocs(input: SearchDocsInput) {
 }
 
 // Tool definitions for MCP
-export const searchTools = [
+export const searchTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-search-compact",
     description:
@@ -411,6 +476,11 @@ export const searchTools = [
         },
       },
       required: ["query"],
+    },
+    outputSchema: searchResultSchema,
+    annotations: {
+      ...searchToolAnnotations,
+      title: "Search Compact Contracts",
     },
     handler: searchCompact,
   },
@@ -440,6 +510,11 @@ export const searchTools = [
       },
       required: ["query"],
     },
+    outputSchema: searchResultSchema,
+    annotations: {
+      ...searchToolAnnotations,
+      title: "Search TypeScript SDK",
+    },
     handler: searchTypeScript,
   },
   {
@@ -464,6 +539,11 @@ export const searchTools = [
         },
       },
       required: ["query"],
+    },
+    outputSchema: searchResultSchema,
+    annotations: {
+      ...searchToolAnnotations,
+      title: "Search Documentation",
     },
     handler: searchDocs,
   },
