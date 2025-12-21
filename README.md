@@ -36,6 +36,13 @@ Add to your `claude_desktop_config.json`:
 
 ### Cursor
 
+**Click the button to auto install the MCP for Cursor**
+
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcCJ9)
+
+---
+**Manual setup instructions are below if you need them:**
+
 Add to Cursor's MCP settings (Settings → MCP → Add Server):
 
 ```json
@@ -61,6 +68,8 @@ Or add to `.cursor/mcp.json` in your project:
   }
 }
 ```
+
+
 
 ### Windsurf
 
