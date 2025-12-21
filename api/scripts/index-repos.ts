@@ -173,13 +173,12 @@ const SKIP_DIRS = new Set([
   // Dependencies
   "vendor",
 
-  // Docs redundancy
+  // Docs redundancy (keep versioned docs out, but include blog)
   "versioned_docs",
   "versioned_sidebars",
   "i18n",
   "static",
   "static-html",
-  "blog",
   "plugins",
 
   // Rust specific
@@ -202,7 +201,6 @@ const SKIP_DIRS = new Set([
   ".changeset",
   "infra",
   "mips",
-  "docs/api",
 ]);
 
 // ============== KV CACHE FOR INCREMENTAL INDEXING ==============
