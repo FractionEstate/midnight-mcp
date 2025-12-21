@@ -75,26 +75,6 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 }
 ```
 
-### Continue.dev
-
-Add to `~/.continue/config.json`:
-
-```json
-{
-  "experimental": {
-    "modelContextProtocolServers": [
-      {
-        "transport": {
-          "type": "stdio",
-          "command": "npx",
-          "args": ["-y", "midnight-mcp"]
-        }
-      }
-    ]
-  }
-}
-```
-
 ---
 
 Restart your editor after adding the config. All features work out of the box—no API keys or setup required.
