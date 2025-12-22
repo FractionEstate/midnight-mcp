@@ -49,6 +49,13 @@ export const REPO_ALIASES: Record<string, { owner: string; repo: string }> = {
     owner: "midnightntwrk",
     repo: "compact-tree-sitter",
   },
+  "tree-sitter": { owner: "midnightntwrk", repo: "compact-tree-sitter" },
+  "setup-compact-action": {
+    owner: "midnightntwrk",
+    repo: "setup-compact-action",
+  },
+  "setup-compact": { owner: "midnightntwrk", repo: "setup-compact-action" },
+  "compact-action": { owner: "midnightntwrk", repo: "setup-compact-action" },
 
   // Community
   "midnight-awesome-dapps": {

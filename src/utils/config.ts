@@ -187,6 +187,13 @@ export const DEFAULT_REPOSITORIES: RepositoryConfig[] = [
     patterns: ["**/*.js", "**/*.md", "**/*.scm"],
     exclude: ["node_modules/**"],
   },
+  {
+    owner: "midnightntwrk",
+    repo: "setup-compact-action",
+    branch: "main",
+    patterns: ["**/*.ts", "**/*.js", "**/*.md", "**/*.yml", "**/*.yaml"],
+    exclude: ["node_modules/**", "dist/**"],
+  },
 
   // Community
   {
