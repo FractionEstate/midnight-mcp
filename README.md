@@ -41,6 +41,7 @@ Add to your `claude_desktop_config.json`:
 [![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcCJ9)
 
 ---
+
 **Manual setup instructions are below if you need them:**
 
 Add to Cursor's MCP settings (Settings → MCP → Add Server):
@@ -68,8 +69,6 @@ Or add to `.cursor/mcp.json` in your project:
   }
 }
 ```
-
-
 
 ### Windsurf
 
@@ -169,11 +168,23 @@ Dynamic access to any resource using URI templates:
 | `midnight://examples/{category}/{name}` | Example contracts by category  |
 | `midnight://schema/{type}`              | JSON schemas (AST, tx, proofs) |
 
-### Resources (20)
+### Embedded Resources (9)
 
-- `midnight://docs/*` — Documentation (Compact reference, SDK API, ZK concepts)
-- `midnight://code/*` — Examples, patterns, and templates
-- `midnight://schema/*` — AST, transaction, and proof schemas
+Curated documentation that's always available without network calls:
+
+| URI                                     | Description                             |
+| --------------------------------------- | --------------------------------------- |
+| `midnight://docs/compact-reference`     | Compact syntax quick reference          |
+| `midnight://docs/sdk-api`               | TypeScript SDK API reference            |
+| `midnight://docs/openzeppelin`          | OpenZeppelin Compact contracts overview |
+| `midnight://docs/openzeppelin/token`    | FungibleToken standard                  |
+| `midnight://docs/openzeppelin/access`   | Access control patterns                 |
+| `midnight://docs/openzeppelin/security` | Security patterns (Pausable)            |
+| `midnight://docs/tokenomics`            | NIGHT/DUST tokenomics summary           |
+| `midnight://docs/wallet-integration`    | DApp Connector API guide                |
+| `midnight://docs/common-errors`         | Common errors & troubleshooting         |
+
+> **Note:** For comprehensive docs (glossary, Zswap, Kachina, etc.), use the `midnight-search-docs` tool which queries the full indexed documentation.
 
 ### Prompts (5)
 
@@ -217,7 +228,26 @@ The hosted API runs on Cloudflare Workers + Vectorize. See [api/README.md](./api
 
 ### Search Quality
 
-The API indexes **25 Midnight repositories** including core infrastructure, SDK, examples, ZK libraries, and developer tools.
+The API indexes **16 Midnight repositories** including core infrastructure, SDK, examples, and developer tools:
+
+| Repository                       | Description                                    |
+| -------------------------------- | ---------------------------------------------- |
+| `compact`                        | Compact language compiler and standard library |
+| `midnight-js`                    | TypeScript SDK                                 |
+| `midnight-docs`                  | Official documentation                         |
+| `example-counter`                | Simple counter DApp example                    |
+| `example-bboard`                 | Bulletin board DApp example                    |
+| `example-dex`                    | DEX DApp example                               |
+| `create-mn-app`                  | Project scaffolding CLI                        |
+| `midnight-wallet`                | Wallet implementation                          |
+| `midnight-indexer`               | Blockchain indexer                             |
+| `midnight-node-docker`           | Node Docker setup                              |
+| `midnight-dapp-connector-api`    | Wallet connector API                           |
+| `compact-tree-sitter`            | Syntax highlighting support                    |
+| `setup-compact-action`           | GitHub Action for CI/CD                        |
+| `midnight-awesome-dapps`         | Curated DApp list                              |
+| `contributor-hub`                | Contributor resources                          |
+| `OpenZeppelin/compact-contracts` | OpenZeppelin Compact library                   |
 
 Search quality techniques:
 
@@ -230,6 +260,29 @@ View live metrics at the [Dashboard](https://midnight-mcp-api.midnightmcp.worker
 ## License
 
 MIT
+
+## Changelog
+
+### v0.1.7
+
+- Added `setup-compact-action` repository to indexed sources
+- New aliases: `setup-compact`, `compact-action`, `tree-sitter`
+
+### v0.1.6
+
+- Fixed bug where tools crashed with "Cannot read properties of undefined" when repo param was omitted
+
+### v0.1.5
+
+- Added `common-errors` embedded resource with verified troubleshooting guide
+- Added comprehensive search tool tests
+- Refactored to follow MCP best practices (tools over embedded knowledge)
+
+### v0.1.4
+
+- Initial stable release with 19 tools, 9 embedded resources, 5 prompts
+- Hosted API with zero-config semantic search
+- Support for Claude Desktop, Cursor, and Windsurf
 
 ## Links
 
