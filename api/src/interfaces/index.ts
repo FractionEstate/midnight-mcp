@@ -9,6 +9,7 @@ export type Bindings = {
   OPENAI_API_KEY: string;
   ENVIRONMENT: string;
   METRICS: KVNamespace;
+  DASHBOARD_PASSWORD?: string;
 };
 
 // ============== Metrics Types ==============

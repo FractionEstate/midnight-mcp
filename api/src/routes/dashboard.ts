@@ -9,6 +9,23 @@ import { generateDashboardHtml } from "../templates/dashboard";
 
 const dashboardRoute = new Hono<{ Bindings: Bindings }>();
 
+// Password protection middleware
+dashboardRoute.use("*", async (c, next) => {
+  const password = c.env.DASHBOARD_PASSWORD;
+  if (!password) {
+    // No password set, allow access (for local dev)
+    return next();
+  }
+
+  // Check password from query param: /dashboard?p=yourpassword
+  const providedPassword = c.req.query("p");
+  if (providedPassword !== password) {
+    return c.text("Unauthorized. Use ?p=password", 401);
+  }
+
+  return next();
+});
+
 // Dashboard HTML page - viewable in browser
 dashboardRoute.get("/", async (c) => {
   await loadMetrics(c.env.METRICS);
