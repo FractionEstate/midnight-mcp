@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.9] - 2025-01-24
+
+### Fixed
+
+- **Permanent fix for undefined repo parameter**: All repository handlers now safely default to "compact" when repo param is undefined/empty
+- Fixed toLowerCase error in `midnight-get-latest-syntax`, `midnight-get-version-info`, `midnight-check-breaking-changes`, `midnight-get-migration-guide`, `midnight-get-file-at-version`, and `midnight-compare-syntax` tools
+- Handlers now use defensive coding pattern with `input?.repo || "compact"`
+
 ## [0.1.1] - 2025-12-21
 
 ### Fixed

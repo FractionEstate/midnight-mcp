@@ -191,9 +191,11 @@ export async function getLatestUpdates(input: GetLatestUpdatesInput) {
  * Get version and release info for a repository
  */
 export async function getVersionInfo(input: GetVersionInfoInput) {
-  logger.debug("Getting version info", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Getting version info", { repo: repoName });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
       `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
@@ -230,12 +232,17 @@ export async function getVersionInfo(input: GetVersionInfoInput) {
  * Check for breaking changes since a specific version
  */
 export async function checkBreakingChanges(input: CheckBreakingChangesInput) {
-  logger.debug("Checking breaking changes", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Checking breaking changes", {
+    repo: repoName,
+    currentVersion: input.currentVersion,
+  });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
-      `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
+      `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
   }
 
@@ -271,12 +278,18 @@ export async function checkBreakingChanges(input: CheckBreakingChangesInput) {
  * Get migration guide between versions
  */
 export async function getMigrationGuide(input: GetMigrationGuideInput) {
-  logger.debug("Getting migration guide", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Getting migration guide", {
+    repo: repoName,
+    fromVersion: input.fromVersion,
+    toVersion: input.toVersion,
+  });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
-      `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
+      `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
   }
 
@@ -313,12 +326,18 @@ export async function getMigrationGuide(input: GetMigrationGuideInput) {
  * Get a file at a specific version - critical for version-accurate recommendations
  */
 export async function getFileAtVersion(input: GetFileAtVersionInput) {
-  logger.debug("Getting file at version", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Getting file at version", {
+    repo: repoName,
+    path: input.path,
+    version: input.version,
+  });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
-      `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
+      `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
   }
 
@@ -331,7 +350,7 @@ export async function getFileAtVersion(input: GetFileAtVersionInput) {
 
   if (!result) {
     throw new Error(
-      `File not found: ${input.path} at version ${input.version} in ${input.repo}`
+      `File not found: ${input.path} at version ${input.version} in ${repoName}`
     );
   }
 
@@ -348,12 +367,18 @@ export async function getFileAtVersion(input: GetFileAtVersionInput) {
  * Compare syntax between two versions - shows what changed
  */
 export async function compareSyntax(input: CompareSyntaxInput) {
-  logger.debug("Comparing syntax between versions", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Comparing syntax between versions", {
+    repo: repoName,
+    oldVersion: input.oldVersion,
+    newVersion: input.newVersion,
+  });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
-      `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
+      `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
   }
 
@@ -397,12 +422,14 @@ export async function compareSyntax(input: CompareSyntaxInput) {
  * This is the source of truth for writing valid, compilable contracts
  */
 export async function getLatestSyntax(input: GetLatestSyntaxInput) {
-  logger.debug("Getting latest syntax reference", input);
+  // Ensure repo defaults to compact if undefined/empty
+  const repoName = input?.repo || "compact";
+  logger.debug("Getting latest syntax reference", { repo: repoName });
 
-  const resolved = resolveRepo(input.repo);
+  const resolved = resolveRepo(repoName);
   if (!resolved) {
     throw new Error(
-      `Unknown repository: ${input.repo}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
+      `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
   }
 
