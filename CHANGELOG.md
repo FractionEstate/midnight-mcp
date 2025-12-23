@@ -15,15 +15,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Tool Categories** for progressive disclosure:
   - `search`, `analyze`, `repository`, `versioning`, `generation`, `health`, `compound`
   - Enables clients to group/filter tools by domain
+- **Discovery Meta-Tools** for progressive exploration:
+  - `midnight-list-tool-categories`: List all 7 categories with descriptions
+  - `midnight-list-category-tools`: Drill into a category to see its tools
 - **Enhanced Tool Annotations**:
   - `destructiveHint`: Marks tools that perform irreversible actions
   - `requiresConfirmation`: Marks tools requiring human confirmation
   - `category`: Tool category for UI grouping
+- **LLM Self-Correction Hints** in error responses:
+  - Structured errors with `correction` field for AI retry logic
+  - Specific hints for unknown repos, invalid versions, missing params
+  - Alternative suggestions when sampling not available
 
 ### Changed
 
-- All 21 tools now include category annotations
+- All 23 tools now include category annotations (19 original + 2 compound + 2 meta)
 - Compound tools marked with ⚡ emoji for visibility
+- Discovery tools marked with 📋 emoji
 - Improved upgrade recommendations with urgency levels (none/low/medium/high/critical)
 
 ## [0.1.9] - 2025-12-23
