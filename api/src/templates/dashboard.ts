@@ -90,6 +90,14 @@ function getDashboardStyles(): string {
     .empty { color: var(--muted); text-align: center; padding: 32px; font-size: 14px; }
     .full-width { grid-column: 1 / -1; }
     
+    /* Tooltip styles */
+    .has-tooltip { position: relative; cursor: help; }
+    .has-tooltip .tooltip { visibility: hidden; opacity: 0; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #2a2a2a; color: var(--text); padding: 8px 12px; border-radius: 6px; font-size: 12px; font-weight: 400; white-space: nowrap; z-index: 100; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,.3); margin-bottom: 8px; max-width: 280px; white-space: normal; text-align: left; line-height: 1.4; }
+    .has-tooltip .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: #2a2a2a; }
+    .has-tooltip:hover .tooltip { visibility: visible; opacity: 1; }
+    .metric-label.has-tooltip { display: inline-flex; align-items: center; gap: 4px; }
+    .info-icon { width: 14px; height: 14px; border-radius: 50%; background: var(--border); display: inline-flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 600; color: var(--muted); }
+    
     /* Mobile responsiveness */
     @media (max-width: 768px) {
       body { padding: 16px; }
@@ -142,15 +150,27 @@ function generateMetricsContent(
     <div class="metrics">
       <div class="metric">
         <div class="metric-value">${metrics.totalQueries.toLocaleString()}</div>
-        <div class="metric-label">Total Queries</div>
+        <div class="metric-label has-tooltip">
+          Total Queries
+          <span class="info-icon">?</span>
+          <span class="tooltip">The total number of MCP tool calls made to this server. Each search, file fetch, or analysis counts as one query.</span>
+        </div>
       </div>
       <div class="metric">
         <div class="metric-value">${(metrics.avgRelevanceScore * 100).toFixed(1)}%</div>
-        <div class="metric-label">Avg Relevance</div>
+        <div class="metric-label has-tooltip">
+          Avg Relevance
+          <span class="info-icon">?</span>
+          <span class="tooltip">Average semantic similarity score between queries and returned results. Higher means search results better match what was asked. 70%+ is excellent, 50-70% is good, below 50% may indicate content gaps.</span>
+        </div>
       </div>
       <div class="metric">
         <div class="metric-value">${qualityScore}%</div>
-        <div class="metric-label">Quality Score</div>
+        <div class="metric-label has-tooltip">
+          Quality Score
+          <span class="info-icon">?</span>
+          <span class="tooltip">Composite metric combining relevance and result distribution. Calculated as: (High×100 + Medium×50) / Total. Indicates overall search effectiveness.</span>
+        </div>
       </div>
     </div>
     
@@ -168,9 +188,21 @@ function generateMetricsContent(
       <div class="card">
         <div class="card-title">Quality Distribution</div>
         <div class="quality">
-          <div class="q-box high"><div class="q-num">${metrics.scoreDistribution.high}</div><div class="q-label">High</div></div>
-          <div class="q-box med"><div class="q-num">${metrics.scoreDistribution.medium}</div><div class="q-label">Medium</div></div>
-          <div class="q-box low"><div class="q-num">${metrics.scoreDistribution.low}</div><div class="q-label">Low</div></div>
+          <div class="q-box high has-tooltip">
+            <div class="q-num">${metrics.scoreDistribution.high}</div>
+            <div class="q-label">High</div>
+            <span class="tooltip">Queries with >70% relevance score. These found highly relevant content.</span>
+          </div>
+          <div class="q-box med has-tooltip">
+            <div class="q-num">${metrics.scoreDistribution.medium}</div>
+            <div class="q-label">Medium</div>
+            <span class="tooltip">Queries with 40-70% relevance. Results were somewhat relevant but could be improved.</span>
+          </div>
+          <div class="q-box low has-tooltip">
+            <div class="q-num">${metrics.scoreDistribution.low}</div>
+            <div class="q-label">Low</div>
+            <span class="tooltip">Queries with <40% relevance. May indicate missing content or unclear queries.</span>
+          </div>
         </div>
       </div>
       
