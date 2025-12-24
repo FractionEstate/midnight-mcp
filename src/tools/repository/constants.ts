@@ -97,6 +97,20 @@ export const REPO_ALIASES: Record<string, { owner: string; repo: string }> = {
     repo: "midnight-sea-battle-hackathon",
   },
   shipyspace: { owner: "eddex", repo: "midnight-sea-battle-hackathon" },
+
+  // Mini DApp Hackathon Winners (Sep 2025)
+  statera: { owner: "statera-protocol", repo: "statera-protocol-midnight" },
+  "statera-protocol": {
+    owner: "statera-protocol",
+    repo: "statera-protocol-midnight",
+  },
+  lucentlabs: { owner: "statera-protocol", repo: "statera-protocol-midnight" },
+  stablecoin: { owner: "statera-protocol", repo: "statera-protocol-midnight" },
+  "midnight-bank": { owner: "nel349", repo: "midnight-bank" },
+  bank: { owner: "nel349", repo: "midnight-bank" },
+  zkbadge: { owner: "Imdavyking", repo: "zkbadge" },
+  badge: { owner: "Imdavyking", repo: "zkbadge" },
+  davyking: { owner: "Imdavyking", repo: "zkbadge" },
 };
 
 // Example definitions
@@ -205,6 +219,55 @@ export const EXAMPLES: ExampleDefinition[] = [
       "Basic ZK patterns",
       "Beginner friendly",
       "Clear player interactions",
+    ],
+  },
+  // Mini DApp Hackathon Winners (Sep 2025)
+  {
+    name: "Statera Protocol (LucentLabs)",
+    repository: "statera-protocol/statera-protocol-midnight",
+    description:
+      "1st place Mini DApp winner. Private overcollateralized stablecoin with shielded liquidations. Institutional-grade DeFi with KYC compliance and full transaction privacy.",
+    category: "defi",
+    complexity: "advanced",
+    mainFile: "contract/src/statera.compact",
+    features: [
+      "Shielded stablecoin",
+      "Automated liquidations",
+      "Off-chain KYC",
+      "Private minting/staking",
+      "Institutional DeFi",
+    ],
+  },
+  {
+    name: "Midnight Bank",
+    repository: "nel349/midnight-bank",
+    description:
+      "2nd place Mini DApp winner. Private banking DApp demonstrating prove/hide/compute/reveal patterns. Shared accounts with PIN, multi-party authorization, and selective disclosure.",
+    category: "defi",
+    complexity: "intermediate",
+    mainFile: "contract/src/bank.compact",
+    features: [
+      "Encrypted balances",
+      "PIN-protected accounts",
+      "Multi-party auth",
+      "Selective disclosure",
+      "Private transfers",
+    ],
+  },
+  {
+    name: "zkBadge (Davyking)",
+    repository: "Imdavyking/zkbadge",
+    description:
+      "3rd place Mini DApp winner. Privacy-preserving identity and access control. Issue verifiable credentials (e.g., age proof) without revealing personal data. Only 'verified' status stored on-chain.",
+    category: "identity",
+    complexity: "intermediate",
+    mainFile: "contract/src/zkbadge.compact",
+    features: [
+      "ZK credentials",
+      "Off-chain verification",
+      "On-chain badges",
+      "Access control",
+      "Reputation system",
     ],
   },
 ];

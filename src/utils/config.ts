@@ -279,4 +279,27 @@ export const DEFAULT_REPOSITORIES: RepositoryConfig[] = [
     patterns: ["**/*.compact", "**/*.ts", "**/*.md"],
     exclude: ["node_modules/**", "dist/**"],
   },
+
+  // Mini DApp Hackathon Winners (Sep 2025)
+  {
+    owner: "statera-protocol",
+    repo: "statera-protocol-midnight",
+    branch: "main",
+    patterns: ["**/*.compact", "**/*.ts", "**/*.md"],
+    exclude: ["node_modules/**", "dist/**"],
+  },
+  {
+    owner: "nel349",
+    repo: "midnight-bank",
+    branch: "main",
+    patterns: ["**/*.compact", "**/*.ts", "**/*.md"],
+    exclude: ["node_modules/**", "dist/**"],
+  },
+  {
+    owner: "Imdavyking",
+    repo: "zkbadge",
+    branch: "main",
+    patterns: ["**/*.compact", "**/*.ts", "**/*.md"],
+    exclude: ["node_modules/**", "dist/**"],
+  },
 ];

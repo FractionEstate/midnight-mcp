@@ -145,4 +145,13 @@ export const REPOSITORIES: RepoConfig[] = [
   // Sea Battle Hackathon Winners (Feb 2025)
   { owner: "ErickRomeroDev", repo: "naval-battle-game_v2", branch: "main" }, // 2nd place - Edda Labs
   { owner: "eddex", repo: "midnight-sea-battle-hackathon", branch: "main" }, // 3rd place - ShipySpace
+
+  // Mini DApp Hackathon Winners (Sep 2025)
+  {
+    owner: "statera-protocol",
+    repo: "statera-protocol-midnight",
+    branch: "main",
+  }, // 1st place - LucentLabs (stablecoin)
+  { owner: "nel349", repo: "midnight-bank", branch: "main" }, // 2nd place - Private banking
+  { owner: "Imdavyking", repo: "zkbadge", branch: "main" }, // 3rd place - ZK identity badges
 ];
