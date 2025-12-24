@@ -15,6 +15,10 @@ export interface CodeDocument {
     codeType: string;
     codeName: string;
     isPublic: boolean;
+    // Version tracking
+    repoVersion?: string;
+    pragmaVersion?: string;
+    indexedAt?: string;
   };
 }
 

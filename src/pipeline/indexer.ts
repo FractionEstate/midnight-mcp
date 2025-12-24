@@ -26,6 +26,22 @@ export interface ChunkMetadata {
   startLine: number;
   endLine: number;
   isPublic: boolean;
+  // Version tracking - added for version-aware search
+  repoVersion?: string; // Git tag or commit SHA when indexed
+  pragmaVersion?: string; // Extracted from pragma language_version if present
+  indexedAt?: string; // ISO timestamp when this chunk was indexed
+}
+
+/**
+ * Extract pragma language_version from Compact file content
+ * Returns the version string or undefined if not found
+ */
+function extractPragmaVersion(content: string): string | undefined {
+  // Match patterns like: pragma language_version >= 0.14.0;
+  const pragmaMatch = content.match(
+    /pragma\s+language_version\s*[><=]*\s*([\d.]+)/
+  );
+  return pragmaMatch?.[1];
 }
 
 /**
@@ -34,9 +50,17 @@ export interface ChunkMetadata {
  */
 function createChunks(
   file: ParsedFile,
-  repository: string
+  repository: string,
+  repoVersion?: string
 ): Array<{ text: string; metadata: ChunkMetadata }> {
   const chunks: Array<{ text: string; metadata: ChunkMetadata }> = [];
+  const indexedAt = new Date().toISOString();
+
+  // Extract pragma version for Compact files
+  const pragmaVersion =
+    file.language === "compact"
+      ? extractPragmaVersion(file.content)
+      : undefined;
 
   // Add code units as individual chunks
   for (const unit of file.codeUnits) {
@@ -52,6 +76,9 @@ function createChunks(
         startLine: unit.startLine,
         endLine: unit.endLine,
         isPublic: unit.isPublic,
+        repoVersion,
+        pragmaVersion,
+        indexedAt,
       },
     });
   }
@@ -80,6 +107,9 @@ function createChunks(
             startLine,
             endLine: currentLine - 1,
             isPublic: true,
+            repoVersion,
+            pragmaVersion,
+            indexedAt,
           },
         });
 
@@ -104,6 +134,9 @@ function createChunks(
           startLine,
           endLine: currentLine - 1,
           isPublic: true,
+          repoVersion,
+          pragmaVersion,
+          indexedAt,
         },
       });
     }
@@ -121,6 +154,9 @@ export async function indexRepository(
   const repoName = `${repoConfig.owner}/${repoConfig.repo}`;
   logger.info(`Starting index for ${repoName}...`);
 
+  // Get repo version (branch name or tag)
+  const repoVersion = repoConfig.branch || "main";
+
   try {
     // Fetch all files from the repository
     const files = await githubClient.fetchRepositoryFiles(repoConfig);
@@ -133,8 +169,8 @@ export async function indexRepository(
       // Parse the file
       const parsed = parseFile(file.path, file.content);
 
-      // Create chunks
-      const chunks = createChunks(parsed, repoName);
+      // Create chunks with version info
+      const chunks = createChunks(parsed, repoName, repoVersion);
 
       for (const chunk of chunks) {
         documents.push({
@@ -149,6 +185,9 @@ export async function indexRepository(
             codeType: chunk.metadata.codeUnitType || "unknown",
             codeName: chunk.metadata.codeUnitName || "",
             isPublic: chunk.metadata.isPublic,
+            repoVersion: chunk.metadata.repoVersion,
+            pragmaVersion: chunk.metadata.pragmaVersion,
+            indexedAt: chunk.metadata.indexedAt,
           },
         });
         chunkCount++;
@@ -257,7 +296,8 @@ export async function incrementalUpdate(
 
       if (file) {
         const parsed = parseFile(file.path, file.content);
-        const chunks = createChunks(parsed, repoName);
+        const repoVersion = repoConfig.branch || "main";
+        const chunks = createChunks(parsed, repoName, repoVersion);
 
         for (const chunk of chunks) {
           documents.push({
@@ -272,6 +312,9 @@ export async function incrementalUpdate(
               codeType: chunk.metadata.codeUnitType || "unknown",
               codeName: chunk.metadata.codeUnitName || "",
               isPublic: chunk.metadata.isPublic,
+              repoVersion: chunk.metadata.repoVersion,
+              pragmaVersion: chunk.metadata.pragmaVersion,
+              indexedAt: chunk.metadata.indexedAt,
             },
           });
           chunkCount++;

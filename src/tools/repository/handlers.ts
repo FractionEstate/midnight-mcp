@@ -435,10 +435,45 @@ export async function getLatestSyntax(input: GetLatestSyntaxInput) {
   // This is more reliable than fetching from GitHub and includes pitfalls/patterns
   if (repoName === "compact" || repoName === "midnight-compact") {
     const compactReference = EMBEDDED_DOCS["midnight://docs/compact-reference"];
+
+    // Check if there's a newer release we might not have documented
+    const EMBEDDED_DOCS_VERSION = "0.16"; // Version our docs are based on
+    let versionWarning: string | undefined;
+
+    try {
+      const versionInfo = await releaseTracker.getVersionInfo(
+        "midnightntwrk",
+        "compact"
+      );
+      const latestTag =
+        versionInfo.latestStableRelease?.tag || versionInfo.latestRelease?.tag;
+      if (latestTag) {
+        // Extract version number from tag (e.g., "v0.18.0" -> "0.18")
+        const latestVersion = latestTag
+          .replace(/^v/, "")
+          .split(".")
+          .slice(0, 2)
+          .join(".");
+        const embeddedMajorMinor = EMBEDDED_DOCS_VERSION.split(".")
+          .slice(0, 2)
+          .join(".");
+
+        if (
+          latestVersion !== embeddedMajorMinor &&
+          parseFloat(latestVersion) > parseFloat(embeddedMajorMinor)
+        ) {
+          versionWarning = `⚠️ Compact ${latestTag} is available. This reference is based on ${EMBEDDED_DOCS_VERSION}. Some syntax may have changed - check release notes for breaking changes.`;
+        }
+      }
+    } catch {
+      // Ignore version check errors, still return cached docs
+    }
+
     if (compactReference) {
       return {
         repository: "midnightntwrk/compact",
         version: "0.16+ (current)",
+        ...(versionWarning && { versionWarning }),
         syntaxReference: compactReference,
         sections: [
           "Basic Structure",
