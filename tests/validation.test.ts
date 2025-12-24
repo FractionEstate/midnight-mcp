@@ -79,16 +79,17 @@ circuit helper(): Field {
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.circuits).toHaveLength(2);
+      if (!result.success) return;
+      expect(result.structure!.circuits).toHaveLength(2);
 
-      const exportedCircuit = result.structure.circuits.find(
+      const exportedCircuit = result.structure!.circuits.find(
         (c) => c.name === "increment"
       );
       expect(exportedCircuit).toBeDefined();
       expect(exportedCircuit?.isExport).toBe(true);
       expect(exportedCircuit?.params).toContain("amount: Field");
 
-      const helperCircuit = result.structure.circuits.find(
+      const helperCircuit = result.structure!.circuits.find(
         (c) => c.name === "helper"
       );
       expect(helperCircuit).toBeDefined();
@@ -105,7 +106,8 @@ export circuit transfer(from: Opaque<"address">, to: Opaque<"address">, amounts:
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      const circuit = result.structure.circuits.find(
+      if (!result.success) return;
+      const circuit = result.structure!.circuits.find(
         (c) => c.name === "transfer"
       );
       expect(circuit).toBeDefined();
@@ -124,9 +126,10 @@ witness privateHelper: (x: Field) => Boolean;
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.witnesses).toHaveLength(2);
+      if (!result.success) return;
+      expect(result.structure!.witnesses).toHaveLength(2);
 
-      const exportedWitness = result.structure.witnesses.find(
+      const exportedWitness = result.structure!.witnesses.find(
         (w) => w.name === "getSecret"
       );
       expect(exportedWitness).toBeDefined();
@@ -143,10 +146,11 @@ ledger privateData: Field;
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.ledgerItems).toHaveLength(3);
-      expect(result.exports.ledger).toContain("counter");
-      expect(result.exports.ledger).toContain("balances");
-      expect(result.exports.ledger).not.toContain("privateData");
+      if (!result.success) return;
+      expect(result.structure!.ledgerItems).toHaveLength(3);
+      expect(result.exports!.ledger).toContain("counter");
+      expect(result.exports!.ledger).toContain("balances");
+      expect(result.exports!.ledger).not.toContain("privateData");
     });
 
     it("should extract type definitions", async () => {
@@ -158,9 +162,10 @@ type Balance = Uint<64>;
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.types).toHaveLength(2);
-      expect(result.structure.types[0].name).toBe("Address");
-      expect(result.structure.types[0].definition).toBe("Bytes<32>");
+      if (!result.success) return;
+      expect(result.structure!.types).toHaveLength(2);
+      expect(result.structure!.types[0].name).toBe("Address");
+      expect(result.structure!.types[0].definition).toBe("Bytes<32>");
     });
 
     it("should extract struct definitions", async () => {
@@ -175,9 +180,10 @@ struct User {
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.structs).toHaveLength(1);
-      expect(result.structure.structs[0].name).toBe("User");
-      expect(result.structure.structs[0].fields).toHaveLength(3);
+      if (!result.success) return;
+      expect(result.structure!.structs).toHaveLength(1);
+      expect(result.structure!.structs[0].name).toBe("User");
+      expect(result.structure!.structs[0].fields).toHaveLength(3);
     });
 
     it("should extract enum definitions", async () => {
@@ -192,11 +198,12 @@ enum Status {
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.structure.enums).toHaveLength(1);
-      expect(result.structure.enums[0].name).toBe("Status");
-      expect(result.structure.enums[0].variants).toContain("Pending");
-      expect(result.structure.enums[0].variants).toContain("Active");
-      expect(result.structure.enums[0].variants).toContain("Completed");
+      if (!result.success) return;
+      expect(result.structure!.enums).toHaveLength(1);
+      expect(result.structure!.enums[0].name).toBe("Status");
+      expect(result.structure!.enums[0].variants).toContain("Pending");
+      expect(result.structure!.enums[0].variants).toContain("Active");
+      expect(result.structure!.enums[0].variants).toContain("Completed");
     });
 
     it("should generate accurate statistics", async () => {
@@ -222,12 +229,13 @@ type MyType = Field;
       const result = await extractContractStructure({ code });
 
       expect(result.success).toBe(true);
-      expect(result.stats.circuitCount).toBe(2);
-      expect(result.stats.ledgerCount).toBe(2);
-      expect(result.stats.witnessCount).toBe(1);
-      expect(result.stats.typeCount).toBe(1);
-      expect(result.stats.exportedCircuits).toBe(2);
-      expect(result.stats.exportedLedger).toBe(2);
+      if (!result.success) return;
+      expect(result.stats!.circuitCount).toBe(2);
+      expect(result.stats!.ledgerCount).toBe(2);
+      expect(result.stats!.witnessCount).toBe(1);
+      expect(result.stats!.typeCount).toBe(1);
+      expect(result.stats!.exportedCircuits).toBe(2);
+      expect(result.stats!.exportedLedger).toBe(2);
     });
 
     it("should handle empty contract", async () => {
@@ -322,7 +330,8 @@ export ledger counter: Counter;
     const result = await extractContractStructure({ code });
 
     expect(result.success).toBe(true);
-    expect(result.structure.ledgerItems[0].type).toBe("Counter");
+    if (!result.success) return;
+    expect(result.structure!.ledgerItems[0].type).toBe("Counter");
   });
 
   it("should detect Map type usage", async () => {
@@ -332,6 +341,7 @@ export ledger data: Map<Field, Field>;
     const result = await extractContractStructure({ code });
 
     expect(result.success).toBe(true);
-    expect(result.structure.ledgerItems[0].type).toBe("Map<Field, Field>");
+    if (!result.success) return;
+    expect(result.structure!.ledgerItems[0].type).toBe("Map<Field, Field>");
   });
 });
