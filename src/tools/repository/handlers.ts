@@ -11,6 +11,7 @@ import {
   SelfCorrectionHints,
 } from "../../utils/index.js";
 import { REPO_ALIASES, EXAMPLES } from "./constants.js";
+import { EMBEDDED_DOCS } from "../../resources/content/docs-content.js";
 import type {
   GetFileInput,
   ListExamplesInput,
@@ -429,6 +430,37 @@ export async function getLatestSyntax(input: GetLatestSyntaxInput) {
   // Ensure repo defaults to compact if undefined/empty
   const repoName = input?.repo || "compact";
   logger.debug("Getting latest syntax reference", { repo: repoName });
+
+  // For Compact language, always return our curated reference first
+  // This is more reliable than fetching from GitHub and includes pitfalls/patterns
+  if (repoName === "compact" || repoName === "midnight-compact") {
+    const compactReference = EMBEDDED_DOCS["midnight://docs/compact-reference"];
+    if (compactReference) {
+      return {
+        repository: "midnightntwrk/compact",
+        version: "0.16+ (current)",
+        syntaxReference: compactReference,
+        sections: [
+          "Basic Structure",
+          "Data Types",
+          "Circuits",
+          "Witnesses",
+          "State Management",
+          "Common Patterns",
+          "Disclosure in Conditionals (IMPORTANT)",
+          "Common Pitfalls & Solutions",
+        ],
+        pitfalls: [
+          "Cell<T> wrapper deprecated in 0.15+ - use direct type",
+          'Cannot assign string literals to Opaque<"string"> - use enum or parameters',
+          "Must disclose() comparisons used in if/else conditions",
+          "Counter uses .increment()/.value(), Field uses direct assignment",
+          "Boolean returns from witnesses need disclose()",
+        ],
+        note: "This is the curated syntax reference for Compact 0.16+. Includes common pitfalls and correct patterns.",
+      };
+    }
+  }
 
   const resolved = resolveRepo(repoName);
   if (!resolved) {
