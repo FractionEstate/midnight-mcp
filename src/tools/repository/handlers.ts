@@ -26,6 +26,9 @@ import type {
   FullRepoContextInput,
 } from "./schemas.js";
 
+// Re-export validation handlers from validation.ts
+export { validateContract, extractContractStructure } from "./validation.js";
+
 /**
  * Resolve repository name alias to owner/repo
  */
