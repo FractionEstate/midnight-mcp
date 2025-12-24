@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import { describe, it, expect } from "vitest";
 import { extractContractStructure } from "../src/tools/repository/validation.js";
 
 // Note: validateContract requires actual compiler installation, so we focus on
