@@ -112,8 +112,29 @@ export async function loadMetrics(kv: KVNamespace | undefined): Promise<void> {
     const stored = await kv.get("metrics");
     if (stored) {
       metrics = { ...metrics, ...JSON.parse(stored) };
+      // Recalculate score distribution from recent queries to ensure consistency
+      recalculateScoreDistribution();
     }
   } catch (e) {
     console.error("Failed to load metrics:", e);
+  }
+}
+
+/**
+ * Recalculate score distribution from recent queries
+ * This ensures consistency when thresholds change
+ */
+function recalculateScoreDistribution(): void {
+  const distribution = { high: 0, medium: 0, low: 0 };
+
+  for (const q of metrics.recentQueries) {
+    if (q.topScore >= 0.7) distribution.high++;
+    else if (q.topScore >= 0.4) distribution.medium++;
+    else distribution.low++;
+  }
+
+  // Only update if we have recent queries to calculate from
+  if (metrics.recentQueries.length > 0) {
+    metrics.scoreDistribution = distribution;
   }
 }
