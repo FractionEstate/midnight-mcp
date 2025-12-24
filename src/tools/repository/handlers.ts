@@ -30,8 +30,109 @@ import type {
 import { exec } from "child_process";
 import { promisify } from "util";
 import { writeFile, unlink, mkdir, readFile } from "fs/promises";
-import { join, basename } from "path";
+import { join, basename, resolve, isAbsolute } from "path";
 import { tmpdir } from "os";
+
+// ============================================================================
+// SECURITY & VALIDATION HELPERS
+// ============================================================================
+
+/**
+ * Validate file path for security - prevent path traversal attacks
+ */
+function validateFilePath(filePath: string): {
+  valid: boolean;
+  error?: string;
+  normalizedPath?: string;
+} {
+  // Must be absolute path
+  if (!isAbsolute(filePath)) {
+    return {
+      valid: false,
+      error: "File path must be absolute (e.g., /Users/you/contract.compact)",
+    };
+  }
+
+  // Resolve to catch ../ traversal
+  const normalized = resolve(filePath);
+
+  // Check for path traversal attempts
+  if (normalized !== filePath && filePath.includes("..")) {
+    return {
+      valid: false,
+      error: "Path traversal detected - use absolute paths without ../",
+    };
+  }
+
+  // Must end with .compact
+  if (!normalized.endsWith(".compact")) {
+    return {
+      valid: false,
+      error: "File must have .compact extension",
+    };
+  }
+
+  // Block sensitive paths
+  const blockedPaths = ["/etc", "/var", "/usr", "/bin", "/sbin", "/root"];
+  if (blockedPaths.some((blocked) => normalized.startsWith(blocked))) {
+    return {
+      valid: false,
+      error: "Cannot access system directories",
+    };
+  }
+
+  return { valid: true, normalizedPath: normalized };
+}
+
+/**
+ * Check if content is valid UTF-8 text (not binary)
+ */
+function isValidUtf8Text(content: string): boolean {
+  // Check for null bytes (common in binary files)
+  if (content.includes("\x00")) {
+    return false;
+  }
+
+  // Check for excessive non-printable characters
+  const nonPrintable = content.match(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g);
+  if (nonPrintable && nonPrintable.length > content.length * 0.01) {
+    return false;
+  }
+
+  return true;
+}
+
+/**
+ * Detect local includes that won't work in temp directory
+ */
+function detectLocalIncludes(code: string): string[] {
+  const localIncludes: string[] = [];
+
+  // Pattern: include "something.compact" or include "./path"
+  const includePattern = /include\s+"([^"]+)"/g;
+  let match;
+
+  while ((match = includePattern.exec(code)) !== null) {
+    const includePath = match[1];
+    // Skip standard library includes
+    if (
+      includePath === "std" ||
+      includePath.startsWith("CompactStandardLibrary")
+    ) {
+      continue;
+    }
+    // Local file reference
+    if (
+      includePath.endsWith(".compact") ||
+      includePath.startsWith("./") ||
+      includePath.startsWith("../")
+    ) {
+      localIncludes.push(includePath);
+    }
+  }
+
+  return localIncludes;
+}
 
 const execAsync = promisify(exec);
 
@@ -754,24 +855,47 @@ export async function validateContract(input: ValidateContractInput) {
 
   let code: string;
   let filename: string;
+  let sourceDir: string | null = null; // Track source directory for local includes
 
   if (input.filePath) {
+    // SECURITY: Validate file path first
+    const pathValidation = validateFilePath(input.filePath);
+    if (!pathValidation.valid) {
+      return {
+        success: false,
+        errorType: "security_error",
+        error: "Invalid file path",
+        message: `❌ ${pathValidation.error}`,
+        userAction: {
+          problem: pathValidation.error,
+          solution:
+            "Provide an absolute path to a .compact file in your project directory",
+          example: { filePath: "/Users/you/projects/myapp/contract.compact" },
+          isUserFault: true,
+        },
+      };
+    }
+
+    const safePath = pathValidation.normalizedPath!;
+    sourceDir = join(safePath, "..");
+
     // Read code from file
     try {
-      code = await readFile(input.filePath, "utf-8");
-      filename = basename(input.filePath);
+      code = await readFile(safePath, "utf-8");
+      filename = basename(safePath);
 
-      // Validate file extension
-      if (!input.filePath.endsWith(".compact")) {
+      // SECURITY: Check for binary/non-UTF8 content
+      if (!isValidUtf8Text(code)) {
         return {
           success: false,
           errorType: "user_error",
-          error: "Invalid file extension",
-          message: "❌ File must have .compact extension",
+          error: "Invalid file content",
+          message:
+            "❌ File appears to be binary or contains invalid characters",
           userAction: {
-            problem: `File "${filename}" does not have .compact extension`,
+            problem: "The file is not a valid UTF-8 text file",
             solution:
-              "Provide a valid Compact source file with .compact extension",
+              "Ensure you're pointing to a Compact source file (.compact), not a compiled binary",
             isUserFault: true,
           },
         };
@@ -802,6 +926,22 @@ export async function validateContract(input: ValidateContractInput) {
   } else if (input.code) {
     code = input.code;
     filename = input.filename || "contract.compact";
+
+    // Check for binary content in provided code
+    if (!isValidUtf8Text(code)) {
+      return {
+        success: false,
+        errorType: "user_error",
+        error: "Invalid code content",
+        message: "❌ Code contains invalid characters",
+        userAction: {
+          problem:
+            "The provided code contains binary or non-printable characters",
+          solution: "Provide valid UTF-8 Compact source code",
+          isUserFault: true,
+        },
+      };
+    }
   } else {
     // Neither code nor filePath provided
     return {
@@ -825,6 +965,39 @@ export async function validateContract(input: ValidateContractInput) {
   // ============================================================================
   // INPUT VALIDATION - Check for user errors before attempting compilation
   // ============================================================================
+
+  // Check for local includes that won't work in temp directory
+  const localIncludes = detectLocalIncludes(code);
+  if (localIncludes.length > 0 && !sourceDir) {
+    // Code was provided directly (not from file) and has local includes
+    return {
+      success: false,
+      errorType: "user_error",
+      error: "Local includes detected",
+      message: "❌ Contract has local file includes that cannot be resolved",
+      userAction: {
+        problem: `Contract includes local files: ${localIncludes.join(", ")}`,
+        solution:
+          "Use filePath instead of code when your contract has local includes, so we can resolve relative paths",
+        detectedIncludes: localIncludes,
+        example: {
+          instead: '{ code: "include \\"utils.compact\\"; ..." }',
+          use: '{ filePath: "/path/to/your/contract.compact" }',
+        },
+        isUserFault: true,
+      },
+    };
+  }
+
+  // Warn about local includes (they may fail during compilation)
+  const localIncludeWarning =
+    localIncludes.length > 0
+      ? {
+          warning: "Contract has local includes",
+          includes: localIncludes,
+          note: "Local includes may fail if files are not in the expected location relative to the contract",
+        }
+      : null;
 
   // Check for empty input
   if (!code || code.trim().length === 0) {
@@ -1054,6 +1227,15 @@ export ledger counter: Counter;
       );
 
       // Compilation succeeded!
+      const allWarnings = stderr ? parseWarnings(stderr) : [];
+
+      // Add local include warning if applicable
+      if (localIncludeWarning) {
+        allWarnings.push(
+          `Note: Contract has local includes (${localIncludes.join(", ")}) - ensure these files exist relative to your contract`
+        );
+      }
+
       return {
         success: true,
         errorType: null,
@@ -1062,7 +1244,8 @@ export ledger counter: Counter;
         compilerPath: compactPath,
         message: "✅ Contract compiled successfully!",
         output: stdout || "Compilation completed without errors",
-        warnings: stderr ? parseWarnings(stderr) : [],
+        warnings: allWarnings,
+        localIncludes: localIncludes.length > 0 ? localIncludes : undefined,
         contractInfo: {
           filename,
           codeLength: code.length,
@@ -1504,9 +1687,28 @@ export async function extractContractStructure(
   let filename: string;
 
   if (input.filePath) {
+    // SECURITY: Validate file path
+    const pathValidation = validateFilePath(input.filePath);
+    if (!pathValidation.valid) {
+      return {
+        success: false,
+        error: "Invalid file path",
+        message: pathValidation.error,
+      };
+    }
+
     try {
-      code = await readFile(input.filePath, "utf-8");
-      filename = basename(input.filePath);
+      code = await readFile(pathValidation.normalizedPath!, "utf-8");
+      filename = basename(pathValidation.normalizedPath!);
+
+      // Check for binary content
+      if (!isValidUtf8Text(code)) {
+        return {
+          success: false,
+          error: "Invalid file content",
+          message: "File appears to be binary or contains invalid characters",
+        };
+      }
     } catch (fsError: unknown) {
       const err = fsError as { code?: string; message?: string };
       return {
@@ -1519,6 +1721,15 @@ export async function extractContractStructure(
   } else if (input.code) {
     code = input.code;
     filename = "contract.compact";
+
+    // Check for binary content
+    if (!isValidUtf8Text(code)) {
+      return {
+        success: false,
+        error: "Invalid code content",
+        message: "Code contains invalid characters",
+      };
+    }
   } else {
     return {
       success: false,
