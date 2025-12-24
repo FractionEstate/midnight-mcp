@@ -1083,9 +1083,22 @@ export async function extractContractStructure(
     /(?:(export)\s+)?circuit\s+(\w+)\s*\(([^)]*)\)\s*:\s*([^{\n;]+)/g;
   const lines = code.split("\n");
 
+  // Precompute a mapping from character index to 1-based line number to avoid
+  // repeatedly scanning from the start of the string for each match.
+  const lineByIndex: number[] = new Array(code.length);
+  {
+    let currentLine = 1;
+    for (let i = 0; i < code.length; i++) {
+      lineByIndex[i] = currentLine;
+      if (code[i] === "\n") {
+        currentLine++;
+      }
+    }
+  }
+
   let circuitMatch;
   while ((circuitMatch = circuitPattern.exec(code)) !== null) {
-    const lineNum = code.substring(0, circuitMatch.index).split("\n").length;
+    const lineNum = lineByIndex[circuitMatch.index];
     const params = splitParams(circuitMatch[3]);
 
     circuits.push({
