@@ -126,15 +126,17 @@ Add `"GITHUB_TOKEN": "ghp_..."` for higher GitHub API rate limits (60 → 5000 r
 
 ## Indexed Repositories
 
-The API indexes **22+ Midnight repositories**:
+The API indexes **39 Midnight repositories**:
 
-| Category          | Repositories                                                                                                                                       |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Core              | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`                                                                                       |
-| Examples          | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app`                                                                                |
-| Infrastructure    | `midnight-indexer`, `midnight-node-docker`, `midnight-dapp-connector-api`                                                                          |
-| Partner Libraries | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps`                                                                                     |
-| Official Partners | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core` |
+| Category          | Repositories                                                                                                                                                           |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Core              | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`, `midnight-node`, `midnight-indexer`, `midnight-ledger`, `midnight-zk`                                    |
+| Examples          | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app`                                                                                                    |
+| Infrastructure    | `midnight-node-docker`, `midnight-dapp-connector-api`, `compact-tree-sitter`, `setup-compact-action`                                                                   |
+| Partner Libraries | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps` (LunarSwap)                                                                                             |
+| Official Partners | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core`                     |
+| Core Partner      | `PaimaStudios/midnight-game-2`, `PaimaStudios/midnight-wasm-prover`, `PaimaStudios/midnight-batcher`, `PaimaStudios/midnight-impact-rps-example`                       |
+| Hackathon Winners | Sea Battle: `ErickRomeroDev/naval-battle-game_v2`, `eddex/midnight-sea-battle-hackathon` • Mini DApp: `statera-protocol`, `nel349/midnight-bank`, `Imdavyking/zkbadge` |
 
 ---
 
