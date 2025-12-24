@@ -1031,7 +1031,8 @@ export async function extractContractStructure(
     };
   }
 
-  // Extract pragma version (handles >=, >, <=, <, ==, ~ operators)
+  // Extract pragma version (supports >=, >, <=, <, ==, ~; >=? and <=? are ordered
+  // so that >= and <= are matched before > and <)
   const pragmaMatch = code.match(
     /pragma\s+language_version\s*(?:>=?|<=?|==|~)\s*([\d.]+)/
   );
