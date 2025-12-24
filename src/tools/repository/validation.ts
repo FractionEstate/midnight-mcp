@@ -3,7 +3,7 @@
  * Pre-compilation validation for Compact contracts using the Compact CLI
  */
 
-import { exec } from "child_process";
+import { exec, execFile } from "child_process";
 import { promisify } from "util";
 import { writeFile, mkdir, readFile, rm } from "fs/promises";
 import { join, basename, resolve, isAbsolute } from "path";
@@ -16,6 +16,7 @@ import type {
 } from "./schemas.js";
 
 const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 // ============================================================================
 // SECURITY & VALIDATION HELPERS
@@ -564,8 +565,11 @@ export ledger counter: Counter;
         cwd: sourceDir || tempDir, // Use source directory for include resolution
       };
 
-      const { stdout, stderr } = await execAsync(
-        `compact compile "${contractPath}" "${outputDir}"`,
+      // Use execFile with array arguments to avoid shell injection vulnerabilities
+      // This is safer than string interpolation as paths are passed directly
+      const { stdout, stderr } = await execFileAsync(
+        "compact",
+        ["compile", contractPath, outputDir],
         execOptions
       );
 
