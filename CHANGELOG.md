@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.29] - 2025-12-25
+
+### Changed
+
+- **Removed `midnight-validate-contract` tool**: Compiler-based validation required local installation which most users don't have
+- **Rebranded `midnight-extract-contract-structure`**: Now positioned as static pattern analysis tool under "analyze" category
+- Simplified tool descriptions - removed excessive warnings and emojis
+- Total tools: 25 (down from 26)
+- Total categories: 7 (removed "validation" category)
+
+### Fixed
+
+- Tool count now correctly reports 25 tools
+- README cleaned up and reorganized for better readability
+
+## [0.1.28] - 2025-12-25
+
+### Fixed
+
+- Tool count now correctly includes meta tools (was reporting 24, actually 26)
+
 ## [0.1.27] - 2025-12-25
 
 ### Added

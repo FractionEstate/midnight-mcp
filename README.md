@@ -10,94 +10,124 @@ MCP server that gives AI assistants access to Midnight blockchain—search contr
 
 ## Quick Start
 
-**Claude Desktop** — Add to `claude_desktop_config.json`:
+### Claude Desktop
+
+Add to your `claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp@latest"] }
+    "midnight": {
+      "command": "npx",
+      "args": ["-y", "midnight-mcp@latest"]
+    }
   }
 }
 ```
 
-> **💡 Tip:** Using `@latest` ensures you always get the newest version with all features. If tools seem missing, run `rm -rf ~/.npm/_npx` and restart Claude Desktop.
->
-> **🔄 Auto-Update Detection:** The server automatically checks for updates and prompts the AI to help you update if you're running an older version.
-
-**Cursor** — One-click install:
-
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcCJ9)
-
-<details>
-<summary><strong>Other Editors (Windsurf, VS Code Copilot, Manual Setup)</strong></summary>
-
-**Windsurf** — Add to `~/.codeium/windsurf/mcp_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp@latest"] }
-  }
-}
-```
-
-**VS Code Copilot** — Add to `.vscode/mcp.json` or use Command Palette: `MCP: Add Server` → "command (stdio)" → `npx -y midnight-mcp@latest`
-
-```json
-{
-  "mcpServers": {
-    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp@latest"] }
-  }
-}
-```
-
-**Cursor Manual** — Settings → MCP → Add Server, or add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp@latest"] }
-  }
-}
-```
-
-**Config file locations (Claude Desktop):**
-
+**Config file locations:**
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - Linux: `~/.config/Claude/claude_desktop_config.json`
 
-</details>
+### Cursor
 
-Restart your editor after adding the config. **No API keys required.**
+One-click install:
 
-> **Quality Metrics**: To ensure the MCP stays accurate as Midnight's codebase evolves rapidly, we collect anonymous usage metrics (query counts, relevance scores) to monitor search quality. No query content or personal data is stored. This helps us identify when re-indexing is needed and improve results over time.
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcCJ9)
+
+Or manually add to `.cursor/mcp.json`:
+
+```json
+{
+  "mcpServers": {
+    "midnight": {
+      "command": "npx",
+      "args": ["-y", "midnight-mcp@latest"]
+    }
+  }
+}
+```
+
+### VS Code Copilot
+
+Add to `.vscode/mcp.json` or use Command Palette: `MCP: Add Server` → "command (stdio)" → `npx -y midnight-mcp@latest`
+
+### Windsurf
+
+Add to `~/.codeium/windsurf/mcp_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "midnight": {
+      "command": "npx",
+      "args": ["-y", "midnight-mcp@latest"]
+    }
+  }
+}
+```
+
+**No API keys required.** Restart your editor after adding the config.
 
 ---
 
-## Features
+## What's Included
 
-**25 Tools** — Search, analyze, version tracking, AI generation, compound operations
+### 25 Tools
 
-| Category      | Tools                                                                                                                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Search        | `midnight-search-compact`, `midnight-search-typescript`, `midnight-search-docs`                                                                                                         |
-| Analysis      | `midnight-analyze-contract`, `midnight-explain-circuit`, `midnight-extract-contract-structure`                                                                                          |
-| Repository    | `midnight-get-file`, `midnight-list-examples`, `midnight-get-latest-updates`                                                                                                            |
-| Versioning    | `midnight-get-version-info`, `midnight-check-breaking-changes`, `midnight-get-migration-guide`, `midnight-get-file-at-version`, `midnight-compare-syntax`, `midnight-get-latest-syntax` |
-| AI Generation | `midnight-generate-contract`, `midnight-review-contract`, `midnight-document-contract` _(requires sampling)_                                                                            |
-| Compound      | `midnight-upgrade-check`, `midnight-get-repo-context` _(saves 50-70% tokens)_                                                                                                           |
-| Health        | `midnight-health-check`, `midnight-get-status`, `midnight-check-version`                                                                                                                |
-| Discovery     | `midnight-list-tool-categories`, `midnight-list-category-tools`                                                                                                                         |
+| Category | Tools | Description |
+|----------|-------|-------------|
+| **Search** | `search-compact`, `search-typescript`, `search-docs` | Semantic search across Midnight codebase |
+| **Analysis** | `analyze-contract`, `explain-circuit`, `extract-contract-structure` | Static analysis and pattern detection |
+| **Repository** | `get-file`, `list-examples`, `get-latest-updates` | Access files and examples |
+| **Versioning** | `get-version-info`, `check-breaking-changes`, `get-migration-guide`, `get-file-at-version`, `compare-syntax`, `get-latest-syntax` | Version tracking and migration |
+| **AI Generation** | `generate-contract`, `review-contract`, `document-contract` | AI-powered code generation _(requires sampling)_ |
+| **Compound** | `upgrade-check`, `get-repo-context` | Multi-step operations _(saves 50-70% tokens)_ |
+| **Health** | `health-check`, `get-status`, `check-version` | Server status and version checking |
+| **Discovery** | `list-tool-categories`, `list-category-tools` | Explore available tools |
 
-**9 Embedded Resources** — Quick references available offline: Compact syntax, SDK API, OpenZeppelin contracts, tokenomics, wallet integration, common errors
+All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
-**5 Prompts** — `create-contract`, `review-contract`, `explain-concept`, `compare-approaches`, `debug-contract`
+### 9 Embedded Resources
 
-<details>
-<summary><strong>Advanced Configuration</strong></summary>
+Quick references available offline:
+- Compact syntax guide
+- SDK API reference
+- OpenZeppelin contracts
+- Tokenomics overview
+- Wallet integration
+- Common errors & solutions
 
-### Local Mode (Optional)
+### 5 Prompts
+
+- `create-contract` — Generate new contracts
+- `review-contract` — Security and code review
+- `explain-concept` — Learn Midnight concepts
+- `compare-approaches` — Compare implementation patterns
+- `debug-contract` — Troubleshoot issues
+
+---
+
+## Indexed Repositories
+
+The API indexes **39 Midnight repositories**:
+
+| Category | Repositories |
+|----------|--------------|
+| **Core** | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`, `midnight-node`, `midnight-indexer`, `midnight-ledger`, `midnight-zk` |
+| **Examples** | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app` |
+| **Infrastructure** | `midnight-node-docker`, `midnight-dapp-connector-api`, `compact-tree-sitter`, `setup-compact-action` |
+| **Partner Libraries** | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps` (LunarSwap) |
+| **Official Partners** | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core` |
+| **Core Partner** | `PaimaStudios/midnight-game-2`, `PaimaStudios/midnight-wasm-prover`, `PaimaStudios/midnight-batcher`, `PaimaStudios/midnight-impact-rps-example` |
+| **Hackathon Winners** | Sea Battle: `ErickRomeroDev/naval-battle-game_v2`, `eddex/midnight-sea-battle-hackathon` • Mini DApp: `statera-protocol`, `nel349/midnight-bank`, `Imdavyking/zkbadge` |
+
+---
+
+## Advanced Configuration
+
+### Local Mode
 
 Run everything locally for privacy or offline use:
 
@@ -119,27 +149,9 @@ Run everything locally for privacy or offline use:
 
 Requires ChromaDB (`docker run -d -p 8000:8000 chromadb/chroma`) and OpenAI API key.
 
-### GitHub Token (Optional)
+### GitHub Token
 
 Add `"GITHUB_TOKEN": "ghp_..."` for higher GitHub API rate limits (60 → 5000 requests/hour).
-
-</details>
-
----
-
-## Indexed Repositories
-
-The API indexes **39 Midnight repositories**:
-
-| Category          | Repositories                                                                                                                                                           |
-| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Core              | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`, `midnight-node`, `midnight-indexer`, `midnight-ledger`, `midnight-zk`                                    |
-| Examples          | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app`                                                                                                    |
-| Infrastructure    | `midnight-node-docker`, `midnight-dapp-connector-api`, `compact-tree-sitter`, `setup-compact-action`                                                                   |
-| Partner Libraries | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps` (LunarSwap)                                                                                             |
-| Official Partners | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core`                     |
-| Core Partner      | `PaimaStudios/midnight-game-2`, `PaimaStudios/midnight-wasm-prover`, `PaimaStudios/midnight-batcher`, `PaimaStudios/midnight-impact-rps-example`                       |
-| Hackathon Winners | Sea Battle: `ErickRomeroDev/naval-battle-game_v2`, `eddex/midnight-sea-battle-hackathon` • Mini DApp: `statera-protocol`, `nel349/midnight-bank`, `Imdavyking/zkbadge` |
 
 ---
 
@@ -150,26 +162,15 @@ git clone https://github.com/Olanetsoft/midnight-mcp.git && cd midnight-mcp
 npm install && npm run build && npm test
 ```
 
-<details>
-<summary><strong>API Backend & Local Development</strong></summary>
+The hosted API runs on Cloudflare Workers + Vectorize. See [api/README.md](./api/README.md) for backend details.
 
-The hosted API runs on Cloudflare Workers + Vectorize. See [api/README.md](./api/README.md).
-
-**Testing with Local API:**
-
-```bash
-# Terminal 1: Start local API
-cd api && npm install && npm run dev
-
-# Terminal 2: Run MCP with local API
-MIDNIGHT_API_URL=http://localhost:8787 npm start
-```
-
-</details>
+---
 
 ## Links
 
-- [Midnight Docs](https://docs.midnight.network) • [MCP Spec](https://modelcontextprotocol.io) • [Midnight GitHub](https://github.com/midnightntwrk)
+- [Midnight Docs](https://docs.midnight.network)
+- [MCP Spec](https://modelcontextprotocol.io)
+- [Midnight GitHub](https://github.com/midnightntwrk)
 
 ## License
 
