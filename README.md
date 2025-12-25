@@ -15,10 +15,12 @@ MCP server that gives AI assistants access to Midnight blockchain—search contr
 ```json
 {
   "mcpServers": {
-    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp"] }
+    "midnight": { "command": "npx", "args": ["-y", "midnight-mcp@latest"] }
   }
 }
 ```
+
+> **💡 Tip:** Using `@latest` ensures you always get the newest version with all features. If tools seem missing, run `rm -rf ~/.npm/_npx` and restart Claude Desktop.
 
 **Cursor** — One-click install:
 
@@ -73,19 +75,23 @@ Restart your editor after adding the config. **No API keys required.**
 
 ## Features
 
-**23 Tools** — Search, analyze, version tracking, AI generation, compound operations
+**24 Tools** — Search, analyze, validate, version tracking, AI generation, compound operations
 
-| Category      | Tools                                                                                                                                                                                   |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Search        | `midnight-search-compact`, `midnight-search-typescript`, `midnight-search-docs`                                                                                                         |
-| Analysis      | `midnight-analyze-contract`, `midnight-explain-circuit`                                                                                                                                 |
-| Repository    | `midnight-get-file`, `midnight-list-examples`, `midnight-get-latest-updates`                                                                                                            |
-| Versioning    | `midnight-get-version-info`, `midnight-check-breaking-changes`, `midnight-get-migration-guide`, `midnight-get-file-at-version`, `midnight-compare-syntax`, `midnight-get-latest-syntax` |
-| AI Generation | `midnight-generate-contract`, `midnight-review-contract`, `midnight-document-contract` _(requires sampling)_                                                                            |
-| Compound      | `midnight-upgrade-check`, `midnight-get-repo-context` _(saves 50-70% tokens)_                                                                                                           |
-| Discovery     | `midnight-list-tool-categories`, `midnight-list-category-tools`, `midnight-health-check`, `midnight-get-status`                                                                         |
+| Category       | Tools                                                                                                                                                                                   |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Search         | `midnight-search-compact`, `midnight-search-typescript`, `midnight-search-docs`                                                                                                         |
+| Analysis       | `midnight-analyze-contract`, `midnight-explain-circuit`                                                                                                                                 |
+| **Validation** | `midnight-validate-contract` ⭐, `midnight-extract-contract-structure`                                                                                                                  |
+| Repository     | `midnight-get-file`, `midnight-list-examples`, `midnight-get-latest-updates`                                                                                                            |
+| Versioning     | `midnight-get-version-info`, `midnight-check-breaking-changes`, `midnight-get-migration-guide`, `midnight-get-file-at-version`, `midnight-compare-syntax`, `midnight-get-latest-syntax` |
+| AI Generation  | `midnight-generate-contract`, `midnight-review-contract`, `midnight-document-contract` _(requires sampling)_                                                                            |
+| Compound       | `midnight-upgrade-check`, `midnight-get-repo-context` _(saves 50-70% tokens)_                                                                                                           |
+| Health         | `midnight-health-check`, `midnight-get-status`, `midnight-check-version` 🔄                                                                                                             |
+| Discovery      | `midnight-list-tool-categories`, `midnight-list-category-tools`                                                                                                                         |
 
-> **Tip:** Use compound tools (`midnight-upgrade-check`, `midnight-get-repo-context`) for efficient multi-step operations in a single call.
+> **⭐ Key Tool:** `midnight-validate-contract` compiles code using the **real Compact compiler** - essential for verifying contracts actually work before deployment.
+>
+> **🔄 New:** `midnight-check-version` tells you if you're running the latest version with update instructions.
 
 **9 Embedded Resources** — Quick references available offline: Compact syntax, SDK API, OpenZeppelin contracts, tokenomics, wallet integration, common errors
 

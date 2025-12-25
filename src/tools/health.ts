@@ -12,6 +12,9 @@ import {
 import { searchCache, fileCache, metadataCache } from "../utils/cache.js";
 import type { ExtendedToolDefinition, OutputSchema } from "../types/index.js";
 
+// Current version - should match package.json
+const CURRENT_VERSION = "0.1.24";
+
 // Schema definitions
 export const HealthCheckInputSchema = z.object({
   detailed: z
@@ -23,8 +26,11 @@ export const HealthCheckInputSchema = z.object({
 
 export const GetStatusInputSchema = z.object({});
 
+export const CheckVersionInputSchema = z.object({});
+
 export type HealthCheckInput = z.infer<typeof HealthCheckInputSchema>;
 export type GetStatusInput = z.infer<typeof GetStatusInputSchema>;
+export type CheckVersionInput = z.infer<typeof CheckVersionInputSchema>;
 
 /**
  * Perform health check on the MCP server
@@ -76,6 +82,64 @@ export async function getStatus(_input: GetStatusInput) {
       metadata: metadataCache.getStats(),
     },
   };
+}
+
+/**
+ * Check if current version is up to date with npm
+ */
+export async function checkVersion(_input: CheckVersionInput) {
+  try {
+    const response = await fetch(
+      "https://registry.npmjs.org/midnight-mcp/latest"
+    );
+    if (!response.ok) {
+      return {
+        currentVersion: CURRENT_VERSION,
+        latestVersion: "unknown",
+        isUpToDate: true, // Assume up to date if we can't check
+        error: "Could not fetch latest version from npm",
+      };
+    }
+
+    const data = (await response.json()) as { version: string };
+    const latestVersion = data.version;
+    const isUpToDate = CURRENT_VERSION === latestVersion;
+
+    return {
+      currentVersion: CURRENT_VERSION,
+      latestVersion,
+      isUpToDate,
+      message: isUpToDate
+        ? "✅ You are running the latest version!"
+        : `⚠️ UPDATE AVAILABLE: v${latestVersion} (you have v${CURRENT_VERSION})`,
+      updateInstructions: isUpToDate
+        ? null
+        : {
+            step1:
+              "Clear npx cache: rm -rf ~/.npm/_npx (macOS/Linux) or del /s /q %LocalAppData%\\npm-cache\\_npx (Windows)",
+            step2:
+              "Restart Claude Desktop completely (Cmd+Q / Alt+F4, then reopen)",
+            step3:
+              "Or update config to use: npx -y midnight-mcp@latest (forces latest)",
+            alternative:
+              "You can also install globally: npm install -g midnight-mcp@latest",
+          },
+      newFeatures: isUpToDate
+        ? null
+        : [
+            "midnight-validate-contract - Compile with REAL Compact compiler",
+            "midnight-extract-contract-structure - Static analysis with 10 pre-compilation checks",
+            "Pre-compilation detection: division operator, Counter.value, overflow, disclose() requirements",
+          ],
+    };
+  } catch (error) {
+    return {
+      currentVersion: CURRENT_VERSION,
+      latestVersion: "unknown",
+      isUpToDate: true,
+      error: `Failed to check version: ${error instanceof Error ? error.message : "Unknown error"}`,
+    };
+  }
 }
 
 // Output schemas for health tools
@@ -181,5 +245,48 @@ export const healthTools: ExtendedToolDefinition[] = [
       category: "health",
     },
     handler: getStatus,
+  },
+  {
+    name: "midnight-check-version",
+    description:
+      "🔄 Check if you're running the latest version of midnight-mcp. " +
+      "Compares your installed version against npm registry and provides update instructions if outdated. " +
+      "Use this if tools seem missing or you want to ensure you have the latest features like midnight-validate-contract.",
+    inputSchema: {
+      type: "object" as const,
+      properties: {},
+    },
+    outputSchema: {
+      type: "object" as const,
+      properties: {
+        currentVersion: {
+          type: "string",
+          description: "Your installed version",
+        },
+        latestVersion: { type: "string", description: "Latest version on npm" },
+        isUpToDate: {
+          type: "boolean",
+          description: "Whether you have the latest",
+        },
+        message: { type: "string", description: "Status message" },
+        updateInstructions: {
+          type: "object",
+          description: "How to update if outdated",
+        },
+        newFeatures: {
+          type: "array",
+          items: { type: "string" },
+          description: "New features in latest version",
+        },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      openWorldHint: true,
+      title: "🔄 Check for Updates",
+      category: "health",
+    },
+    handler: checkVersion,
   },
 ];

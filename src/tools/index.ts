@@ -25,8 +25,12 @@ export type {
   GetLatestUpdatesInput,
 } from "./repository.js";
 
-export { healthTools, healthCheck, getStatus } from "./health.js";
-export type { HealthCheckInput, GetStatusInput } from "./health.js";
+export { healthTools, healthCheck, getStatus, checkVersion } from "./health.js";
+export type {
+  HealthCheckInput,
+  GetStatusInput,
+  CheckVersionInput,
+} from "./health.js";
 
 export { generationTools, generationHandlers } from "./generation.js";
 
