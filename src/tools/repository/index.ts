@@ -14,7 +14,6 @@ export {
   GetFileAtVersionInputSchema,
   CompareSyntaxInputSchema,
   GetLatestSyntaxInputSchema,
-  ValidateContractInputSchema,
   ExtractContractStructureInputSchema,
   type GetFileInput,
   type ListExamplesInput,
@@ -25,7 +24,6 @@ export {
   type GetFileAtVersionInput,
   type CompareSyntaxInput,
   type GetLatestSyntaxInput,
-  type ValidateContractInput,
   type ExtractContractStructureInput,
 } from "./schemas.js";
 
@@ -44,7 +42,6 @@ export {
   getFileAtVersion,
   compareSyntax,
   getLatestSyntax,
-  validateContract,
   extractContractStructure,
 } from "./handlers.js";
 

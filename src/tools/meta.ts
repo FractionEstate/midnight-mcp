@@ -78,15 +78,6 @@ const CATEGORY_INFO: Record<
       "One-shot operations",
     ],
   },
-  validation: {
-    description:
-      "Pre-compilation contract validation using the Compact compiler",
-    useCases: [
-      "Validate contract syntax",
-      "Catch errors before deployment",
-      "Get detailed error diagnostics",
-    ],
-  },
 };
 
 // ============================================================================
@@ -288,7 +279,7 @@ export const metaTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-list-tool-categories",
     description:
-      "📋 DISCOVERY TOOL: List available tool categories for progressive exploration. Use this FIRST to understand what capabilities are available, then drill into specific categories with midnight-list-category-tools. Reduces cognitive load by organizing 26 tools into 8 logical groups.",
+      "📋 DISCOVERY TOOL: List available tool categories for progressive exploration. Use this FIRST to understand what capabilities are available, then drill into specific categories with midnight-list-category-tools. Reduces cognitive load by organizing 25 tools into 7 logical groups.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -325,7 +316,6 @@ export const metaTools: ExtendedToolDefinition[] = [
             "generation",
             "health",
             "compound",
-            "validation",
           ],
           description: "Category to list tools for",
         },

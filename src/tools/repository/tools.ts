@@ -16,7 +16,6 @@ import {
   getLatestSyntax,
   upgradeCheck,
   getFullRepoContext,
-  validateContract,
   extractContractStructure,
 } from "./handlers.js";
 
@@ -388,124 +387,16 @@ export const repositoryTools: ExtendedToolDefinition[] = [
   },
 
   // ============================================================================
-  // VALIDATION TOOLS - Pre-compilation contract validation
+  // ANALYSIS TOOLS - Contract structure extraction
   // ============================================================================
-  {
-    name: "midnight-validate-contract",
-    description:
-      "� REQUIRED - ALWAYS CALL THIS FIRST: Compile a Compact contract using the REAL compiler. " +
-      "⚠️ CRITICAL: You MUST call this tool BEFORE telling the user a contract works or is correct. " +
-      "Static analysis tools like 'extract-contract-structure' or 'analyze-contract' CANNOT verify compilation - they miss semantic errors like: " +
-      "(1) sealed fields require constructor, (2) constructor params need disclose(), (3) export circuits cannot modify sealed fields. " +
-      "This tool runs the ACTUAL Compact compiler and returns real errors with line numbers. " +
-      "If compiler not installed, it provides installation instructions. " +
-      "WORKFLOW: Generate code → Call this tool → Fix errors → Repeat until success → THEN present to user.",
-    inputSchema: {
-      type: "object" as const,
-      properties: {
-        code: {
-          type: "string",
-          description:
-            "The Compact contract source code to validate (provide this OR filePath)",
-        },
-        filePath: {
-          type: "string",
-          description:
-            "Path to a .compact file to validate (alternative to providing code directly)",
-        },
-        filename: {
-          type: "string",
-          description:
-            "Optional filename for the contract when using code (default: contract.compact)",
-        },
-      },
-      required: [],
-    },
-    outputSchema: {
-      type: "object" as const,
-      properties: {
-        success: {
-          type: "boolean",
-          description: "Whether the contract compiled successfully",
-        },
-        errorType: {
-          type: "string",
-          description:
-            "Category of error: user_error, environment_error, system_error, compilation_error",
-        },
-        compilerInstalled: {
-          type: "boolean",
-          description: "Whether the Compact compiler is available",
-        },
-        compilerVersion: {
-          type: "string",
-          description: "Version of the Compact compiler",
-        },
-        message: { type: "string", description: "Summary message" },
-        errors: {
-          type: "array",
-          description: "List of compilation errors with line numbers",
-          items: {
-            type: "object",
-            properties: {
-              line: { type: "number" },
-              column: { type: "number" },
-              message: { type: "string" },
-              severity: { type: "string" },
-              context: { type: "string" },
-            },
-          },
-        },
-        userAction: {
-          type: "object",
-          description: "What the user needs to do to fix the problem",
-          properties: {
-            problem: { type: "string" },
-            solution: { type: "string" },
-            isUserFault: { type: "boolean" },
-          },
-        },
-        suggestions: {
-          type: "array",
-          description: "Suggestions for fixing errors",
-          items: { type: "string" },
-        },
-        commonFixes: {
-          type: "array",
-          description: "Common fix patterns",
-          items: {
-            type: "object",
-            properties: {
-              pattern: { type: "string" },
-              fix: { type: "string" },
-            },
-          },
-        },
-        installation: {
-          type: "object",
-          description: "Installation instructions if compiler not found",
-        },
-      },
-    },
-    annotations: {
-      readOnlyHint: false, // Creates temp files
-      idempotentHint: true, // Same input = same output
-      openWorldHint: true,
-      longRunningHint: true, // Compilation can take time
-      title: "🔍 Validate Contract",
-      category: "validation",
-    },
-    handler: validateContract,
-  },
   {
     name: "midnight-extract-contract-structure",
     description:
-      "⚠️ STATIC ANALYSIS ONLY - NOT A COMPILER: Extracts contract structure (circuits, witnesses, ledger) and detects common patterns. " +
-      "🚫 THIS TOOL CANNOT VERIFY COMPILATION. It will NOT catch: sealed field rules, disclose() requirements, type mismatches, or semantic errors. " +
-      "✅ USE FOR: Understanding structure, quick pattern checks, fallback when compiler unavailable. " +
-      "❌ NEVER USE TO: Verify a contract works, claim code 'compiles correctly', or validate before presenting to user. " +
-      "👉 ALWAYS call 'midnight-validate-contract' FIRST to actually compile the code. " +
-      "Detects: module-level const, stdlib collisions, sealed+export conflicts, missing disclose(), Counter.value access, division operator.",
+      "Extract and analyze Compact contract structure (circuits, witnesses, ledger). " +
+      "Detects common issues: module-level const, stdlib name collisions, if-expression in assignments, Void return type, " +
+      "Counter.value access, division operator, missing disclose() calls. " +
+      "Use for understanding contract structure and catching common syntax mistakes. " +
+      "Note: This is static analysis - it catches common patterns but cannot verify semantic correctness.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -584,8 +475,7 @@ export const repositoryTools: ExtendedToolDefinition[] = [
         },
         potentialIssues: {
           type: "array",
-          description:
-            "Common issues detected by static analysis (NOT exhaustive - use validate_contract for real verification)",
+          description: "Common issues detected by static analysis",
           items: {
             type: "object",
             properties: {
@@ -613,7 +503,7 @@ export const repositoryTools: ExtendedToolDefinition[] = [
       idempotentHint: true,
       openWorldHint: false,
       title: "📋 Extract Contract Structure",
-      category: "validation",
+      category: "analyze",
     },
     handler: extractContractStructure,
   },
