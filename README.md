@@ -26,6 +26,7 @@ Add to your `claude_desktop_config.json`:
 ```
 
 **Config file locations:**
+
 - macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 - Linux: `~/.config/Claude/claude_desktop_config.json`
@@ -34,7 +35,7 @@ Add to your `claude_desktop_config.json`:
 
 One-click install:
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcCJ9)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcEBsYXRlc3QifQ==)
 
 Or manually add to `.cursor/mcp.json`:
 
@@ -70,28 +71,44 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 **No API keys required.** Restart your editor after adding the config.
 
+### Automatic Updates
+
+Using `midnight-mcp@latest` ensures you always get the newest version. If you have an older config without `@latest`, update it:
+
+```diff
+- "args": ["-y", "midnight-mcp"]
++ "args": ["-y", "midnight-mcp@latest"]
+```
+
+Or clear the npx cache to force an update:
+
+```bash
+npx clear-npx-cache
+```
+
 ---
 
 ## What's Included
 
 ### 25 Tools
 
-| Category | Tools | Description |
-|----------|-------|-------------|
-| **Search** | `search-compact`, `search-typescript`, `search-docs` | Semantic search across Midnight codebase |
-| **Analysis** | `analyze-contract`, `explain-circuit`, `extract-contract-structure` | Static analysis and pattern detection |
-| **Repository** | `get-file`, `list-examples`, `get-latest-updates` | Access files and examples |
-| **Versioning** | `get-version-info`, `check-breaking-changes`, `get-migration-guide`, `get-file-at-version`, `compare-syntax`, `get-latest-syntax` | Version tracking and migration |
-| **AI Generation** | `generate-contract`, `review-contract`, `document-contract` | AI-powered code generation _(requires sampling)_ |
-| **Compound** | `upgrade-check`, `get-repo-context` | Multi-step operations _(saves 50-70% tokens)_ |
-| **Health** | `health-check`, `get-status`, `check-version` | Server status and version checking |
-| **Discovery** | `list-tool-categories`, `list-category-tools` | Explore available tools |
+| Category          | Tools                                                                                                                             | Description                                      |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| **Search**        | `search-compact`, `search-typescript`, `search-docs`                                                                              | Semantic search across Midnight codebase         |
+| **Analysis**      | `analyze-contract`, `explain-circuit`, `extract-contract-structure`                                                               | Static analysis and pattern detection            |
+| **Repository**    | `get-file`, `list-examples`, `get-latest-updates`                                                                                 | Access files and examples                        |
+| **Versioning**    | `get-version-info`, `check-breaking-changes`, `get-migration-guide`, `get-file-at-version`, `compare-syntax`, `get-latest-syntax` | Version tracking and migration                   |
+| **AI Generation** | `generate-contract`, `review-contract`, `document-contract`                                                                       | AI-powered code generation _(requires sampling)_ |
+| **Compound**      | `upgrade-check`, `get-repo-context`                                                                                               | Multi-step operations _(saves 50-70% tokens)_    |
+| **Health**        | `health-check`, `get-status`, `check-version`                                                                                     | Server status and version checking               |
+| **Discovery**     | `list-tool-categories`, `list-category-tools`                                                                                     | Explore available tools                          |
 
 All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
 ### 9 Embedded Resources
 
 Quick references available offline:
+
 - Compact syntax guide
 - SDK API reference
 - OpenZeppelin contracts
@@ -113,14 +130,14 @@ Quick references available offline:
 
 The API indexes **39 Midnight repositories**:
 
-| Category | Repositories |
-|----------|--------------|
-| **Core** | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`, `midnight-node`, `midnight-indexer`, `midnight-ledger`, `midnight-zk` |
-| **Examples** | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app` |
-| **Infrastructure** | `midnight-node-docker`, `midnight-dapp-connector-api`, `compact-tree-sitter`, `setup-compact-action` |
-| **Partner Libraries** | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps` (LunarSwap) |
-| **Official Partners** | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core` |
-| **Core Partner** | `PaimaStudios/midnight-game-2`, `PaimaStudios/midnight-wasm-prover`, `PaimaStudios/midnight-batcher`, `PaimaStudios/midnight-impact-rps-example` |
+| Category              | Repositories                                                                                                                                                           |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Core**              | `compact`, `midnight-js`, `midnight-wallet`, `midnight-docs`, `midnight-node`, `midnight-indexer`, `midnight-ledger`, `midnight-zk`                                    |
+| **Examples**          | `example-counter`, `example-bboard`, `example-dex`, `create-mn-app`                                                                                                    |
+| **Infrastructure**    | `midnight-node-docker`, `midnight-dapp-connector-api`, `compact-tree-sitter`, `setup-compact-action`                                                                   |
+| **Partner Libraries** | `OpenZeppelin/compact-contracts`, `OpenZeppelin/midnight-apps` (LunarSwap)                                                                                             |
+| **Official Partners** | `bricktowers/midnight-seabattle`, `bricktowers/midnight-identity`, `bricktowers/midnight-rwa`, `MeshJS/midnight-starter-template`, `midnames/core`                     |
+| **Core Partner**      | `PaimaStudios/midnight-game-2`, `PaimaStudios/midnight-wasm-prover`, `PaimaStudios/midnight-batcher`, `PaimaStudios/midnight-impact-rps-example`                       |
 | **Hackathon Winners** | Sea Battle: `ErickRomeroDev/naval-battle-game_v2`, `eddex/midnight-sea-battle-hackathon` • Mini DApp: `statera-protocol`, `nel349/midnight-bank`, `Imdavyking/zkbadge` |
 
 ---
