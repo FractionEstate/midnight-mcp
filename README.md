@@ -83,17 +83,13 @@ Restart your editor after adding the config. **No API keys required.**
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Search         | `midnight-search-compact`, `midnight-search-typescript`, `midnight-search-docs`                                                                                                         |
 | Analysis       | `midnight-analyze-contract`, `midnight-explain-circuit`                                                                                                                                 |
-| **Validation** | `midnight-validate-contract` ⭐, `midnight-extract-contract-structure`                                                                                                                  |
+| **Validation** | `midnight-validate-contract`, `midnight-extract-contract-structure`                                                                                                                     |
 | Repository     | `midnight-get-file`, `midnight-list-examples`, `midnight-get-latest-updates`                                                                                                            |
 | Versioning     | `midnight-get-version-info`, `midnight-check-breaking-changes`, `midnight-get-migration-guide`, `midnight-get-file-at-version`, `midnight-compare-syntax`, `midnight-get-latest-syntax` |
 | AI Generation  | `midnight-generate-contract`, `midnight-review-contract`, `midnight-document-contract` _(requires sampling)_                                                                            |
 | Compound       | `midnight-upgrade-check`, `midnight-get-repo-context` _(saves 50-70% tokens)_                                                                                                           |
-| Health         | `midnight-health-check`, `midnight-get-status`, `midnight-check-version` 🔄                                                                                                             |
+| Health         | `midnight-health-check`, `midnight-get-status`, `midnight-check-version`                                                                                                                |
 | Discovery      | `midnight-list-tool-categories`, `midnight-list-category-tools`                                                                                                                         |
-
-> **⭐ Key Tool:** `midnight-validate-contract` compiles code using the **real Compact compiler** - essential for verifying contracts actually work before deployment.
->
-> **🔄 New:** `midnight-check-version` tells you if you're running the latest version with update instructions.
 
 **9 Embedded Resources** — Quick references available offline: Compact syntax, SDK API, OpenZeppelin contracts, tokenomics, wallet integration, common errors
 
