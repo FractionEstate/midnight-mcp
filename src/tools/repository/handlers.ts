@@ -10,6 +10,7 @@ import {
   DEFAULT_REPOSITORIES,
   SelfCorrectionHints,
 } from "../../utils/index.js";
+import { sendProgressNotification } from "../../server.js";
 import { REPO_ALIASES, EXAMPLES } from "./constants.js";
 import { EMBEDDED_DOCS } from "../../resources/content/docs-content.js";
 import type {
@@ -551,9 +552,12 @@ export async function getLatestSyntax(input: GetLatestSyntaxInput) {
  * Combines: getVersionInfo + checkBreakingChanges + getMigrationGuide
  * Reduces 3 tool calls to 1, saving ~60% tokens
  */
-export async function upgradeCheck(input: UpgradeCheckInput) {
+export async function upgradeCheck(
+  input: UpgradeCheckInput & { _meta?: { progressToken?: string | number } }
+) {
   const repoName = input?.repo || "compact";
   const currentVersion = input.currentVersion;
+  const progressToken = input._meta?.progressToken;
 
   logger.debug("Running compound upgrade check", {
     repo: repoName,
@@ -567,6 +571,11 @@ export async function upgradeCheck(input: UpgradeCheckInput) {
     );
   }
 
+  // Send progress: Starting
+  if (progressToken) {
+    sendProgressNotification(progressToken, 1, 4, "Fetching version info...");
+  }
+
   // Fetch all data in parallel
   const [versionInfo, outdatedInfo, breakingChanges] = await Promise.all([
     releaseTracker.getVersionInfo(resolved.owner, resolved.repo),
@@ -578,18 +587,43 @@ export async function upgradeCheck(input: UpgradeCheckInput) {
     ),
   ]);
 
+  // Send progress: Fetched version data
+  if (progressToken) {
+    sendProgressNotification(
+      progressToken,
+      2,
+      4,
+      "Checking breaking changes..."
+    );
+  }
+
   const latestVersion =
     versionInfo.latestStableRelease?.tag || versionInfo.latestRelease?.tag;
 
   // Only fetch migration guide if there are breaking changes
   let migrationGuide = null;
   if (breakingChanges.length > 0 && latestVersion) {
+    // Send progress: Fetching migration guide
+    if (progressToken) {
+      sendProgressNotification(
+        progressToken,
+        3,
+        4,
+        "Generating migration guide..."
+      );
+    }
+
     migrationGuide = await releaseTracker.getMigrationGuide(
       resolved.owner,
       resolved.repo,
       currentVersion,
       latestVersion
     );
+  }
+
+  // Send progress: Complete
+  if (progressToken) {
+    sendProgressNotification(progressToken, 4, 4, "Analysis complete");
   }
 
   // Compute upgrade urgency
@@ -640,8 +674,11 @@ export async function upgradeCheck(input: UpgradeCheckInput) {
  * Combines: getVersionInfo + getLatestSyntax + listExamples (filtered)
  * Provides everything needed to start working with a repo
  */
-export async function getFullRepoContext(input: FullRepoContextInput) {
+export async function getFullRepoContext(
+  input: FullRepoContextInput & { _meta?: { progressToken?: string | number } }
+) {
   const repoName = input?.repo || "compact";
+  const progressToken = input._meta?.progressToken;
 
   logger.debug("Getting full repo context", { repo: repoName });
 
@@ -650,6 +687,11 @@ export async function getFullRepoContext(input: FullRepoContextInput) {
     throw new Error(
       `Unknown repository: ${repoName}. Available: ${Object.keys(REPO_ALIASES).join(", ")}`
     );
+  }
+
+  // Send progress: Starting
+  if (progressToken) {
+    sendProgressNotification(progressToken, 1, 4, "Fetching version info...");
   }
 
   // Fetch version info
@@ -662,6 +704,16 @@ export async function getFullRepoContext(input: FullRepoContextInput) {
     versionInfo.latestRelease?.tag ||
     "main";
 
+  // Send progress: Fetched version
+  if (progressToken) {
+    sendProgressNotification(
+      progressToken,
+      2,
+      4,
+      "Loading syntax reference..."
+    );
+  }
+
   // Conditionally fetch syntax reference
   let syntaxRef = null;
   if (input.includeSyntax !== false) {
@@ -669,6 +721,11 @@ export async function getFullRepoContext(input: FullRepoContextInput) {
       resolved.owner,
       resolved.repo
     );
+  }
+
+  // Send progress: Loading examples
+  if (progressToken) {
+    sendProgressNotification(progressToken, 3, 4, "Gathering examples...");
   }
 
   // Get relevant examples for this repo
@@ -690,6 +747,11 @@ export async function getFullRepoContext(input: FullRepoContextInput) {
         description: ex.description,
         complexity: ex.complexity,
       }));
+  }
+
+  // Send progress: Complete
+  if (progressToken) {
+    sendProgressNotification(progressToken, 4, 4, "Context ready");
   }
 
   return {

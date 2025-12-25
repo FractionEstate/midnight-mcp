@@ -12,6 +12,7 @@ import {
   UnsubscribeRequestSchema,
   SetLevelRequestSchema,
   LoggingLevel,
+  CompleteRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 
 import {
@@ -194,6 +195,33 @@ export function sendLogToClient(
   }
 }
 
+/**
+ * Send a progress notification to the MCP client
+ * Used for long-running operations like compound tools
+ */
+export function sendProgressNotification(
+  progressToken: string | number,
+  progress: number,
+  total?: number,
+  message?: string
+): void {
+  if (!serverInstance) return;
+
+  try {
+    serverInstance.notification({
+      method: "notifications/progress",
+      params: {
+        progressToken,
+        progress,
+        ...(total !== undefined && { total }),
+        ...(message && { message }),
+      },
+    });
+  } catch {
+    // Ignore notification errors
+  }
+}
+
 export function createServer(): Server {
   const server = new Server(SERVER_INFO, {
     capabilities: {
@@ -208,6 +236,7 @@ export function createServer(): Server {
         listChanged: true,
       },
       logging: {},
+      completions: {},
     },
   });
 
@@ -234,6 +263,9 @@ export function createServer(): Server {
   // Register logging handler
   registerLoggingHandler(server);
 
+  // Register completions handler
+  registerCompletionsHandler(server);
+
   // Setup sampling callback if available
   setupSampling(server);
 
@@ -252,6 +284,102 @@ function registerLoggingHandler(server: Server): void {
       message: `Log level changed to ${level}`,
     });
     return {};
+  });
+}
+
+// Completion suggestions for prompt arguments
+const COMPLETION_VALUES: Record<string, Record<string, string[]>> = {
+  "midnight:create-contract": {
+    contractType: [
+      "token",
+      "voting",
+      "credential",
+      "auction",
+      "escrow",
+      "custom",
+    ],
+    privacyLevel: ["full", "partial", "public"],
+    complexity: ["beginner", "intermediate", "advanced"],
+  },
+  "midnight:review-contract": {
+    focusAreas: [
+      "security",
+      "performance",
+      "privacy",
+      "readability",
+      "gas-optimization",
+    ],
+  },
+  "midnight:explain-concept": {
+    concept: [
+      "zk-proofs",
+      "circuits",
+      "witnesses",
+      "ledger",
+      "state-management",
+      "privacy-model",
+      "token-transfers",
+      "merkle-trees",
+    ],
+    level: ["beginner", "intermediate", "advanced"],
+  },
+  "midnight:compare-approaches": {
+    approaches: [
+      "token-standards",
+      "state-management",
+      "privacy-patterns",
+      "circuit-design",
+    ],
+  },
+  "midnight:debug-contract": {
+    errorType: [
+      "compilation",
+      "runtime",
+      "logic",
+      "privacy-leak",
+      "state-corruption",
+    ],
+  },
+};
+
+/**
+ * Register completions handler for argument autocompletion
+ */
+function registerCompletionsHandler(server: Server): void {
+  server.setRequestHandler(CompleteRequestSchema, async (request) => {
+    const { ref, argument } = request.params;
+
+    if (ref.type !== "ref/prompt") {
+      return { completion: { values: [], hasMore: false } };
+    }
+
+    const promptName = ref.name;
+    const argName = argument.name;
+    const currentValue = argument.value?.toLowerCase() || "";
+
+    // Get completion values for this prompt/argument
+    const promptCompletions = COMPLETION_VALUES[promptName];
+    if (!promptCompletions) {
+      return { completion: { values: [], hasMore: false } };
+    }
+
+    const argValues = promptCompletions[argName];
+    if (!argValues) {
+      return { completion: { values: [], hasMore: false } };
+    }
+
+    // Filter by current input
+    const filtered = argValues.filter((v) =>
+      v.toLowerCase().includes(currentValue)
+    );
+
+    return {
+      completion: {
+        values: filtered.slice(0, 20),
+        total: filtered.length,
+        hasMore: filtered.length > 20,
+      },
+    };
   });
 }
 
@@ -352,6 +480,9 @@ function registerToolHandlers(server: Server): void {
             text: JSON.stringify(result, null, 2),
           },
         ],
+        // Include structured content for machine-readable responses
+        // This allows clients to parse results without JSON.parse()
+        structuredContent: result,
       };
     } catch (error) {
       logger.error(`Tool error: ${name}`, { error: String(error) });

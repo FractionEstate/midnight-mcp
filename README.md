@@ -107,13 +107,15 @@ All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
 ### MCP Capabilities
 
-| Capability | Feature |
-|------------|---------|
-| **Tools** | 25 tools with `listChanged` notifications |
-| **Resources** | 9 embedded resources with subscription support |
-| **Prompts** | 5 workflow prompts |
-| **Logging** | Client-controllable log level |
-| **Sampling** | AI-powered generation (when client supports it) |
+| Capability      | Feature                                         |
+| --------------- | ----------------------------------------------- |
+| **Tools**       | 25 tools with `listChanged` notifications       |
+| **Resources**   | 9 embedded resources with subscription support  |
+| **Prompts**     | 5 workflow prompts                              |
+| **Logging**     | Client-controllable log level                   |
+| **Completions** | Autocomplete for prompt arguments               |
+| **Progress**    | Real-time progress for compound tools           |
+| **Sampling**    | AI-powered generation (when client supports it) |
 
 ### 9 Embedded Resources
 
