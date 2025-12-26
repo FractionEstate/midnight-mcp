@@ -457,7 +457,7 @@ export const analyzeTools: ExtendedToolDefinition[] = [
     description:
       "⚠️ STATIC ANALYSIS ONLY - Analyze contract structure and patterns. " +
       "🚫 THIS DOES NOT COMPILE THE CONTRACT. Cannot catch: sealed field rules, disclose() requirements, semantic errors. " +
-      "👉 ALWAYS call 'midnight-validate-contract' FIRST to verify the code actually compiles. " +
+      "👉 Use 'midnight-extract-contract-structure' for pre-compilation checks. " +
       "Use this for: understanding structure, security pattern analysis, recommendations. " +
       "NEVER claim a contract 'works' or 'compiles' based on this tool alone.",
     inputSchema: {

@@ -129,9 +129,9 @@ export async function checkVersion(_input: CheckVersionInput) {
       newFeatures: isUpToDate
         ? null
         : [
-            "midnight-validate-contract - Compile with REAL Compact compiler",
+            "Auto-update config tool - AI agents update your config automatically",
             "midnight-extract-contract-structure - Static analysis with 10 pre-compilation checks",
-            "Pre-compilation detection: division operator, Counter.value, overflow, disclose() requirements",
+            "MCP Logging, Progress, Completions capabilities",
           ],
     };
   } catch (error) {
@@ -342,7 +342,7 @@ export const healthTools: ExtendedToolDefinition[] = [
     description:
       "🔄 Check if you're running the latest version of midnight-mcp. " +
       "Compares your installed version against npm registry and provides update instructions if outdated. " +
-      "Use this if tools seem missing or you want to ensure you have the latest features like midnight-validate-contract.",
+      "Use this if tools seem missing or you want to ensure you have the latest features.",
     inputSchema: {
       type: "object" as const,
       properties: {},
