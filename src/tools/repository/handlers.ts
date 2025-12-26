@@ -571,6 +571,16 @@ export circuit increment(): [] {
             correct: "Choice.rock (dot notation)",
             error: 'parse error: found ":" looking for ")"',
           },
+          {
+            wrong: "witness fn(): T { ... }",
+            correct: "witness fn(): T;  // declaration only, no body",
+            error: "parse error after witness declaration",
+          },
+          {
+            wrong: "pure function helper(): T",
+            correct: "pure circuit helper(): T",
+            error: 'unbound identifier "function"',
+          },
         ],
 
         syntaxReference: compactReference,

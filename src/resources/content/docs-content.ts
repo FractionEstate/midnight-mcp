@@ -198,18 +198,20 @@ export pure circuit hash(x: Field): Bytes<32>  // No state access
 
 Witnesses provide off-chain/private data to circuits. They run locally, not on-chain.
 
+**CRITICAL**: Witnesses are declarations only - NO implementation body in Compact!
+The implementation goes in your TypeScript prover.
+
 \`\`\`compact
-// Basic witness - returns private data
+// ✅ CORRECT - declaration only, semicolon at end
 witness local_secret_key(): Bytes<32>;
-
-// Witness with parameters
 witness get_merkle_path(leaf: Bytes<32>): MerkleTreePath<10, Bytes<32>>;
-
-// Witness that returns nothing (side effect only)
 witness store_locally(data: Field): [];
-
-// Witness returning optional
 witness find_user(id: Bytes<32>): Maybe<UserData>;
+
+// ❌ WRONG - witnesses cannot have bodies
+witness get_caller(): Bytes<32> {
+  return public_key(local_secret_key());  // ERROR!
+}
 \`\`\`
 
 ---
@@ -225,6 +227,27 @@ export sealed ledger nonce: Bytes<32>;
 constructor(initNonce: Bytes<32>) {
   owner = disclose(public_key(local_secret_key()));
   nonce = disclose(initNonce);
+}
+\`\`\`
+
+---
+
+## 7.5 Pure Circuits (Helper Functions)
+
+Use \`pure circuit\` for helper functions that don't modify ledger state:
+
+\`\`\`compact
+// ✅ CORRECT - use "pure circuit"
+pure circuit determine_winner(p1: Choice, p2: Choice): Result {
+  if (p1 == p2) {
+    return Result.draw;
+  }
+  // ... logic
+}
+
+// ❌ WRONG - "function" keyword doesn't exist
+pure function determine_winner(p1: Choice, p2: Choice): Result {
+  // ERROR: unbound identifier "function"
 }
 \`\`\`
 

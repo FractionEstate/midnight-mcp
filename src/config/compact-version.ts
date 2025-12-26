@@ -381,4 +381,19 @@ witness lookup_value(key: Bytes<32>): Field;`,
 WRONG:  Choice::rock, GameState::waiting
 CORRECT: Choice.rock, GameState.waiting`,
   },
+  {
+    error: 'parse error: found "{" after witness declaration',
+    cause: "Trying to add implementation body to witness",
+    fix: `Witnesses are declarations only - no body allowed:
+WRONG:  witness get_caller(): Bytes<32> { return ...; }
+CORRECT: witness get_caller(): Bytes<32>;
+Implementation goes in TypeScript prover, not Compact.`,
+  },
+  {
+    error: 'unbound identifier "function"',
+    cause: 'Using "pure function" instead of "pure circuit"',
+    fix: `Use "pure circuit" for helper functions:
+WRONG:  pure function helper(...): Type { }
+CORRECT: pure circuit helper(...): Type { }`,
+  },
 ];
