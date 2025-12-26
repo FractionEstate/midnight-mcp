@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.34] - 2025-12-26
+
+### Fixed
+
+- **Connection timing bug** - Fixed crash in Claude Desktop with "Not connected" error
+  - Added `isConnected` flag to track when server transport is ready
+  - Modified `sendLogToClient` to check connection state before sending notifications
+  - Prevents log notifications from being sent before MCP handshake completes
+
 ## [0.1.33] - 2025-12-26
 
 ### Fixed
