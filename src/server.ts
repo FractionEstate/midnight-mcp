@@ -155,6 +155,16 @@ let mcpLogLevel: LoggingLevel = "info";
 // Server instance for sending notifications
 let serverInstance: Server | null = null;
 
+// Track if server is connected (can send notifications)
+let isConnected = false;
+
+/**
+ * Mark server as connected (safe to send notifications)
+ */
+export function setServerConnected(connected: boolean): void {
+  isConnected = connected;
+}
+
 /**
  * Send a log message to the MCP client
  * This allows clients to see server logs for debugging
@@ -164,7 +174,8 @@ export function sendLogToClient(
   loggerName: string,
   data: unknown
 ): void {
-  if (!serverInstance) return;
+  // Only send if server exists AND is connected
+  if (!serverInstance || !isConnected) return;
 
   // Map levels to numeric values for comparison
   const levelValues: Record<LoggingLevel, number> = {
@@ -803,6 +814,9 @@ export async function startServer(): Promise<void> {
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
+
+  // Now safe to send notifications
+  setServerConnected(true);
 
   logger.info("Midnight MCP Server running on stdio");
 }
