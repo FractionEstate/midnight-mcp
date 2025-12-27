@@ -206,7 +206,37 @@ export const TYPE_COMPATIBILITY = {
     {
       types: "Uint<N> + Uint<N>",
       works: true,
-      note: "Must fit in result width",
+      note: "Result is bounded type, cast back: (a + b) as Uint<64>",
+    },
+    {
+      types: "Uint<64> + Uint<64>",
+      works: true,
+      note: "Result is Uint<0..36893488147419103230>, must cast: (a + b) as Uint<64>",
+    },
+    {
+      types: "Uint<64> * Uint<64>",
+      works: true,
+      note: "Result is wide bounded type, cast back to target type",
+    },
+  ],
+  typeCasting: [
+    {
+      from: "Uint<64>",
+      to: "Bytes<32>",
+      direct: false,
+      fix: "Go through Field: (amount as Field) as Bytes<32>",
+    },
+    {
+      from: "Uint<N>",
+      to: "Field",
+      direct: true,
+      note: "Safe cast: value as Field",
+    },
+    {
+      from: "arithmetic result",
+      to: "Uint<64>",
+      direct: true,
+      note: "Required cast: (a + b) as Uint<64>",
     },
   ],
   assignments: [
@@ -258,27 +288,18 @@ export const LEDGER_TYPE_LIMITS = {
       { method: ".remove(key)", works: true, note: "Removes entry" },
       {
         method: ".lookup(key)",
-        works: false,
-        note: "NOT available in circuits",
+        works: true,
+        note: "Returns Option<ValueType> - use in circuits",
       },
       {
         method: ".member(key)",
-        works: false,
-        note: "NOT available in circuits",
+        works: true,
+        note: "Returns Boolean - checks if key exists",
       },
     ],
     typescriptAccess:
       "Query map via `contractState.data.get(key)` in TypeScript SDK",
-    reason:
-      "ZK circuits prove transitions, not current state. Use witnesses for reads.",
-    pattern: `// To read a map value in a circuit, use a witness:
-witness get_stored_value(key: Bytes<32>): Field;
-
-export circuit update_if_exists(key: Bytes<32>, new_value: Field): [] {
-  const current = get_stored_value(key);  // Prover fetches from ledger
-  // ... use current value
-  data.insert(key, new_value);  // Update is allowed
-}`,
+    note: "Map.lookup() and Map.member() ARE available in circuits (verified with OpenZeppelin contracts)",
   },
   Set: {
     circuitOperations: [
@@ -286,13 +307,13 @@ export circuit update_if_exists(key: Bytes<32>, new_value: Field): [] {
       { method: ".remove(value)", works: true, note: "Removes from set" },
       {
         method: ".member(value)",
-        works: false,
-        note: "NOT available in circuits",
+        works: true,
+        note: "Returns Boolean - checks if value exists in set",
       },
     ],
     typescriptAccess:
       "Check membership via `contractState.set.has(value)` in TypeScript SDK",
-    reason: "Same as Map - use witnesses for membership checks",
+    note: "Set.member() IS available in circuits",
   },
   MerkleTree: {
     circuitOperations: [
@@ -361,10 +382,35 @@ export ledger myField: Field;  // Not Cell<Field>`,
   },
   {
     error: "member access requires struct type",
-    cause: "Trying to use .member() or .lookup() on Map/Set in circuit",
-    fix: `Map/Set queries are not available in circuits.
-Use a witness to fetch the value from the prover:
-witness lookup_value(key: Bytes<32>): Field;`,
+    cause: "Trying to access a field on a non-struct type",
+    fix: `Make sure you're accessing a struct field, not a primitive.
+Map.lookup() and Map.member() ARE available in circuits.
+Check that the base type is actually a struct.`,
+  },
+  {
+    error: "potential witness-value disclosure must be declared",
+    cause: "Circuit parameter flows to ledger operation without disclose()",
+    fix: `Disclose parameters at the start of the circuit:
+export circuit my_circuit(param: Bytes<32>): [] {
+  const d_param = disclose(param);  // Acknowledge on-chain visibility
+  ledger.insert(d_param, value);    // Now use disclosed value
+}`,
+  },
+  {
+    error:
+      "expected second argument of insert to have type Uint<64> but received Uint<0..N>",
+    cause: "Arithmetic result has bounded type, needs cast back to target",
+    fix: `Cast arithmetic results back to the target type:
+const new_balance = (current + amount) as Uint<64>;
+ledger_map.insert(key, new_balance);`,
+  },
+  {
+    error: "cannot cast from type Uint<64> to type Bytes<32>",
+    cause: "Direct Uint to Bytes cast not allowed",
+    fix: `Go through Field first:
+const amount_field = amount as Field;
+const amount_bytes = amount_field as Bytes<32>;
+// Or chained: (amount as Field) as Bytes<32>`,
   },
   {
     error: "cannot prove assertion",

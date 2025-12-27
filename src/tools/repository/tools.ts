@@ -251,8 +251,15 @@ export const repositoryTools: ExtendedToolDefinition[] = [
   },
   {
     name: "midnight-get-latest-syntax",
-    description:
-      "Get the authoritative syntax reference for Compact language at the latest version. Use this as the source of truth when writing or reviewing contracts to ensure they compile.",
+    description: `🚨 CALL THIS BEFORE GENERATING ANY COMPACT CODE!
+Get the authoritative Compact syntax reference. Prevents hallucination by providing:
+- Correct syntax patterns (Compact is NOT TypeScript!)
+- commonMistakes array with wrong→correct mappings
+- Type casting rules (Uint→Bytes needs two casts)
+- disclose() requirements for circuit params
+- Map.lookup()/Set.member() ARE available in circuits
+
+ALWAYS check this reference before writing Compact contracts.`,
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -266,7 +273,7 @@ export const repositoryTools: ExtendedToolDefinition[] = [
     annotations: {
       readOnlyHint: true,
       openWorldHint: true,
-      title: "Get Latest Syntax Reference",
+      title: "🚨 Get Syntax Reference (Call First!)",
       category: "versioning",
     },
     handler: getLatestSyntax,

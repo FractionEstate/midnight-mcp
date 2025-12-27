@@ -562,11 +562,6 @@ export circuit increment(): [] {
             error: 'operation "value" undefined for Counter',
           },
           {
-            wrong: "data.lookup(key)",
-            correct: "// Use witness: witness get_value(key): Type;",
-            error: "member access requires struct type",
-          },
-          {
             wrong: "Choice::rock (Rust-style)",
             correct: "Choice.rock (dot notation)",
             error: 'parse error: found ":" looking for ")"',
@@ -580,6 +575,23 @@ export circuit increment(): [] {
             wrong: "pure function helper(): T",
             correct: "pure circuit helper(): T",
             error: 'unbound identifier "function"',
+          },
+          {
+            wrong: "amount as Bytes<32>  // direct Uint to Bytes",
+            correct: "(amount as Field) as Bytes<32>  // go through Field",
+            error: "cannot cast from type Uint<64> to type Bytes<32>",
+          },
+          {
+            wrong: "ledger.insert(key, a + b)  // arithmetic result",
+            correct: "ledger.insert(key, (a + b) as Uint<64>)  // cast result",
+            error: "expected type Uint<64> but received Uint<0..N>",
+          },
+          {
+            wrong:
+              "export circuit fn(param: T): [] { ledger.insert(param, v); }",
+            correct:
+              "export circuit fn(param: T): [] { const d = disclose(param); ledger.insert(d, v); }",
+            error: "potential witness-value disclosure must be declared",
           },
         ],
 
@@ -612,13 +624,19 @@ export circuit increment(): [] {
           description: rc.description,
         })),
 
-        note: `CRITICAL: Use quickStartTemplate as your base. Check commonMistakes and commonErrors before submitting code. 
-KEY GOTCHAS:
+        note: `⚠️ CALL THIS TOOL BEFORE generating ANY Compact code!
+Use quickStartTemplate as your base. Check commonMistakes BEFORE submitting code.
+
+KEY RULES:
 1. public_key() is NOT a builtin - use persistentHash pattern
 2. Counter.value() NOT available in circuits - use witnesses
-3. Map.lookup()/Set.member() NOT available in circuits - use witnesses
-4. Field vs Uint comparison requires casting
-This reference is for Compact ${COMPACT_VERSION.min}-${COMPACT_VERSION.max} (last updated: ${COMPACT_VERSION.lastUpdated}).`,
+3. Map.lookup()/Set.member() ARE available in circuits (verified)
+4. Arithmetic results need casting: (a + b) as Uint<64>
+5. Uint→Bytes needs two casts: (amount as Field) as Bytes<32>
+6. Circuit params touching ledger need disclose(): const d = disclose(param);
+
+Compact is NOT TypeScript - don't guess syntax, use this reference!
+Version: ${COMPACT_VERSION.min}-${COMPACT_VERSION.max} (updated: ${COMPACT_VERSION.lastUpdated}).`,
       };
     }
   }

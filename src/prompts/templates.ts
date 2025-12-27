@@ -175,6 +175,15 @@ Based on syntax reference, generate the contract using:
 - Empty tuple return: \`circuit fn(): []\` (NOT \`Void\`)
 - Export enums: \`export enum State { ... }\`
 - Wrap witness conditionals: \`if (disclose(witness == value))\`
+- Disclose circuit params that touch ledger: \`const d = disclose(param); ledger.insert(d, v);\`
+- Cast arithmetic results: \`(a + b) as Uint<64>\`
+- Uint to Bytes needs two casts: \`(amount as Field) as Bytes<32>\`
+
+### IMPORTANT: Compact is NOT TypeScript!
+- Map.lookup() and Set.member() ARE available in circuits
+- No 'function' keyword - use 'circuit' or 'pure circuit'
+- No 'void' - use '[]'
+- Enum access: \`Choice.rock\` NOT \`Choice::rock\`
 
 ### Step 3: Validate Before Returning
 Call \`midnight-extract-contract-structure\` with your generated code to check for:
@@ -438,6 +447,13 @@ Call \`midnight-extract-contract-structure\` FIRST to check for common syntax er
 If syntax errors found, call \`midnight-get-latest-syntax\` to get:
 - The \`commonMistakes\` array with correct patterns
 - Current \`quickStartTemplate\` for reference
+
+### Step 3: Check for Common Compiler Errors
+Match error message against known fixes:
+- "cannot cast from type Uint<64> to type Bytes<32>" → Use \`(amount as Field) as Bytes<32>\`
+- "expected type Uint<64> but received Uint<0..N>" → Cast arithmetic: \`(a + b) as Uint<64>\`
+- "potential witness-value disclosure must be declared" → Disclose params: \`const d = disclose(param);\`
+- Map.lookup() and Set.member() ARE available in circuits (ignore old advice saying they aren't)
 
 ---
 
