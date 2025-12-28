@@ -8,6 +8,30 @@
 
 MCP server that gives AI assistants access to Midnight blockchain—search contracts, analyze code, and explore documentation.
 
+## Requirements
+
+- **Node.js 20+** (LTS recommended)
+
+Check your version: `node --version`
+
+<details>
+<summary><strong>Using nvm?</strong> Click for Claude Desktop setup</summary>
+
+If you use nvm, Claude Desktop may not see your nvm-managed Node. Use this config instead:
+
+```json
+{
+  "mcpServers": {
+    "midnight": {
+      "command": "/bin/sh",
+      "args": ["-c", "source ~/.nvm/nvm.sh && nvm use 20 >/dev/null 2>&1 && npx -y midnight-mcp@latest"]
+    }
+  }
+}
+```
+
+</details>
+
 ## Quick Start
 
 ### Claude Desktop
