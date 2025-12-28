@@ -11,7 +11,7 @@ export default defineConfig({
   clean: true,
   sourcemap: true,
   dts: true,
-  splitting: false,
+  splitting: true,
   shims: true,
   define: {
     "process.env.NPM_PACKAGE_VERSION": JSON.stringify(packageJson.version),
