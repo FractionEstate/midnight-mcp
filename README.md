@@ -24,7 +24,10 @@ If you use nvm, Claude Desktop may not see your nvm-managed Node. Use this confi
   "mcpServers": {
     "midnight": {
       "command": "/bin/sh",
-      "args": ["-c", "source ~/.nvm/nvm.sh && nvm use 20 >/dev/null 2>&1 && npx -y midnight-mcp@latest"]
+      "args": [
+        "-c",
+        "source ~/.nvm/nvm.sh && nvm use 20 >/dev/null 2>&1 && npx -y midnight-mcp@latest"
+      ]
     }
   }
 }
