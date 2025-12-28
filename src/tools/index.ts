@@ -1,40 +1,87 @@
+/**
+ * Tools module exports
+ * Barrel file for all MCP tools
+ */
+
+// Search tools
 export {
   searchTools,
   searchCompact,
   searchTypeScript,
   searchDocs,
-} from "./search.js";
-export type {
-  SearchCompactInput,
-  SearchTypeScriptInput,
-  SearchDocsInput,
-} from "./search.js";
+  SearchCompactInputSchema,
+  SearchTypeScriptInputSchema,
+  SearchDocsInputSchema,
+  type SearchCompactInput,
+  type SearchTypeScriptInput,
+  type SearchDocsInput,
+} from "./search/index.js";
 
-export { analyzeTools, analyzeContract, explainCircuit } from "./analyze.js";
-export type { AnalyzeContractInput, ExplainCircuitInput } from "./analyze.js";
+// Analyze tools
+export {
+  analyzeTools,
+  analyzeContract,
+  explainCircuit,
+  AnalyzeContractInputSchema,
+  ExplainCircuitInputSchema,
+  type AnalyzeContractInput,
+  type ExplainCircuitInput,
+} from "./analyze/index.js";
 
+// Repository tools
 export {
   repositoryTools,
   getFile,
   listExamples,
   getLatestUpdates,
-} from "./repository.js";
-export type {
-  GetFileInput,
-  ListExamplesInput,
-  GetLatestUpdatesInput,
-} from "./repository.js";
+  GetFileInputSchema,
+  ListExamplesInputSchema,
+  GetLatestUpdatesInputSchema,
+  type GetFileInput,
+  type ListExamplesInput,
+  type GetLatestUpdatesInput,
+} from "./repository/index.js";
 
-export { healthTools, healthCheck, getStatus, checkVersion } from "./health.js";
-export type {
-  HealthCheckInput,
-  GetStatusInput,
-  CheckVersionInput,
-} from "./health.js";
+// Health tools
+export {
+  healthTools,
+  healthCheck,
+  getStatus,
+  checkVersion,
+  HealthCheckInputSchema,
+  GetStatusInputSchema,
+  CheckVersionInputSchema,
+  type HealthCheckInput,
+  type GetStatusInput,
+  type CheckVersionInput,
+} from "./health/index.js";
 
-export { generationTools, generationHandlers } from "./generation.js";
+// Generation tools
+export {
+  generationTools,
+  generationHandlers,
+  handleGenerateContract,
+  handleReviewContract,
+  handleDocumentContract,
+  GenerateContractInputSchema,
+  ReviewContractInputSchema,
+  DocumentContractInputSchema,
+  type GenerateContractInput,
+  type ReviewContractInput,
+  type DocumentContractInput,
+} from "./generation/index.js";
 
-export { metaTools, listToolCategories, listCategoryTools } from "./meta.js";
+// Meta tools
+export {
+  metaTools,
+  listToolCategories,
+  listCategoryTools,
+  ListToolCategoriesInputSchema,
+  ListCategoryToolsInputSchema,
+  CATEGORY_INFO,
+  type ListToolCategoriesInput,
+  type ListCategoryToolsInput,
+} from "./meta/index.js";
 
 // Re-export types
 export type {
@@ -44,12 +91,12 @@ export type {
 } from "../types/index.js";
 
 // Combined tool list for MCP server
-import { searchTools } from "./search.js";
-import { analyzeTools } from "./analyze.js";
-import { repositoryTools } from "./repository.js";
-import { healthTools } from "./health.js";
-import { generationTools } from "./generation.js";
-import { metaTools } from "./meta.js";
+import { searchTools } from "./search/index.js";
+import { analyzeTools } from "./analyze/index.js";
+import { repositoryTools } from "./repository/index.js";
+import { healthTools } from "./health/index.js";
+import { generationTools } from "./generation/index.js";
+import { metaTools } from "./meta/index.js";
 import type { ExtendedToolDefinition } from "../types/index.js";
 
 export const allTools: ExtendedToolDefinition[] = [

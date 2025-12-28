@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { analyzeContract, explainCircuit } from "../src/tools/analyze.js";
+import { analyzeContract, explainCircuit } from "../src/tools/analyze/index.js";
 
 describe("Contract Analyzer", () => {
   it("should analyze a simple counter contract", async () => {
@@ -61,8 +61,8 @@ export circuit increment(amount: Field): Void {
 
     const result = await analyzeContract({ code, checkSecurity: true });
 
-    const unusedWitnessFindings = result.securityFindings.filter(
-      (f) => f.message.includes("not used")
+    const unusedWitnessFindings = result.securityFindings.filter((f) =>
+      f.message.includes("not used")
     );
     expect(unusedWitnessFindings.length).toBeGreaterThan(0);
   });
@@ -80,7 +80,9 @@ export circuit revealData(data: Field): Field {
 
     expect(result.circuitName).toBe("revealData");
     expect(result.isPublic).toBe(true);
-    expect(result.operations).toContain("Reveals private data selectively (disclose)");
+    expect(result.operations).toContain(
+      "Reveals private data selectively (disclose)"
+    );
     expect(result.zkImplications.length).toBeGreaterThan(0);
   });
 

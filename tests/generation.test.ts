@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   generationTools,
   generationHandlers,
-} from "../src/tools/generation.js";
+} from "../src/tools/generation/index.js";
 
 describe("Generation Tools", () => {
   describe("Tool Definitions", () => {

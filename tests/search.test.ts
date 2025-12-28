@@ -1,19 +1,21 @@
 import { describe, it, expect } from "vitest";
-import { searchTools } from "../src/tools/search.js";
+import { searchTools } from "../src/tools/search/index.js";
 
 describe("Search Tools", () => {
   describe("Tool Definitions", () => {
     it("should have all three search tools", () => {
       expect(searchTools).toHaveLength(3);
-      
-      const toolNames = searchTools.map(t => t.name);
+
+      const toolNames = searchTools.map((t) => t.name);
       expect(toolNames).toContain("midnight-search-compact");
       expect(toolNames).toContain("midnight-search-typescript");
       expect(toolNames).toContain("midnight-search-docs");
     });
 
     it("search_compact should have correct schema", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-compact");
+      const tool = searchTools.find(
+        (t) => t.name === "midnight-search-compact"
+      );
       expect(tool).toBeDefined();
       expect(tool!.description).toContain("Compact");
       expect(tool!.inputSchema.properties).toHaveProperty("query");
@@ -22,7 +24,9 @@ describe("Search Tools", () => {
     });
 
     it("search_typescript should have correct schema", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-typescript");
+      const tool = searchTools.find(
+        (t) => t.name === "midnight-search-typescript"
+      );
       expect(tool).toBeDefined();
       expect(tool!.description).toContain("TypeScript");
       expect(tool!.inputSchema.properties).toHaveProperty("query");
@@ -31,7 +35,7 @@ describe("Search Tools", () => {
     });
 
     it("search_docs should have correct schema", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-docs");
+      const tool = searchTools.find((t) => t.name === "midnight-search-docs");
       expect(tool).toBeDefined();
       expect(tool!.description).toContain("documentation");
       expect(tool!.inputSchema.properties).toHaveProperty("query");
@@ -59,18 +63,24 @@ describe("Search Tools", () => {
 
   describe("Search Input Validation", () => {
     it("search_compact should require query parameter", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-compact");
+      const tool = searchTools.find(
+        (t) => t.name === "midnight-search-compact"
+      );
       expect(tool!.inputSchema.required).toContain("query");
     });
 
     it("limit should be optional with default", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-compact");
+      const tool = searchTools.find(
+        (t) => t.name === "midnight-search-compact"
+      );
       expect(tool!.inputSchema.required).not.toContain("limit");
     });
 
     it("category enum should have valid values", () => {
-      const tool = searchTools.find(t => t.name === "midnight-search-docs");
-      const categoryProp = tool!.inputSchema.properties.category as { enum?: string[] };
+      const tool = searchTools.find((t) => t.name === "midnight-search-docs");
+      const categoryProp = tool!.inputSchema.properties.category as {
+        enum?: string[];
+      };
       expect(categoryProp.enum).toContain("guides");
       expect(categoryProp.enum).toContain("api");
       expect(categoryProp.enum).toContain("concepts");

@@ -1,46 +1,22 @@
 /**
- * Contract generation tool using sampling capability
- *
- * Enables AI-assisted generation and review of Compact smart contracts
+ * Generation tool definitions
+ * MCP tool registration for AI-powered generation operations
  */
 
-import { z } from "zod";
+import type {
+  ExtendedToolDefinition,
+  OutputSchema,
+} from "../../types/index.js";
 import {
-  generateContract,
-  reviewContract,
-  generateDocumentation,
-  isSamplingAvailable,
-} from "../services/index.js";
-import type { ExtendedToolDefinition, OutputSchema } from "../types/index.js";
+  handleGenerateContract,
+  handleReviewContract,
+  handleDocumentContract,
+} from "./handlers.js";
 
-// Input schemas
-const generateContractSchema = z.object({
-  requirements: z
-    .string()
-    .describe("Natural language description of the contract requirements"),
-  contractType: z
-    .enum(["counter", "token", "voting", "custom"])
-    .optional()
-    .describe("Type of contract to generate"),
-  baseExample: z
-    .string()
-    .optional()
-    .describe("Example contract code to use as a base"),
-});
+// ============================================================================
+// Output Schemas
+// ============================================================================
 
-const reviewContractSchema = z.object({
-  code: z.string().describe("Compact contract code to review"),
-});
-
-const documentContractSchema = z.object({
-  code: z.string().describe("Compact contract code to document"),
-  format: z
-    .enum(["markdown", "jsdoc"])
-    .optional()
-    .describe("Documentation format (default: markdown)"),
-});
-
-// Output schemas for structured responses
 const generateContractOutputSchema: OutputSchema = {
   type: "object",
   properties: {
@@ -119,48 +95,10 @@ const documentContractOutputSchema: OutputSchema = {
   required: ["documentation", "format", "samplingAvailable"],
 };
 
-// Handler functions
-async function handleGenerateContract(
-  args: z.infer<typeof generateContractSchema>
-) {
-  const result = await generateContract(args.requirements, {
-    contractType: args.contractType,
-    baseExample: args.baseExample,
-  });
+// ============================================================================
+// Tool Definitions
+// ============================================================================
 
-  return {
-    ...result,
-    samplingAvailable: isSamplingAvailable(),
-  };
-}
-
-async function handleReviewContract(
-  args: z.infer<typeof reviewContractSchema>
-) {
-  const result = await reviewContract(args.code);
-
-  return {
-    ...result,
-    samplingAvailable: isSamplingAvailable(),
-  };
-}
-
-async function handleDocumentContract(
-  args: z.infer<typeof documentContractSchema>
-) {
-  const documentation = await generateDocumentation(
-    args.code,
-    args.format || "markdown"
-  );
-
-  return {
-    documentation,
-    format: args.format || "markdown",
-    samplingAvailable: isSamplingAvailable(),
-  };
-}
-
-// Tool definitions
 export const generationTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-generate-contract",
@@ -306,7 +244,7 @@ MARKDOWN INCLUDES:
   },
 ];
 
-// Export handler map
+// Export handler map for direct access
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const generationHandlers: Record<string, (args: any) => Promise<any>> = {
   "midnight-generate-contract": handleGenerateContract,
