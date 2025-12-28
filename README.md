@@ -98,6 +98,8 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 **No API keys required.** Restart your editor after adding the config.
 
+> **Why `@latest`?** Unlike cached npx packages that never auto-update, `@latest` ensures you get new features and fixes on each restart—important for an actively developed tool.
+
 ### Updating to Latest Version
 
 Using `midnight-mcp@latest` in your config ensures you get updates automatically on restart.
