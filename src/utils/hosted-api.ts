@@ -7,6 +7,72 @@ import { config, logger } from "./index.js";
 
 const API_TIMEOUT = 10000; // 10 seconds
 
+// ============================================================================
+// Error Handling
+// ============================================================================
+
+/**
+ * Generate actionable error messages based on HTTP status codes
+ * Provides users with specific guidance on how to resolve issues
+ */
+function getActionableErrorMessage(
+  status: number,
+  endpoint: string,
+  serverMessage?: string
+): string {
+  const baseMessages: Record<number, string> = {
+    400: `Bad request to ${endpoint}. Check your query parameters are valid.`,
+    401: `Authentication failed. If you have an API key configured, verify it's correct.`,
+    403: `Access denied to ${endpoint}. This resource may require authentication.`,
+    404: `Resource not found at ${endpoint}. Use midnight-list-examples to see available resources.`,
+    408: `Request timed out. The hosted service may be under heavy load - try again in a moment.`,
+    429: `Rate limited. Try again in a few minutes, or set MIDNIGHT_LOCAL=true for unlimited local search (requires ChromaDB + OpenAI API key).`,
+    500: `Server error. This is temporary - try again shortly or report at github.com/Olanetsoft/midnight-mcp/issues`,
+    502: `Bad gateway. The hosted API may be restarting - try again in 30 seconds.`,
+    503: `Service temporarily unavailable. The hosted API may be under maintenance - try again later or use MIDNIGHT_LOCAL=true for local mode.`,
+    504: `Gateway timeout. The request took too long - try a simpler query or try again later.`,
+  };
+
+  const actionableMessage =
+    baseMessages[status] ||
+    `API error (${status}). Try again or report at github.com/Olanetsoft/midnight-mcp/issues`;
+
+  // Include server message if available and different from our message
+  if (serverMessage && !actionableMessage.includes(serverMessage)) {
+    return `${actionableMessage} Server said: "${serverMessage}"`;
+  }
+
+  return actionableMessage;
+}
+
+/**
+ * Parse error response from the hosted API
+ */
+async function parseApiError(
+  response: Response,
+  endpoint: string
+): Promise<Error> {
+  let serverMessage: string | undefined;
+
+  try {
+    const errorData = (await response.json()) as {
+      error?: string;
+      message?: string;
+    };
+    serverMessage = errorData.error || errorData.message;
+  } catch {
+    // JSON parsing failed, that's okay
+  }
+
+  const actionableMessage = getActionableErrorMessage(
+    response.status,
+    endpoint,
+    serverMessage
+  );
+
+  return new Error(actionableMessage);
+}
+
 export interface HostedSearchResult {
   code?: string;
   content?: string;
@@ -60,17 +126,30 @@ async function apiRequest<T>(
     });
 
     if (!response.ok) {
-      const errorData = (await response
-        .json()
-        .catch(() => ({ error: "Unknown error" }))) as { error?: string };
-      throw new Error(errorData.error || `API error: ${response.status}`);
+      throw await parseApiError(response, endpoint);
     }
 
     return (await response.json()) as T;
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new Error(
-        "API request timed out. The hosted service may be unavailable."
+        `Request to ${endpoint} timed out after ${API_TIMEOUT / 1000}s. ` +
+          `The hosted service may be unavailable. ` +
+          `Try again or set MIDNIGHT_LOCAL=true for local search.`
+      );
+    }
+    // Re-throw if already processed (our actionable errors)
+    if (
+      error instanceof Error &&
+      error.message.includes("github.com/Olanetsoft")
+    ) {
+      throw error;
+    }
+    // Network errors and other fetch failures
+    if (error instanceof Error) {
+      throw new Error(
+        `Failed to connect to hosted API: ${error.message}. ` +
+          `Check your internet connection or set MIDNIGHT_LOCAL=true for local search.`
       );
     }
     throw error;

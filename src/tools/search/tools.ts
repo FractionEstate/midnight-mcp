@@ -78,8 +78,12 @@ const searchToolAnnotations: ToolAnnotations = {
 export const searchTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-search-compact",
-    description:
-      "Semantic search across Compact smart contract code and patterns. Use this to find circuit definitions, witness functions, ledger declarations, and best practices for Midnight smart contracts.",
+    description: `Semantic search across Compact smart contract code and patterns. Use this to find circuit definitions, witness functions, ledger declarations, and best practices for Midnight smart contracts.
+
+USAGE GUIDANCE:
+• Call at most 2 times per question - if first search doesn't help, try different keywords
+• For comprehensive results, combine with midnight-search-docs
+• Use specific terms like "ledger", "circuit", "witness" for better matches`,
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -111,8 +115,12 @@ export const searchTools: ExtendedToolDefinition[] = [
   },
   {
     name: "midnight-search-typescript",
-    description:
-      "Search TypeScript SDK code, types, and API implementations. Use this to find how to use the Midnight JavaScript SDK, type definitions, and integration patterns.",
+    description: `Search TypeScript SDK code, types, and API implementations. Use this to find how to use the Midnight JavaScript SDK, type definitions, and integration patterns.
+
+USAGE GUIDANCE:
+• Call at most 2 times per question - refine keywords rather than repeating
+• For contract code, use midnight-search-compact instead
+• Include "type" or "interface" in query for type definitions`,
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -144,8 +152,12 @@ export const searchTools: ExtendedToolDefinition[] = [
   },
   {
     name: "midnight-search-docs",
-    description:
-      "Full-text search across official Midnight documentation. Use this to find guides, API documentation, and conceptual explanations about Midnight blockchain and the Compact language.",
+    description: `Full-text search across official Midnight documentation. Use this to find guides, API documentation, and conceptual explanations about Midnight blockchain and the Compact language.
+
+USAGE GUIDANCE:
+• Call at most 2 times per question - use different keywords if first search fails
+• For code examples, combine with midnight-search-compact or midnight-search-typescript
+• Use category filter to narrow results (guides, api, concepts)`,
     inputSchema: {
       type: "object" as const,
       properties: {

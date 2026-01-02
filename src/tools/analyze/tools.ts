@@ -164,12 +164,17 @@ const explainCircuitOutputSchema: OutputSchema = {
 export const analyzeTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-analyze-contract",
-    description:
-      "⚠️ STATIC ANALYSIS ONLY - Analyze contract structure and patterns. " +
-      "🚫 THIS DOES NOT COMPILE THE CONTRACT. Cannot catch: sealed field rules, disclose() requirements, semantic errors. " +
-      "👉 Use 'midnight-extract-contract-structure' for pre-compilation checks. " +
-      "Use this for: understanding structure, security pattern analysis, recommendations. " +
-      "NEVER claim a contract 'works' or 'compiles' based on this tool alone.",
+    description: `⚠️ STATIC ANALYSIS ONLY - Analyze contract structure and patterns.
+🚫 THIS DOES NOT COMPILE THE CONTRACT. Cannot catch: sealed field rules, disclose() requirements, semantic errors.
+👉 Use 'midnight-extract-contract-structure' for pre-compilation checks.
+
+Use this for: understanding structure, security pattern analysis, recommendations.
+NEVER claim a contract 'works' or 'compiles' based on this tool alone.
+
+USAGE GUIDANCE:
+• Call once per contract - results are deterministic
+• For security review, also use midnight-review-contract (requires sampling)
+• Run before making changes, not repeatedly during iteration`,
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -195,8 +200,12 @@ export const analyzeTools: ExtendedToolDefinition[] = [
   },
   {
     name: "midnight-explain-circuit",
-    description:
-      "Explain what a specific Compact circuit does in plain language, including its zero-knowledge proof implications and privacy considerations.",
+    description: `Explain what a specific Compact circuit does in plain language, including its zero-knowledge proof implications and privacy considerations.
+
+USAGE GUIDANCE:
+• Call once per circuit - explanations are deterministic
+• Provide complete circuit code including parameters and body
+• For full contract analysis, use midnight-analyze-contract first`,
     inputSchema: {
       type: "object" as const,
       properties: {

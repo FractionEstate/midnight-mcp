@@ -23,8 +23,12 @@ import {
 export const repositoryTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-get-file",
-    description:
-      "Retrieve a specific file from Midnight repositories. Use repository aliases like 'compact', 'midnight-js', 'counter', or 'bboard' for convenience.",
+    description: `Retrieve a specific file from Midnight repositories. Use repository aliases like 'compact', 'midnight-js', 'counter', or 'bboard' for convenience.
+
+USAGE GUIDANCE:
+• Use midnight-list-examples first if you're unsure which file to get
+• For searching across files, use midnight-search-* tools instead
+• Use 'ref' parameter to get specific versions (branch, tag, or commit)`,
     inputSchema: {
       type: "object" as const,
       properties: {

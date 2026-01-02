@@ -11,6 +11,7 @@ import type {
 import {
   listToolCategories,
   listCategoryTools,
+  suggestTool,
   setMetaTools,
 } from "./handlers.js";
 
@@ -81,6 +82,36 @@ const listCategoryToolsOutputSchema: OutputSchema = {
   description: "Tools within a specific category",
 };
 
+const suggestToolOutputSchema: OutputSchema = {
+  type: "object",
+  properties: {
+    intent: { type: "string", description: "The original intent" },
+    suggestions: {
+      type: "array",
+      description: "Suggested tools ranked by relevance",
+      items: {
+        type: "object",
+        properties: {
+          tool: { type: "string", description: "Tool name" },
+          reason: { type: "string", description: "Why this tool is suggested" },
+          confidence: {
+            type: "string",
+            enum: ["high", "medium", "low"],
+            description: "Match confidence",
+          },
+        },
+      },
+    },
+    primaryRecommendation: {
+      type: "object",
+      description: "Top recommendation",
+    },
+    tip: { type: "string", description: "Helpful tip" },
+  },
+  required: ["intent", "suggestions"],
+  description: "Tool suggestions based on intent",
+};
+
 // ============================================================================
 // Tool Definitions
 // ============================================================================
@@ -89,7 +120,7 @@ export const metaTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-list-tool-categories",
     description:
-      "📋 DISCOVERY TOOL: List available tool categories for progressive exploration. Use this FIRST to understand what capabilities are available, then drill into specific categories with midnight-list-category-tools. Reduces cognitive load by organizing 25 tools into 7 logical groups.",
+      "📋 DISCOVERY TOOL: List available tool categories for progressive exploration. Use this FIRST to understand what capabilities are available, then drill into specific categories with midnight-list-category-tools. Reduces cognitive load by organizing 27 tools into 7 logical groups.",
     inputSchema: {
       type: "object" as const,
       properties: {
@@ -144,6 +175,42 @@ export const metaTools: ExtendedToolDefinition[] = [
       category: "health" as ToolCategory,
     },
     handler: listCategoryTools,
+  },
+  {
+    name: "midnight-suggest-tool",
+    description: `🎯 SMART DISCOVERY: Describe what you want to do in natural language, and get tool recommendations.
+
+EXAMPLES:
+• "I want to find example voting contracts" → midnight-search-compact
+• "Check if my version is outdated" → midnight-upgrade-check
+• "Analyze my contract for security issues" → midnight-analyze-contract
+• "I'm new to Midnight and want to get started" → midnight-get-repo-context
+
+This tool matches your intent against known patterns and suggests the most appropriate tools with confidence levels.
+
+USAGE GUIDANCE:
+• Call once with your intent - no need to call repeatedly
+• More specific intents get better matches
+• Use the primaryRecommendation for the best match`,
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        intent: {
+          type: "string",
+          description:
+            "What you want to accomplish (natural language description)",
+        },
+      },
+      required: ["intent"],
+    },
+    outputSchema: suggestToolOutputSchema,
+    annotations: {
+      readOnlyHint: true,
+      idempotentHint: true,
+      title: "🎯 Suggest Tool",
+      category: "health" as ToolCategory,
+    },
+    handler: suggestTool,
   },
 ];
 

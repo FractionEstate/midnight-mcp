@@ -104,7 +104,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ## What's Included
 
-### 26 Tools
+### 27 Tools
 
 | Category          | Tools                                                                                                                             | Description                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -115,7 +115,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 | **AI Generation** | `generate-contract`, `review-contract`, `document-contract`                                                                       | AI-powered code generation _(requires sampling)_ |
 | **Compound**      | `upgrade-check`, `get-repo-context`                                                                                               | Multi-step operations _(saves 50-70% tokens)_    |
 | **Health**        | `health-check`, `get-status`, `check-version`                                                                                     | Server status and version checking               |
-| **Discovery**     | `list-tool-categories`, `list-category-tools`                                                                                     | Explore available tools                          |
+| **Discovery**     | `list-tool-categories`, `list-category-tools`, `suggest-tool`                                                                     | Explore available tools and get recommendations  |
 
 All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
@@ -123,7 +123,7 @@ All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
 | Capability      | Feature                                         |
 | --------------- | ----------------------------------------------- |
-| **Tools**       | 26 tools with `listChanged` notifications       |
+| **Tools**       | 27 tools with `listChanged` notifications       |
 | **Resources**   | 9 embedded resources with subscription support  |
 | **Prompts**     | 5 workflow prompts                              |
 | **Logging**     | Client-controllable log level                   |
