@@ -64,7 +64,8 @@ async function suggestTool(input: { intent: string }) {
       suggestions: [],
       fallback: {
         tool: "midnight-list-tool-categories",
-        reason: "No specific match found.",
+        reason:
+          "No specific match found. Start by exploring available tool categories.",
       },
       tip: "Try rephrasing your intent with keywords like: search, analyze, generate, upgrade, version, security, example",
     };
@@ -89,7 +90,7 @@ async function suggestTool(input: { intent: string }) {
       seenTools.add(match.startWith);
       suggestions.push({
         tool: match.startWith,
-        reason: `Recommended starting tool for ${match.category}`,
+        reason: `Recommended starting tool for ${match.category}: ${match.description}`,
         confidence: match.confidence,
       });
     }
@@ -104,7 +105,7 @@ async function suggestTool(input: { intent: string }) {
     tip:
       topSuggestions[0]?.confidence === "high"
         ? `Strong match! Use ${topSuggestions[0].tool} for this task.`
-        : "Multiple tools may help.",
+        : "Multiple tools may help. Consider the suggestions based on your specific needs.",
   };
 }
 
