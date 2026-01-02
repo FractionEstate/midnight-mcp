@@ -5,6 +5,29 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.3] - 2026-01-02
+
+### Added
+
+- **Intent-based Tool Discovery** - New `midnight-suggest-tool` for natural language tool recommendations
+  - Describe what you want to accomplish, get tool suggestions with confidence levels
+  - 35 intent patterns covering all 27 tools (100% coverage)
+  - Fallback to `midnight-list-tool-categories` when no match found
+
+- **Usage Guidance in Tool Descriptions** - Helps prevent excessive tool calls
+  - Search tools: "Call at most 2 times per question"
+  - Analyze tools: "Call once per contract - results are deterministic"
+  - Repository tools: "Use midnight-list-examples first if unsure"
+
+- **Comprehensive Meta Tests** - 28 new tests for suggestTool functionality
+
+### Improved
+
+- **Actionable Error Messages** - Better guidance when hosted API returns errors
+  - Status-specific messages (rate limits, timeouts, server errors)
+  - Suggests `MIDNIGHT_LOCAL=true` for local mode when appropriate
+  - Includes server error details when available
+
 ## [0.2.0] - 2025-12-28
 
 ### Added
