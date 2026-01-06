@@ -307,6 +307,9 @@ export async function searchDocs(input: SearchDocsInput) {
   const cached = checkSearchCache(cacheKey);
   if (cached) return cached;
 
+  const freshnessHint =
+    "For guaranteed freshness, use midnight-fetch-docs with the path from these results (e.g., /develop/faq)";
+
   // Try hosted API first
   const hostedResult = await tryHostedSearch(
     "docs",
@@ -314,7 +317,9 @@ export async function searchDocs(input: SearchDocsInput) {
     cacheKey,
     warnings
   );
-  if (hostedResult) return hostedResult.result;
+  if (hostedResult) {
+    return { ...hostedResult.result, hint: freshnessHint };
+  }
 
   // Local search (fallback or when in local mode)
   const filter: SearchFilter = {
@@ -342,6 +347,7 @@ export async function searchDocs(input: SearchDocsInput) {
     totalResults: results.length,
     query: sanitizedQuery,
     category: input.category,
+    hint: "For guaranteed freshness, use midnight-fetch-docs with the path from these results (e.g., /develop/faq)",
   };
 
   return finalizeResponse(response, cacheKey, warnings);
