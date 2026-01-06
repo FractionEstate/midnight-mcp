@@ -55,6 +55,16 @@ export const REPO_ALIASES: Record<string, { owner: string; repo: string }> = {
   },
   "trusted-setup": { owner: "midnightntwrk", repo: "midnight-trusted-setup" },
   halo2: { owner: "midnightntwrk", repo: "halo2" },
+  "rs-merkle": { owner: "midnightntwrk", repo: "rs-merkle" },
+  merkle: { owner: "midnightntwrk", repo: "rs-merkle" },
+
+  // Governance
+  "lfdt-project-proposals": {
+    owner: "midnightntwrk",
+    repo: "lfdt-project-proposals",
+  },
+  "project-proposals": { owner: "midnightntwrk", repo: "lfdt-project-proposals" },
+  lfdt: { owner: "midnightntwrk", repo: "lfdt-project-proposals" },
 
   // Token Distribution
   "night-token-distribution": {

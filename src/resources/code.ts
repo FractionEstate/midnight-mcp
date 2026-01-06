@@ -79,6 +79,27 @@ export const codeResources: ResourceDefinition[] = [
       "Starting template with initialization, access control, and state management",
     mimeType: "text/x-compact",
   },
+  {
+    uri: "midnight://code/integration/nextjs-provider",
+    name: "Next.js Midnight Provider",
+    description:
+      "React context provider for Midnight wallet integration in Next.js apps",
+    mimeType: "text/typescript",
+  },
+  {
+    uri: "midnight://code/integration/nextjs-hooks",
+    name: "Next.js Midnight Hooks",
+    description:
+      "React hooks for contract interaction in Next.js (useContract, useContractState, useCounter)",
+    mimeType: "text/typescript",
+  },
+  {
+    uri: "midnight://code/integration/turbo-config",
+    name: "Turbo Monorepo Config",
+    description:
+      "Complete turbo.json, next.config.ts, and package.json for Midnight + Next.js monorepo",
+    mimeType: "application/json",
+  },
 ];
 
 /**

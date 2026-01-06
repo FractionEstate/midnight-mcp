@@ -110,6 +110,29 @@ export const promptDefinitions: PromptDefinition[] = [
       },
     ],
   },
+  {
+    name: "midnight:nextjs-dapp",
+    description:
+      "Build a Next.js + Midnight dApp with turbo monorepo structure and best practices",
+    arguments: [
+      {
+        name: "projectName",
+        description: "Name of the dApp project",
+        required: true,
+      },
+      {
+        name: "features",
+        description:
+          "Key features (wallet-connect, private-data, token, voting, etc.)",
+        required: false,
+      },
+      {
+        name: "monorepoType",
+        description: "Monorepo structure (turbo, nx, simple)",
+        required: false,
+      },
+    ],
+  },
 ];
 
 /**
@@ -130,6 +153,8 @@ export function generatePrompt(
       return generateCompareApproachesPrompt(args);
     case "midnight:debug-contract":
       return generateDebugContractPrompt(args);
+    case "midnight:nextjs-dapp":
+      return generateNextJsDappPrompt(args);
     default:
       return [
         {
@@ -483,6 +508,204 @@ Please help me debug by:
 6. **Additional Improvements**
    - Code quality suggestions
    - Best practices`,
+      },
+    },
+  ];
+}
+
+function generateNextJsDappPrompt(
+  args: Record<string, string>
+): PromptMessage[] {
+  const projectName = args.projectName || "midnight-dapp";
+  const features = args.features || "wallet-connect, private-data";
+  const monorepoType = args.monorepoType || "turbo";
+
+  return [
+    {
+      role: "user",
+      content: {
+        type: "text",
+        text: `I want to build a Next.js + Midnight dApp with the following specifications:
+
+**Project Name:** ${projectName}
+**Key Features:** ${features}
+**Monorepo Structure:** ${monorepoType}
+
+## Required Architecture
+
+### Turbo Monorepo Structure
+\`\`\`
+${projectName}/
+├── apps/
+│   └── web/                    # Next.js 16+ frontend
+│       ├── app/
+│       │   ├── layout.tsx      # Root layout with providers
+│       │   ├── page.tsx        # Landing page
+│       │   └── dapp/           # Protected dApp routes
+│       ├── components/
+│       │   ├── providers/      # MidnightProvider, WalletProvider
+│       │   └── ui/             # shadcn/ui components
+│       └── lib/
+│           ├── midnight/       # SDK integration
+│           └── hooks/          # useWallet, useContract hooks
+├── packages/
+│   ├── contracts/              # Compact smart contracts
+│   │   ├── src/
+│   │   │   └── main.compact    # Main contract
+│   │   └── package.json
+│   ├── shared/                 # Shared types & utilities
+│   │   ├── src/
+│   │   │   ├── types.ts
+│   │   │   └── constants.ts
+│   │   └── package.json
+│   └── ui/                     # Shared UI components
+│       └── package.json
+├── turbo.json
+├── package.json
+└── pnpm-workspace.yaml
+\`\`\`
+
+## Implementation Requirements
+
+### 1. Midnight SDK Integration (packages/contracts)
+- Use \`@midnight-ntwrk/compact-compiler\` for compiling
+- Use \`@midnight-ntwrk/midnight-js\` for runtime
+- Use \`@midnight-ntwrk/dapp-connector-api\` for wallet
+
+### 2. Next.js 16+ Configuration (apps/web)
+- Enable App Router with server components
+- Use \`"use client"\` boundary for wallet interactions
+- Implement proper Suspense boundaries for async operations
+- Configure \`next.config.ts\` with:
+  - \`transpilePackages: ["@${projectName}/contracts", "@${projectName}/shared"]\`
+  - WebAssembly support for ZK provers
+
+### 3. Wallet Integration Pattern
+\`\`\`typescript
+// apps/web/lib/midnight/provider.tsx
+"use client";
+
+import { DAppConnectorAPI } from "@midnight-ntwrk/dapp-connector-api";
+import { createContext, useContext, useEffect, useState } from "react";
+
+interface MidnightContextType {
+  connector: DAppConnectorAPI | null;
+  isConnected: boolean;
+  connect: () => Promise<void>;
+  disconnect: () => void;
+}
+
+const MidnightContext = createContext<MidnightContextType | null>(null);
+
+export function MidnightProvider({ children }: { children: React.ReactNode }) {
+  const [connector, setConnector] = useState<DAppConnectorAPI | null>(null);
+  const [isConnected, setIsConnected] = useState(false);
+
+  const connect = async () => {
+    // Connect to Lace wallet via DApp Connector API
+    const api = await window.midnight?.enable();
+    if (api) {
+      setConnector(api);
+      setIsConnected(true);
+    }
+  };
+
+  const disconnect = () => {
+    setConnector(null);
+    setIsConnected(false);
+  };
+
+  return (
+    <MidnightContext.Provider value={{ connector, isConnected, connect, disconnect }}>
+      {children}
+    </MidnightContext.Provider>
+  );
+}
+
+export const useMidnight = () => {
+  const context = useContext(MidnightContext);
+  if (!context) throw new Error("useMidnight must be used within MidnightProvider");
+  return context;
+};
+\`\`\`
+
+### 4. Contract Interaction Hook
+\`\`\`typescript
+// apps/web/lib/midnight/useContract.ts
+"use client";
+
+import { useCallback, useState } from "react";
+import { useMidnight } from "./provider";
+
+export function useContract<T>(contractAddress: string) {
+  const { connector } = useMidnight();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
+
+  const callCircuit = useCallback(async (
+    circuitName: string,
+    args: unknown[]
+  ): Promise<T | null> => {
+    if (!connector) {
+      setError(new Error("Wallet not connected"));
+      return null;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Build and submit transaction
+      const result = await connector.submitTransaction({
+        contractAddress,
+        circuit: circuitName,
+        arguments: args,
+      });
+      return result as T;
+    } catch (e) {
+      setError(e as Error);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [connector, contractAddress]);
+
+  return { callCircuit, loading, error };
+}
+\`\`\`
+
+## Development Workflow
+
+### Using Both MCP Servers Together
+For the best development experience, use **both** MCP servers:
+- \`midnight-mcp\`: Compact contracts, SDK docs, blockchain integration
+- \`next-devtools-mcp\`: Next.js runtime diagnostics, cache components, upgrades
+
+### Key Commands
+\`\`\`bash
+# Initialize turbo monorepo
+pnpm create turbo@latest ${projectName}
+
+# Add Midnight packages
+cd packages/contracts
+pnpm add @midnight-ntwrk/compact-compiler @midnight-ntwrk/midnight-js
+
+# Add Next.js frontend
+cd apps/web
+pnpm add @midnight-ntwrk/dapp-connector-api
+
+# Development
+pnpm dev              # Run all apps
+pnpm build            # Build all packages
+pnpm contracts:compile # Compile Compact contracts
+\`\`\`
+
+Please provide:
+1. Complete turbo.json configuration
+2. Full MidnightProvider implementation
+3. Contract compilation pipeline setup
+4. Example page with wallet connection and contract interaction
+5. Testing setup for both contracts and UI`,
       },
     },
   ];
