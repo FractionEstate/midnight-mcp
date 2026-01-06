@@ -83,6 +83,17 @@ export {
   type ListCategoryToolsInput,
 } from "./meta/index.js";
 
+// Next.js DevTools integration
+export {
+  initNextDevTools,
+  getNextJsTools,
+  callNextJsTool,
+  isNextJsTool,
+  isNextDevToolsAvailable,
+  nextjsIntegrationTools,
+  handleNextJsStatus,
+} from "./nextjs/index.js";
+
 // Re-export types
 export type {
   ExtendedToolDefinition,
@@ -97,6 +108,7 @@ import { repositoryTools } from "./repository/index.js";
 import { healthTools } from "./health/index.js";
 import { generationTools } from "./generation/index.js";
 import { metaTools } from "./meta/index.js";
+import { nextjsIntegrationTools } from "./nextjs/index.js";
 import type { ExtendedToolDefinition } from "../types/index.js";
 
 export const allTools: ExtendedToolDefinition[] = [
@@ -106,4 +118,8 @@ export const allTools: ExtendedToolDefinition[] = [
   ...repositoryTools,
   ...healthTools,
   ...generationTools,
+  ...nextjsIntegrationTools, // Next.js status tool
 ];
+
+// Note: Next.js DevTools tools are added dynamically via getNextJsTools()
+// after initNextDevTools() is called during server startup

@@ -28,7 +28,14 @@ import {
   serialize,
 } from "./utils/index.js";
 import { vectorStore } from "./db/index.js";
-import { allTools } from "./tools/index.js";
+import {
+  allTools,
+  initNextDevTools,
+  getNextJsTools,
+  callNextJsTool,
+  isNextJsTool,
+  handleNextJsStatus,
+} from "./tools/index.js";
 import {
   allResources,
   getDocumentation,
@@ -407,8 +414,13 @@ function registerToolHandlers(server: Server): void {
   // List available tools with annotations and output schemas
   server.setRequestHandler(ListToolsRequestSchema, async () => {
     logger.debug("Listing tools");
+
+    // Combine static tools with dynamically loaded Next.js tools
+    const nextJsTools = getNextJsTools();
+    const combinedTools = [...allTools, ...nextJsTools];
+
     return {
-      tools: allTools.map((tool) => ({
+      tools: combinedTools.map((tool) => ({
         name: tool.name,
         description: tool.description,
         inputSchema: tool.inputSchema,
@@ -426,9 +438,66 @@ function registerToolHandlers(server: Server): void {
     logger.info(`Tool called: ${name}`, { args });
     const startTime = Date.now();
 
+    // Check if this is a Next.js DevTools call
+    if (isNextJsTool(name)) {
+      try {
+        const result = await callNextJsTool(name, (args || {}) as Record<string, unknown>);
+        const durationMs = Date.now() - startTime;
+        trackToolCall(name, true, durationMs, CURRENT_VERSION);
+        return result;
+      } catch (error) {
+        const durationMs = Date.now() - startTime;
+        logger.error(`Next.js tool error: ${name}`, { error: String(error) });
+        trackToolCall(name, false, durationMs, CURRENT_VERSION);
+        const errorResponse = formatErrorResponse(error, `tool:${name}`);
+        return {
+          content: [
+            {
+              type: "text",
+              text: serialize(errorResponse),
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+
+    // Handle the midnight-nextjs-status tool specially
+    if (name === "midnight-nextjs-status") {
+      try {
+        const result = await handleNextJsStatus();
+        const durationMs = Date.now() - startTime;
+        trackToolCall(name, true, durationMs, CURRENT_VERSION);
+        return {
+          content: [
+            {
+              type: "text",
+              text: serialize(result),
+            },
+          ],
+        };
+      } catch (error) {
+        const durationMs = Date.now() - startTime;
+        trackToolCall(name, false, durationMs, CURRENT_VERSION);
+        const errorResponse = formatErrorResponse(error, `tool:${name}`);
+        return {
+          content: [
+            {
+              type: "text",
+              text: serialize(errorResponse),
+            },
+          ],
+          isError: true,
+        };
+      }
+    }
+
+    // Handle regular Midnight tools
     const tool = allTools.find((t) => t.name === name);
     if (!tool) {
-      const availableTools = allTools
+      const nextJsTools = getNextJsTools();
+      const combinedTools = [...allTools, ...nextJsTools];
+      const availableTools = combinedTools
         .map((t) => t.name)
         .slice(0, 5)
         .join(", ");
@@ -847,6 +916,21 @@ export async function initializeServer(): Promise<Server> {
     logger.info("Vector store initialized");
   } catch (error) {
     logger.warn("Vector store initialization failed, continuing without it", {
+      error: String(error),
+    });
+  }
+
+  // Initialize Next.js DevTools integration
+  try {
+    const nextJsAvailable = await initNextDevTools();
+    if (nextJsAvailable) {
+      const nextJsTools = getNextJsTools();
+      logger.info(
+        `Next.js DevTools integration active with ${nextJsTools.length} tools`
+      );
+    }
+  } catch (error) {
+    logger.warn("Next.js DevTools initialization failed, continuing without it", {
       error: String(error),
     });
   }

@@ -1,11 +1,11 @@
 {
-  "name": "midnight-mcp",
+  "name": "midnight-nextjs-mcp",
   "version": "0.2.6",
-  "description": "Model Context Protocol Server for Midnight Blockchain Development",
+  "description": "Model Context Protocol Server for Midnight Blockchain Development on next.js",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "midnight-mcp": "./dist/bin.js"
+    "midnight-nextjs-mcp": "./dist/bin.js"
   },
   "scripts": {
     "build": "tsup",
@@ -27,7 +27,9 @@
     "compact",
     "zero-knowledge",
     "ai",
-    "developer-tools"
+    "developer-tools",
+    "nextjs",
+    "turbo-monorepo"
   ],
   "author": "Idris Olubisi",
   "license": "MIT",
@@ -37,6 +39,7 @@
     "dotenv": "^16.3.1",
     "express": "^5.2.1",
     "js-yaml": "^4.1.1",
+    "next-devtools-mcp": "^0.3.9",
     "octokit": "^3.1.2",
     "openai": "^6.15.0",
     "yargs": "^18.0.0",
@@ -66,10 +69,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Olanetsoft/midnight-mcp.git"
+    "url": "https://github.com/FractionEstate/midnight-mcp.git"
   },
-  "homepage": "https://github.com/Olanetsoft/midnight-mcp#readme",
+  "homepage": "https://github.com/FractionEstate/midnight-mcp#readme",
   "bugs": {
-    "url": "https://github.com/Olanetsoft/midnight-mcp/issues"
+    "url": "https://github.com/FractionEstate/midnight-mcp/issues"
   }
 }
