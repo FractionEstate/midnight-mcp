@@ -13,7 +13,7 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                      midnight-mcp                                │
 │  ┌────────────┐  ┌─────────────┐  ┌────────────┐                │
-│  │ 27 Tools   │  │ 9 Resources │  │ 5 Prompts  │                │
+│  │ 28 Tools   │  │ 9 Resources │  │ 5 Prompts  │                │
 │  └────────────┘  └─────────────┘  └────────────┘                │
 └──────────────────────────────────────────────────────────────────┘
                               │
@@ -73,27 +73,36 @@ Additional repositories accessible via `midnight-get-file` and other GitHub tool
 
 ### Tools (`src/tools/`)
 
-| Tool                              | Purpose                                        |
-| --------------------------------- | ---------------------------------------------- |
-| `midnight-search-compact`         | Semantic search over Compact code              |
-| `midnight-search-typescript`      | Semantic search over TypeScript SDK            |
-| `midnight-search-docs`            | Semantic search over documentation             |
-| `midnight-analyze-contract`       | Static analysis: structure, patterns, security |
-| `midnight-explain-circuit`        | Explain circuit logic and ZK implications      |
-| `midnight-get-file`               | Fetch file from GitHub                         |
-| `midnight-list-examples`          | List example contracts                         |
-| `midnight-get-latest-updates`     | Recent commits                                 |
-| `midnight-get-version-info`       | Latest release info                            |
-| `midnight-check-breaking-changes` | Breaking changes since version X               |
-| `midnight-get-migration-guide`    | Upgrade guide between versions                 |
-| `midnight-get-file-at-version`    | File content at specific tag                   |
-| `midnight-compare-syntax`         | Diff file between versions                     |
-| `midnight-get-latest-syntax`      | Canonical syntax reference                     |
-| `midnight-health-check`           | Server health                                  |
-| `midnight-get-status`             | Rate limits, cache stats                       |
-| `midnight-generate-contract`      | AI-generate contracts from natural language    |
-| `midnight-review-contract`        | AI-powered security review                     |
-| `midnight-document-contract`      | AI-generate documentation                      |
+| Tool                                  | Purpose                                        |
+| ------------------------------------- | ---------------------------------------------- |
+| `midnight-search-compact`             | Semantic search over Compact code              |
+| `midnight-search-typescript`          | Semantic search over TypeScript SDK            |
+| `midnight-search-docs`                | Semantic search over documentation             |
+| `midnight-fetch-docs`                 | Live fetch from docs.midnight.network (SSG)    |
+| `midnight-analyze-contract`           | Static analysis: structure, patterns, security |
+| `midnight-explain-circuit`            | Explain circuit logic and ZK implications      |
+| `midnight-get-file`                   | Fetch file from GitHub                         |
+| `midnight-list-examples`              | List example contracts                         |
+| `midnight-get-latest-updates`         | Recent commits                                 |
+| `midnight-get-version-info`           | Latest release info                            |
+| `midnight-check-breaking-changes`     | Breaking changes since version X               |
+| `midnight-get-migration-guide`        | Upgrade guide between versions                 |
+| `midnight-get-file-at-version`        | File content at specific tag                   |
+| `midnight-compare-syntax`             | Diff file between versions                     |
+| `midnight-get-latest-syntax`          | Canonical syntax reference                     |
+| `midnight-health-check`               | Server health                                  |
+| `midnight-get-status`                 | Rate limits, cache stats                       |
+| `midnight-check-version`              | Check for server updates                       |
+| `midnight-auto-update-config`         | Auto-update MCP client config                  |
+| `midnight-generate-contract`          | AI-generate contracts from natural language    |
+| `midnight-review-contract`            | AI-powered security review                     |
+| `midnight-document-contract`          | AI-generate documentation                      |
+| `midnight-upgrade-check`              | Compound: breaking changes + migration guide   |
+| `midnight-get-repo-context`           | Compound: repo context for AI assistants       |
+| `midnight-extract-contract-structure` | Extract AST, functions, state from Compact     |
+| `midnight-list-tool-categories`       | List available tool categories                 |
+| `midnight-list-category-tools`        | List tools in a category                       |
+| `midnight-suggest-tool`               | AI-suggest best tool for a task                |
 
 ### Advanced MCP Features (v0.1.0+)
 

@@ -3,13 +3,14 @@ import { searchTools } from "../src/tools/search/index.js";
 
 describe("Search Tools", () => {
   describe("Tool Definitions", () => {
-    it("should have all three search tools", () => {
-      expect(searchTools).toHaveLength(3);
+    it("should have all four search tools", () => {
+      expect(searchTools).toHaveLength(4);
 
       const toolNames = searchTools.map((t) => t.name);
       expect(toolNames).toContain("midnight-search-compact");
       expect(toolNames).toContain("midnight-search-typescript");
       expect(toolNames).toContain("midnight-search-docs");
+      expect(toolNames).toContain("midnight-fetch-docs");
     });
 
     it("search_compact should have correct schema", () => {
@@ -42,11 +43,23 @@ describe("Search Tools", () => {
       expect(tool!.inputSchema.properties).toHaveProperty("category");
     });
 
+    it("fetch_docs should have correct schema", () => {
+      const tool = searchTools.find((t) => t.name === "midnight-fetch-docs");
+      expect(tool).toBeDefined();
+      expect(tool!.description).toContain("LIVE FETCH");
+      expect(tool!.inputSchema.properties).toHaveProperty("path");
+      expect(tool!.inputSchema.properties).toHaveProperty("extractSection");
+      expect(tool!.inputSchema.required).toContain("path");
+    });
+
     it("all search tools should have annotations", () => {
       for (const tool of searchTools) {
         expect(tool.annotations).toBeDefined();
         expect(tool.annotations!.readOnlyHint).toBe(true);
-        expect(tool.annotations!.idempotentHint).toBe(true);
+        // fetch-docs has openWorldHint instead of idempotentHint
+        if (tool.name !== "midnight-fetch-docs") {
+          expect(tool.annotations!.idempotentHint).toBe(true);
+        }
       }
     });
 
@@ -54,9 +67,15 @@ describe("Search Tools", () => {
       for (const tool of searchTools) {
         expect(tool.outputSchema).toBeDefined();
         expect(tool.outputSchema!.type).toBe("object");
-        expect(tool.outputSchema!.properties).toHaveProperty("results");
-        expect(tool.outputSchema!.properties).toHaveProperty("totalResults");
-        expect(tool.outputSchema!.properties).toHaveProperty("query");
+        // fetch-docs has different output schema (content instead of results)
+        if (tool.name === "midnight-fetch-docs") {
+          expect(tool.outputSchema!.properties).toHaveProperty("content");
+          expect(tool.outputSchema!.properties).toHaveProperty("title");
+        } else {
+          expect(tool.outputSchema!.properties).toHaveProperty("results");
+          expect(tool.outputSchema!.properties).toHaveProperty("totalResults");
+          expect(tool.outputSchema!.properties).toHaveProperty("query");
+        }
       }
     });
   });

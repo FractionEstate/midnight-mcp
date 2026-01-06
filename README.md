@@ -104,11 +104,11 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ## What's Included
 
-### 27 Tools
+### 28 Tools
 
 | Category          | Tools                                                                                                                             | Description                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Search**        | `search-compact`, `search-typescript`, `search-docs`                                                                              | Semantic search across Midnight codebase         |
+| **Search**        | `search-compact`, `search-typescript`, `search-docs`, `fetch-docs`                                                                | Semantic search + live docs fetching             |
 | **Analysis**      | `analyze-contract`, `explain-circuit`, `extract-contract-structure`                                                               | Static analysis with 15+ checks (P0-P2 severity) |
 | **Repository**    | `get-file`, `list-examples`, `get-latest-updates`                                                                                 | Access files and examples                        |
 | **Versioning**    | `get-version-info`, `check-breaking-changes`, `get-migration-guide`, `get-file-at-version`, `compare-syntax`, `get-latest-syntax` | Version tracking and migration                   |
@@ -123,7 +123,7 @@ All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
 
 | Capability      | Feature                                         |
 | --------------- | ----------------------------------------------- |
-| **Tools**       | 27 tools with `listChanged` notifications       |
+| **Tools**       | 28 tools with `listChanged` notifications       |
 | **Resources**   | 9 embedded resources with subscription support  |
 | **Prompts**     | 5 workflow prompts                              |
 | **Logging**     | Client-controllable log level                   |

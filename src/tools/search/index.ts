@@ -8,13 +8,20 @@ export {
   SearchCompactInputSchema,
   SearchTypeScriptInputSchema,
   SearchDocsInputSchema,
+  FetchDocsInputSchema,
   type SearchCompactInput,
   type SearchTypeScriptInput,
   type SearchDocsInput,
+  type FetchDocsInput,
 } from "./schemas.js";
 
 // Handlers
-export { searchCompact, searchTypeScript, searchDocs } from "./handlers.js";
+export {
+  searchCompact,
+  searchTypeScript,
+  searchDocs,
+  fetchDocs,
+} from "./handlers.js";
 
 // Tools
 export { searchTools } from "./tools.js";

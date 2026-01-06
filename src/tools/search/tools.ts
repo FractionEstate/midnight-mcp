@@ -7,8 +7,14 @@ import type {
   ExtendedToolDefinition,
   OutputSchema,
   ToolAnnotations,
+  ToolCategory,
 } from "../../types/index.js";
-import { searchCompact, searchTypeScript, searchDocs } from "./handlers.js";
+import {
+  searchCompact,
+  searchTypeScript,
+  searchDocs,
+  fetchDocs,
+} from "./handlers.js";
 
 // ============================================================================
 // Output Schema for Search Results
@@ -183,5 +189,80 @@ USAGE GUIDANCE:
       title: "Search Documentation",
     },
     handler: searchDocs,
+  },
+  {
+    name: "midnight-fetch-docs",
+    description: `🌐 LIVE FETCH: Retrieve latest documentation directly from docs.midnight.network (SSG-enabled).
+
+Unlike midnight-search-docs which uses pre-indexed content, this tool fetches LIVE documentation pages in real-time. Use when you need:
+• The absolute latest content (just updated docs)
+• A specific page you know the path to
+• Full page content rather than search snippets
+
+COMMON PATHS:
+• /develop/faq - Frequently asked questions
+• /getting-started/installation - Installation guide
+• /getting-started/create-mn-app - Create an MN app
+• /compact - Compact language reference
+• /develop/tutorial/building - Build guide
+• /develop/reference/midnight-api - API documentation
+• /learn/what-is-midnight - What is Midnight
+• /blog - Dev diaries
+
+USAGE GUIDANCE:
+• Use extractSection to get only a specific heading (e.g., "Developer questions")
+• Prefer midnight-search-docs for discovery, use this for known pages
+• Content is truncated at 15KB for token efficiency`,
+    inputSchema: {
+      type: "object" as const,
+      properties: {
+        path: {
+          type: "string",
+          description:
+            "Documentation page path (e.g., '/develop/faq', '/getting-started/installation')",
+        },
+        extractSection: {
+          type: "string",
+          description:
+            "Optional: Extract only a specific section by heading text",
+        },
+      },
+      required: ["path"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        title: { type: "string", description: "Page title" },
+        path: { type: "string", description: "Normalized path" },
+        url: { type: "string", description: "Full URL" },
+        content: { type: "string", description: "Extracted page content" },
+        headings: {
+          type: "array",
+          description: "Page headings/table of contents",
+          items: {
+            type: "object",
+            properties: {
+              level: { type: "number" },
+              text: { type: "string" },
+              id: { type: "string" },
+            },
+          },
+        },
+        lastUpdated: { type: "string", description: "Last update timestamp" },
+        truncated: {
+          type: "boolean",
+          description: "Whether content was truncated",
+        },
+      },
+      required: ["title", "path", "content"],
+      description: "Live documentation page content",
+    },
+    annotations: {
+      readOnlyHint: true,
+      openWorldHint: true, // Fetches from external URL
+      title: "🌐 Fetch Live Docs",
+      category: "search" as ToolCategory,
+    },
+    handler: fetchDocs,
   },
 ];

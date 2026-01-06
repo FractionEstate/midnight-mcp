@@ -47,7 +47,22 @@ export const SearchDocsInputSchema = z.object({
   limit: z.number().optional().default(10),
 });
 
+export const FetchDocsInputSchema = z.object({
+  path: z
+    .string()
+    .describe(
+      "Documentation page path (e.g., '/develop/faq', '/getting-started/installation', '/compact')"
+    ),
+  extractSection: z
+    .string()
+    .optional()
+    .describe(
+      "Optional: Extract only a specific section by heading (e.g., 'General questions')"
+    ),
+});
+
 // Type exports
 export type SearchCompactInput = z.infer<typeof SearchCompactInputSchema>;
 export type SearchTypeScriptInput = z.infer<typeof SearchTypeScriptInputSchema>;
 export type SearchDocsInput = z.infer<typeof SearchDocsInputSchema>;
+export type FetchDocsInput = z.infer<typeof FetchDocsInputSchema>;

@@ -505,6 +505,20 @@ export const INTENT_TO_TOOL: Array<{
     tool: "midnight-search-docs",
     reason: "Search official Midnight documentation",
   },
+  {
+    patterns: [
+      "fetch docs",
+      "get docs",
+      "latest docs",
+      "live docs",
+      "docs page",
+      "faq",
+      "installation guide",
+      "getting started page",
+    ],
+    tool: "midnight-fetch-docs",
+    reason: "Fetch live documentation directly from docs.midnight.network",
+  },
 
   // Code Generation
   {
