@@ -1,12 +1,12 @@
-# Midnight MCP Server
+# Midnight + Next.js MCP Server
 
-[![npm version](https://badge.fury.io/js/midnight-mcp.svg)](https://www.npmjs.com/package/midnight-mcp)
-[![npm downloads](https://img.shields.io/npm/dm/midnight-mcp)](https://www.npmjs.com/package/midnight-mcp)
-[![License](https://img.shields.io/npm/l/midnight-mcp)](./LICENSE)
+[![npm version](https://badge.fury.io/js/midnight-nextjs-mcp.svg)](https://www.npmjs.com/package/midnight-nextjs-mcp)
+[![npm downloads](https://img.shields.io/npm/dm/midnight-nextjs-mcp)](https://www.npmjs.com/package/midnight-nextjs-mcp)
+[![License](https://img.shields.io/npm/l/midnight-nextjs-mcp)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![CI](https://github.com/Olanetsoft/midnight-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Olanetsoft/midnight-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/Olanetsoft/midnight-nextjs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Olanetsoft/midnight-nextjs-mcp/actions/workflows/ci.yml)
 
-MCP server that gives AI assistants access to Midnight blockchain—search contracts, analyze code, and explore documentation.
+Unified MCP server that gives AI assistants access to **Midnight blockchain** and **Next.js development**—combining Compact contract analysis, turbo monorepo scaffolding, and full-stack dApp development in one package.
 
 ## Requirements
 
@@ -22,11 +22,11 @@ If you use nvm, Claude Desktop may not see your nvm-managed Node. Use this confi
 ```json
 {
   "mcpServers": {
-    "midnight": {
+    "midnight-nextjs": {
       "command": "/bin/sh",
       "args": [
         "-c",
-        "source ~/.nvm/nvm.sh && nvm use 20 >/dev/null 2>&1 && npx -y midnight-mcp@latest"
+        "source ~/.nvm/nvm.sh && nvm use 20 >/dev/null 2>&1 && npx -y midnight-nextjs-mcp@latest"
       ]
     }
   }
@@ -44,9 +44,9 @@ Add to your `claude_desktop_config.json`:
 ```json
 {
   "mcpServers": {
-    "midnight": {
+    "midnight-nextjs": {
       "command": "npx",
-      "args": ["-y", "midnight-mcp@latest"]
+      "args": ["-y", "midnight-nextjs-mcp@latest"]
     }
   }
 }
@@ -62,16 +62,16 @@ Add to your `claude_desktop_config.json`:
 
 One-click install:
 
-[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW1jcEBsYXRlc3QifQ==)
+[![Install MCP Server](https://cursor.com/deeplink/mcp-install-dark.svg)](https://cursor.com/en-US/install-mcp?name=midnight-nextjs&config=eyJjb21tYW5kIjoibnB4IC15IG1pZG5pZ2h0LW5leHRqcy1tY3BAbGF0ZXN0In0=)
 
 Or manually add to `.cursor/mcp.json`:
 
 ```json
 {
   "mcpServers": {
-    "midnight": {
+    "midnight-nextjs": {
       "command": "npx",
-      "args": ["-y", "midnight-mcp@latest"]
+      "args": ["-y", "midnight-nextjs-mcp@latest"]
     }
   }
 }
@@ -79,7 +79,7 @@ Or manually add to `.cursor/mcp.json`:
 
 ### VS Code Copilot
 
-Add to `.vscode/mcp.json` or use Command Palette: `MCP: Add Server` → "command (stdio)" → `npx -y midnight-mcp@latest`
+Add to `.vscode/mcp.json` or use Command Palette: `MCP: Add Server` → "command (stdio)" → `npx -y midnight-nextjs-mcp@latest`
 
 ### Windsurf
 
@@ -88,9 +88,9 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 ```json
 {
   "mcpServers": {
-    "midnight": {
+    "midnight-nextjs": {
       "command": "npx",
-      "args": ["-y", "midnight-mcp@latest"]
+      "args": ["-y", "midnight-nextjs-mcp@latest"]
     }
   }
 }
@@ -104,34 +104,36 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ## What's Included
 
-### 28 Tools
+### 28+ Tools
 
 | Category          | Tools                                                                                                                             | Description                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| **Search**        | `search-compact`, `search-typescript`, `search-docs`, `fetch-docs`                                                                | Semantic search + live docs fetching             |
-| **Analysis**      | `analyze-contract`, `explain-circuit`, `extract-contract-structure`                                                               | Static analysis with 15+ checks (P0-P2 severity) |
+| **Midnight Search**        | `search-compact`, `search-typescript`, `search-docs`, `fetch-docs`                                                                | Semantic search + live docs fetching             |
+| **Contract Analysis**      | `analyze-contract`, `explain-circuit`, `extract-contract-structure`                                                               | Static analysis with 15+ checks (P0-P2 severity) |
 | **Repository**    | `get-file`, `list-examples`, `get-latest-updates`                                                                                 | Access files and examples                        |
 | **Versioning**    | `get-version-info`, `check-breaking-changes`, `get-migration-guide`, `get-file-at-version`, `compare-syntax`, `get-latest-syntax` | Version tracking and migration                   |
 | **AI Generation** | `generate-contract`, `review-contract`, `document-contract`                                                                       | AI-powered code generation _(requires sampling)_ |
 | **Compound**      | `upgrade-check`, `get-repo-context`                                                                                               | Multi-step operations _(saves 50-70% tokens)_    |
+| **Next.js**       | `nextjs-*` (via next-devtools-mcp)                                                                                                | Cache inspection, diagnostics, turbo monorepo    |
 | **Health**        | `health-check`, `get-status`, `check-version`                                                                                     | Server status and version checking               |
 | **Discovery**     | `list-tool-categories`, `list-category-tools`, `suggest-tool`                                                                     | Explore available tools and get recommendations  |
 
-All tools are prefixed with `midnight-` (e.g., `midnight-search-compact`).
+Midnight tools are prefixed with `midnight-` (e.g., `midnight-search-compact`), Next.js tools with `nextjs-`.
 
 ### MCP Capabilities
 
 | Capability      | Feature                                         |
 | --------------- | ----------------------------------------------- |
-| **Tools**       | 28 tools with `listChanged` notifications       |
-| **Resources**   | 9 embedded resources with subscription support  |
-| **Prompts**     | 5 workflow prompts                              |
+| **Tools**       | 28+ tools with `listChanged` notifications      |
+| **Resources**   | 26 embedded resources with subscription support |
+| **Prompts**     | 6 workflow prompts (incl. Next.js dApp scaffold)|
 | **Logging**     | Client-controllable log level                   |
 | **Completions** | Autocomplete for prompt arguments               |
 | **Progress**    | Real-time progress for compound tools           |
 | **Sampling**    | AI-powered generation (when client supports it) |
+| **Next.js**     | Full turbo monorepo integration                 |
 
-### 9 Embedded Resources
+### 26 Embedded Resources
 
 Quick references available offline:
 
@@ -141,6 +143,8 @@ Quick references available offline:
 - Tokenomics overview
 - Wallet integration
 - Common errors & solutions
+- Next.js integration patterns
+- Turbo monorepo configuration
 
 ### Static Analysis
 
@@ -155,13 +159,14 @@ Quick references available offline:
 | `module_level_const`      | P0       | Use `pure circuit` instead                              |
 | + 10 more checks          | P1-P2    | Overflow, division, assertions, etc.                    |
 
-### 5 Prompts
+### 6 Prompts
 
 - `create-contract` — Generate new contracts
 - `review-contract` — Security and code review
 - `explain-concept` — Learn Midnight concepts
 - `compare-approaches` — Compare implementation patterns
 - `debug-contract` — Troubleshoot issues
+- `nextjs-dapp` — Scaffold a complete Midnight + Next.js turbo monorepo
 
 ---
 
@@ -189,7 +194,7 @@ Run as an HTTP server for web integrations or remote deployment:
 
 ```bash
 # Start HTTP server on port 3000
-npx midnight-mcp --http --port 3000
+npx midnight-nextjs-mcp --http --port 3000
 ```
 
 Endpoints:
@@ -201,7 +206,7 @@ Endpoints:
 ### CLI Options
 
 ```bash
-npx midnight-mcp --help
+npx midnight-nextjs-mcp --help
 
 Options:
   --stdio          Use stdio transport (default, for Claude Desktop)
@@ -222,9 +227,9 @@ Run everything locally for privacy or offline use:
 ```json
 {
   "mcpServers": {
-    "midnight": {
+    "midnight-nextjs": {
       "command": "npx",
-      "args": ["-y", "midnight-mcp@latest"],
+      "args": ["-y", "midnight-nextjs-mcp@latest"],
       "env": {
         "MIDNIGHT_LOCAL": "true",
         "OPENAI_API_KEY": "sk-...",
@@ -246,7 +251,7 @@ Add `"GITHUB_TOKEN": "ghp_..."` for higher GitHub API rate limits (60 → 5000 r
 ## Developer Setup
 
 ```bash
-git clone https://github.com/Olanetsoft/midnight-mcp.git && cd midnight-mcp
+git clone https://github.com/FractionEstate/midnight-nextjs-mcp.git && cd midnight-nextjs-mcp
 npm install && npm run build && npm test
 ```
 

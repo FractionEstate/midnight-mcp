@@ -1,7 +1,7 @@
 {
   "name": "midnight-nextjs-mcp",
-  "version": "0.2.6",
-  "description": "Model Context Protocol Server for Midnight Blockchain Development on next.js",
+  "version": "0.3.0",
+  "description": "Unified MCP Server for Midnight Blockchain + Next.js Development - Combines midnight-mcp and next-devtools-mcp",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -69,10 +69,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/FractionEstate/midnight-mcp.git"
+    "url": "https://github.com/Olanetsoft/midnight-nextjs-mcp.git"
   },
-  "homepage": "https://github.com/FractionEstate/midnight-mcp#readme",
+  "homepage": "https://github.com/Olanetsoft/midnight-nextjs-mcp#readme",
   "bugs": {
-    "url": "https://github.com/FractionEstate/midnight-mcp/issues"
+    "url": "https://github.com/Olanetsoft/midnight-nextjs-mcp/issues"
   }
 }

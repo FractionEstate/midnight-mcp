@@ -1,25 +1,27 @@
-# Copilot Instructions for midnight-mcp
+# Copilot Instructions for midnight-nextjs-mcp
 
 ## Project Overview
 
-This is an **MCP (Model Context Protocol) server** that gives AI assistants access to the [Midnight blockchain](https://midnight.network) ecosystem—enabling semantic search, contract analysis, and documentation access. Published to npm as `midnight-mcp`.
+This is a **unified MCP (Model Context Protocol) server** that gives AI assistants access to the [Midnight blockchain](https://midnight.network) ecosystem and **Next.js development**—enabling semantic search, contract analysis, documentation access, and full-stack turbo monorepo development. Published to npm as `midnight-nextjs-mcp`.
 
 **Key references:**
 - [Midnight Docs](https://docs.midnight.network) - Official documentation
 - [MCP Specification](https://modelcontextprotocol.io) - Protocol standard
 - [Midnight GitHub](https://github.com/midnightntwrk) - Source repositories
+- [Next.js DevTools MCP](https://github.com/vercel/next-devtools-mcp) - Bundled Next.js capabilities
 
 ## Architecture
 
 ```
 src/                    # MCP server (main package)
 ├── server.ts           # MCP protocol handler (JSON-RPC 2.0 over stdio)
-├── tools/              # 29 MCP tools organized by category
+├── tools/              # 28+ MCP tools organized by category
 │   ├── {category}/
 │   │   ├── index.ts    # Barrel exports
 │   │   ├── schemas.ts  # Zod validation schemas
 │   │   ├── handlers.ts # Business logic
 │   │   └── tools.ts    # Tool definitions with annotations
+│   └── nextjs/         # Next.js tools (proxied from next-devtools-mcp)
 ├── resources/          # MCP resources (midnight:// URIs)
 ├── prompts/            # MCP prompt templates
 ├── pipeline/           # Parsing & indexing (parser.ts for Compact lang)
@@ -38,7 +40,7 @@ api/                    # Cloudflare Workers API (hosted backend)
 ## MCP Primitives (per spec)
 
 This server implements three core MCP primitives:
-- **Tools** (29): Executable functions (`tools/list`, `tools/call`)
+- **Tools** (28+): Executable functions (`tools/list`, `tools/call`)
 - **Resources** (26): Context data via `midnight://` URIs (`resources/list`, `resources/read`)
   - 9 docs, 14 code examples/patterns/integrations, 3 schemas
 - **Prompts** (6): Reusable templates (`prompts/list`, `prompts/get`)

@@ -1,4 +1,4 @@
-# Midnight MCP API
+# Midnight + Next.js MCP API
 
 Cloudflare Workers + Vectorize backend for semantic search.
 
