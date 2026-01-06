@@ -5,7 +5,9 @@
 
 import { config, logger } from "./index.js";
 
-const API_TIMEOUT = 10000; // 10 seconds
+const API_TIMEOUT = 15000; // 15 seconds (increased from 10s for reliability)
+const MAX_RETRIES = 2; // Retry up to 2 times (3 total attempts)
+const RETRY_DELAY_MS = 1000; // 1 second base delay
 
 // ============================================================================
 // Error Handling
@@ -103,14 +105,42 @@ export interface HostedSearchFilter {
 }
 
 /**
- * Make a request to the hosted API
+ * Check if an error is retryable (network issues, timeouts, server errors)
  */
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
-  const url = `${config.hostedApiUrl}${endpoint}`;
+function isRetryableError(error: unknown): boolean {
+  if (error instanceof Error) {
+    const message = error.message.toLowerCase();
+    return (
+      error.name === "AbortError" ||
+      message.includes("timeout") ||
+      message.includes("network") ||
+      message.includes("econnreset") ||
+      message.includes("502") ||
+      message.includes("503") ||
+      message.includes("504") ||
+      message.includes("bad gateway") ||
+      message.includes("service unavailable") ||
+      message.includes("gateway timeout")
+    );
+  }
+  return false;
+}
 
+/**
+ * Sleep for a given number of milliseconds
+ */
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Make a single request attempt to the hosted API
+ */
+async function makeRequest<T>(
+  url: string,
+  endpoint: string,
+  options: RequestInit
+): Promise<T> {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), API_TIMEOUT);
 
@@ -133,29 +163,79 @@ async function apiRequest<T>(
   } catch (error) {
     if (error instanceof Error && error.name === "AbortError") {
       throw new Error(
-        `Request to ${endpoint} timed out after ${API_TIMEOUT / 1000}s. ` +
-          `The hosted service may be unavailable. ` +
-          `Try again or set MIDNIGHT_LOCAL=true for local search.`
-      );
-    }
-    // Re-throw if already processed (our actionable errors)
-    if (
-      error instanceof Error &&
-      error.message.includes("github.com/Olanetsoft")
-    ) {
-      throw error;
-    }
-    // Network errors and other fetch failures
-    if (error instanceof Error) {
-      throw new Error(
-        `Failed to connect to hosted API: ${error.message}. ` +
-          `Check your internet connection or set MIDNIGHT_LOCAL=true for local search.`
+        `Request to ${endpoint} timed out after ${API_TIMEOUT / 1000}s.`
       );
     }
     throw error;
   } finally {
     clearTimeout(timeout);
   }
+}
+
+/**
+ * Make a request to the hosted API with automatic retry on transient failures
+ */
+async function apiRequest<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${config.hostedApiUrl}${endpoint}`;
+  let lastError: Error | null = null;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      return await makeRequest<T>(url, endpoint, options);
+    } catch (error) {
+      lastError = error as Error;
+
+      // Don't retry non-retryable errors (4xx client errors, etc.)
+      if (!isRetryableError(error)) {
+        break;
+      }
+
+      // Don't retry if we've exhausted attempts
+      if (attempt === MAX_RETRIES) {
+        logger.warn(`Hosted API request failed after ${attempt + 1} attempts`, {
+          endpoint,
+          error: String(error),
+        });
+        break;
+      }
+
+      // Exponential backoff: 1s, 2s
+      const delay = RETRY_DELAY_MS * Math.pow(2, attempt);
+      logger.debug(
+        `Retrying hosted API request in ${delay}ms (attempt ${attempt + 1}/${MAX_RETRIES + 1})`,
+        { endpoint }
+      );
+      await sleep(delay);
+    }
+  }
+
+  // Enhance the final error message
+  if (lastError) {
+    // Already processed errors from parseApiError
+    if (lastError.message.includes("github.com/Olanetsoft")) {
+      throw lastError;
+    }
+
+    // Timeout errors
+    if (lastError.message.includes("timed out")) {
+      throw new Error(
+        `Request to ${endpoint} timed out after ${MAX_RETRIES + 1} attempts. ` +
+          `The hosted service may be slow or unavailable. ` +
+          `Try a simpler query or set MIDNIGHT_LOCAL=true for local search.`
+      );
+    }
+
+    // Network errors
+    throw new Error(
+      `Failed to connect to hosted API after ${MAX_RETRIES + 1} attempts: ${lastError.message}. ` +
+        `Check your internet connection or set MIDNIGHT_LOCAL=true for local search.`
+    );
+  }
+
+  throw new Error("Unknown error in API request");
 }
 
 /**
