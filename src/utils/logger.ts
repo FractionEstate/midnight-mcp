@@ -43,7 +43,7 @@ class Logger {
   constructor(
     level: LogLevel = "info",
     format: LogFormat = "text",
-    service: string = "midnight-mcp"
+    service: string = "midnight-nextjs-mcp"
   ) {
     this.level = level;
     this.format = format;

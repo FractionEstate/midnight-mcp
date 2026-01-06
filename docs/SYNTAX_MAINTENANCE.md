@@ -1,6 +1,6 @@
 # Compact Syntax Maintenance Guide
 
-This guide explains how to update midnight-mcp when the Compact language syntax changes or a new compiler version is released.
+This guide explains how to update midnight-nextjs-mcp when the Compact language syntax changes or a new compiler version is released.
 
 ## When to Update
 
@@ -113,8 +113,8 @@ export circuit inc(): [] { counter.increment(1); }' > /tmp/test.compact
 
 ## Version History
 
-| Compact Version | midnight-mcp Version | Key Changes                                          |
-| --------------- | -------------------- | ---------------------------------------------------- |
+| Compact Version | midnight-nextjs-mcp Version | Key Changes                                          |
+| --------------- | --------------------------- | ---------------------------------------------------- |
 | 0.16 - 0.18     | 0.1.33+              | Individual ledger decls, `[]` return, bounded pragma |
 | 0.14 - 0.15     | 0.1.0 - 0.1.32       | `ledger {}` block, `Cell<T>` wrapper                 |
 
@@ -139,7 +139,7 @@ To reduce manual maintenance burden, consider:
 
 ## Questions?
 
-If you're unsure whether a syntax change affects midnight-mcp:
+If you're unsure whether a syntax change affects midnight-nextjs-mcp:
 
 1. Write a minimal contract using the new/changed syntax
 2. Run `midnight-extract-contract-structure` on it

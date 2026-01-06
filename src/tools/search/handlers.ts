@@ -584,7 +584,7 @@ export async function fetchDocs(input: {
     const response = await fetch(url, {
       signal: controller.signal,
       headers: {
-        "User-Agent": "midnight-mcp/1.0 (Documentation Fetcher)",
+        "User-Agent": "midnight-nextjs-mcp/1.0 (Documentation Fetcher)",
         Accept: "text/html",
       },
     });

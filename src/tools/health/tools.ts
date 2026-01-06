@@ -209,7 +209,7 @@ export const healthTools: ExtendedToolDefinition[] = [
   {
     name: "midnight-check-version",
     description:
-      "🔄 Check if you're running the latest version of midnight-mcp. " +
+      "🔄 Check if you're running the latest version of midnight-nextjs-mcp. " +
       "Compares your installed version against npm registry and provides update instructions if outdated. " +
       "Use this if tools seem missing or you want to ensure you have the latest features.",
     inputSchema: {
@@ -230,7 +230,7 @@ export const healthTools: ExtendedToolDefinition[] = [
     name: "midnight-auto-update-config",
     description:
       "⚠️ DEPRECATED: Auto-update is NOT possible because AI agents run in sandboxed environments without access to local filesystems. " +
-      "Instead, tell users to manually update their config to use midnight-mcp@latest, then run: rm -rf ~/.npm/_npx && restart their editor. " +
+      "Instead, tell users to manually update their config to use midnight-nextjs-mcp@latest, then run: rm -rf ~/.npm/_npx && restart their editor. " +
       "This tool only returns config file paths for reference.",
     inputSchema: {
       type: "object" as const,

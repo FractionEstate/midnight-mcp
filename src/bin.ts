@@ -26,7 +26,7 @@ process.on("unhandledRejection", (reason) => {
 
 // Parse CLI arguments
 const argv = yargs(hideBin(process.argv))
-  .scriptName("midnight-mcp")
+  .scriptName("midnight-nextjs-mcp")
   .usage("$0 [options]")
   .option("http", {
     type: "boolean",

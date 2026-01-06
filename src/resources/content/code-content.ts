@@ -1217,4 +1217,385 @@ export default nextConfig;
 //   }
 // }
 `,
+
+  // Next.js DevTools Integration Resources
+  "midnight://code/integration/nextjs-devtools": `// Next.js DevTools MCP Integration Guide
+// This server bundles next-devtools-mcp for unified Midnight + Next.js development
+
+## Available Next.js Tools (prefixed with 'nextjs-')
+
+### Core Tools
+
+1. **nextjs-init**
+   Initialize Next.js DevTools MCP context.
+   - Sets up proper context for AI assistants
+   - Establishes documentation-first approach
+   - Should be called at the start of every Next.js session
+
+2. **nextjs-nextjs-docs**
+   Search and retrieve official Next.js documentation.
+   - action: "search" - Find docs by keyword
+   - action: "get" - Fetch full markdown content by path
+   - Supports App Router and Pages Router filtering
+
+3. **nextjs-browser-eval**
+   Automate and test web applications using Playwright.
+   - Start/close browser
+   - Navigate to URLs
+   - Click, type, fill forms
+   - Take screenshots
+   - Capture console messages
+
+### Runtime Diagnostics (Next.js 16+)
+
+4. **nextjs-nextjs-index**
+   Discover all running Next.js dev servers.
+   - Finds servers with MCP enabled
+   - Lists available diagnostic tools
+   - Returns port, PID, URL for each server
+
+5. **nextjs-nextjs-call**
+   Execute tools on a running Next.js dev server.
+   - port: Dev server port
+   - toolName: Name of tool to invoke
+   - args: Optional arguments
+
+   Available runtime tools:
+   - get_errors: Build, runtime, and type errors
+   - get_logs: Development log file path
+   - get_page_metadata: Routes and component metadata
+   - get_project_metadata: Project structure and config
+   - get_server_action_by_id: Server Action source lookup
+
+### Development Automation
+
+6. **nextjs-upgrade-nextjs-16**
+   Guide through upgrading to Next.js 16.
+   - Runs official codemods automatically
+   - Handles async API changes
+   - Updates configuration
+
+7. **nextjs-enable-cache-components**
+   Complete Cache Components setup and migration.
+   - Pre-flight checks
+   - Enable configuration
+   - Automated error detection and fixing
+
+## Typical Workflow
+
+\`\`\`typescript
+// 1. Initialize context
+await callTool("nextjs-init", { project_path: "." });
+
+// 2. Discover servers
+const servers = await callTool("nextjs-nextjs-index", {});
+
+// 3. Get errors from dev server
+const errors = await callTool("nextjs-nextjs-call", {
+  port: 3000,
+  toolName: "get_errors"
+});
+
+// 4. Search documentation
+const docs = await callTool("nextjs-nextjs-docs", {
+  action: "search",
+  query: "error boundary"
+});
+\`\`\`
+
+## Integration with Midnight
+
+For Midnight + Next.js dApps:
+1. Use \`midnight-*\` tools for Compact contracts and SDK
+2. Use \`nextjs-*\` tools for Next.js runtime and configuration
+3. Use the \`midnight:nextjs-dapp\` prompt for turbo monorepo setup
+`,
+
+  "midnight://code/integration/cache-components-guide": `// Cache Components Migration Guide for Midnight dApps
+// Optimizing Next.js 16 caching with Midnight integration
+
+## What are Cache Components?
+
+Cache Components is Next.js 16's new caching model that provides:
+- Automatic component-level caching
+- Public caches for shared data (e.g., blockchain state)
+- Private caches for user-specific data (e.g., wallet state)
+- Intelligent cache invalidation
+
+## Key Concepts
+
+### 1. Public Caches
+Use for data shared across users:
+\`\`\`typescript
+// app/contract/[address]/page.tsx
+import { cache } from "react";
+
+// Public cache - same for all users
+export const getContractState = cache(async (address: string) => {
+  const state = await midnightClient.getContractState(address);
+  return state;
+});
+\`\`\`
+
+### 2. Private Caches
+Use for user-specific data:
+\`\`\`typescript
+// app/wallet/page.tsx
+import { unstable_cache } from "next/cache";
+
+// Private cache - unique per user
+export const getWalletBalance = unstable_cache(
+  async (userId: string) => {
+    return await getPrivateBalance(userId);
+  },
+  ["wallet-balance"],
+  { tags: ["wallet"], revalidate: 60 }
+);
+\`\`\`
+
+### 3. Suspense Boundaries
+Wrap cached components:
+\`\`\`tsx
+import { Suspense } from "react";
+
+export default function ContractPage({ params }: { params: { address: string } }) {
+  return (
+    <Suspense fallback={<ContractSkeleton />}>
+      <ContractDetails address={params.address} />
+    </Suspense>
+  );
+}
+\`\`\`
+
+### 4. Cache Invalidation
+Revalidate when blockchain state changes:
+\`\`\`typescript
+"use server";
+import { revalidateTag, revalidatePath } from "next/cache";
+
+export async function onTransactionComplete(address: string) {
+  // Invalidate contract state
+  revalidateTag(\`contract-\${address}\`);
+
+  // Or invalidate entire path
+  revalidatePath(\`/contract/\${address}\`);
+}
+\`\`\`
+
+## Midnight-Specific Patterns
+
+### Contract State Caching
+\`\`\`typescript
+// lib/midnight/cache.ts
+import { cache } from "react";
+import { unstable_cache } from "next/cache";
+
+// Cache contract metadata (rarely changes)
+export const getContractMetadata = cache(async (address: string) => {
+  return await client.getMetadata(address);
+});
+
+// Cache contract state with revalidation
+export const getContractState = unstable_cache(
+  async (address: string) => {
+    return await client.getState(address);
+  },
+  ["contract-state"],
+  {
+    tags: ["contracts"],
+    revalidate: 30, // Revalidate every 30 seconds
+  }
+);
+\`\`\`
+
+### Wallet State Caching
+\`\`\`typescript
+// lib/midnight/wallet-cache.ts
+import { unstable_cache } from "next/cache";
+import { cookies } from "next/headers";
+
+export const getWalletState = async () => {
+  const cookieStore = await cookies();
+  const sessionId = cookieStore.get("session")?.value;
+
+  if (!sessionId) return null;
+
+  return unstable_cache(
+    async () => {
+      return await getPrivateWalletState(sessionId);
+    },
+    [\`wallet-\${sessionId}\`],
+    { tags: ["wallet"], revalidate: 60 }
+  )();
+};
+\`\`\`
+
+## Configuration
+
+Enable in next.config.ts:
+\`\`\`typescript
+const nextConfig: NextConfig = {
+  experimental: {
+    cacheComponents: true,
+  },
+};
+\`\`\`
+
+## Common Error Patterns
+
+1. **Missing Suspense boundary**
+   - Error: Component with cache must be wrapped in Suspense
+   - Fix: Add <Suspense> around cached components
+
+2. **Cache in client component**
+   - Error: cache() only works in Server Components
+   - Fix: Move caching logic to server components
+
+3. **Dynamic data in static cache**
+   - Error: Stale data after transaction
+   - Fix: Use revalidateTag() or revalidatePath()
+`,
+
+  "midnight://code/integration/nextjs16-migration": `// Next.js 16 Migration Guide for Midnight dApps
+// Breaking changes and migration steps
+
+## Breaking Changes in Next.js 16
+
+### 1. Async Request APIs
+Headers, cookies, params, and searchParams are now async:
+
+\`\`\`typescript
+// Before (Next.js 15)
+export default function Page({ params }: { params: { id: string } }) {
+  const { id } = params;
+  return <div>{id}</div>;
+}
+
+// After (Next.js 16)
+export default async function Page({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  return <div>{id}</div>;
+}
+\`\`\`
+
+### 2. Cookies and Headers
+\`\`\`typescript
+// Before
+import { cookies, headers } from "next/headers";
+const cookieStore = cookies();
+const headersList = headers();
+
+// After
+import { cookies, headers } from "next/headers";
+const cookieStore = await cookies();
+const headersList = await headers();
+\`\`\`
+
+### 3. searchParams
+\`\`\`typescript
+// Before
+export default function Page({ searchParams }: { searchParams: { q?: string } }) {
+  return <div>{searchParams.q}</div>;
+}
+
+// After
+export default async function Page({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams;
+  return <div>{q}</div>;
+}
+\`\`\`
+
+## Midnight-Specific Migration
+
+### Contract Pages
+\`\`\`typescript
+// Before
+export default function ContractPage({ params }: { params: { address: string } }) {
+  return <ContractDetails address={params.address} />;
+}
+
+// After
+export default async function ContractPage({
+  params,
+}: {
+  params: Promise<{ address: string }>;
+}) {
+  const { address } = await params;
+  return <ContractDetails address={address} />;
+}
+\`\`\`
+
+### Wallet Authentication
+\`\`\`typescript
+// Before
+export default function WalletPage() {
+  const cookieStore = cookies();
+  const session = cookieStore.get("wallet_session");
+  // ...
+}
+
+// After
+export default async function WalletPage() {
+  const cookieStore = await cookies();
+  const session = cookieStore.get("wallet_session");
+  // ...
+}
+\`\`\`
+
+### API Routes
+\`\`\`typescript
+// Before - app/api/contract/[address]/route.ts
+export async function GET(
+  request: Request,
+  { params }: { params: { address: string } }
+) {
+  const state = await getContractState(params.address);
+  return Response.json(state);
+}
+
+// After
+export async function GET(
+  request: Request,
+  { params }: { params: Promise<{ address: string }> }
+) {
+  const { address } = await params;
+  const state = await getContractState(address);
+  return Response.json(state);
+}
+\`\`\`
+
+## Running the Codemod
+
+Use the Next.js codemod to automatically migrate:
+
+\`\`\`bash
+# Ensure clean git state first
+npx @next/codemod@latest next-async-request-api .
+\`\`\`
+
+Or use the MCP tool:
+\`\`\`
+Call nextjs-upgrade-nextjs-16 with project_path: "."
+\`\`\`
+
+## MCP Endpoint (New in Next.js 16)
+
+Next.js 16 includes a built-in MCP endpoint:
+- URL: \`http://localhost:3000/_next/mcp\`
+- Enabled by default in development
+- Provides runtime diagnostics
+
+Use with nextjs-nextjs-index and nextjs-nextjs-call tools.
+
+## Post-Migration Checklist
+
+1. ✅ All params are awaited
+2. ✅ All searchParams are awaited  
+3. ✅ cookies() calls are awaited
+4. ✅ headers() calls are awaited
+5. ✅ API routes handle async params
+6. ✅ Middleware updated if using params
+7. ✅ Build passes without errors
+8. ✅ Runtime behavior unchanged
+`,
 };

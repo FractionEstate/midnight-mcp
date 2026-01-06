@@ -191,7 +191,7 @@ export function createUserError(error: unknown, context?: string): MCPError {
   return new MCPError(
     `An error occurred${ctx}`,
     "UNKNOWN_ERROR",
-    "If this problem persists, please report it at https://github.com/Olanetsoft/midnight-mcp/issues"
+    "If this problem persists, please report it at https://github.com/Olanetsoft/midnight-nextjs-mcp/issues"
   );
 }
 

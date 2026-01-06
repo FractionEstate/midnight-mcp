@@ -56,7 +56,7 @@ export async function getStatus(_input: GetStatusInput) {
   const rateLimitStatus = getRateLimitStatus();
 
   return {
-    server: "midnight-mcp",
+    server: "midnight-nextjs-mcp",
     status: "running",
     timestamp: new Date().toISOString(),
     rateLimit: {
@@ -84,7 +84,7 @@ export async function getStatus(_input: GetStatusInput) {
 export async function checkVersion(_input: CheckVersionInput) {
   try {
     const response = await fetch(
-      "https://registry.npmjs.org/midnight-mcp/latest"
+      "https://registry.npmjs.org/midnight-nextjs-mcp/latest"
     );
     if (!response.ok) {
       return {
@@ -114,9 +114,9 @@ export async function checkVersion(_input: CheckVersionInput) {
             step2:
               "Restart Claude Desktop completely (Cmd+Q / Alt+F4, then reopen)",
             step3:
-              "Or update config to use: npx -y midnight-mcp@latest (forces latest)",
+              "Or update config to use: npx -y midnight-nextjs-mcp@latest (forces latest)",
             alternative:
-              "You can also install globally: npm install -g midnight-mcp@latest",
+              "You can also install globally: npm install -g midnight-nextjs-mcp@latest",
           },
       newFeatures: isUpToDate
         ? null
@@ -189,8 +189,8 @@ export async function getAutoUpdateConfig(_input: AutoUpdateConfigInput) {
   };
 
   // The exact JSON change needed
-  const oldConfig = `"args": ["-y", "midnight-mcp"]`;
-  const newConfig = `"args": ["-y", "midnight-mcp@latest"]`;
+  const oldConfig = `"args": ["-y", "midnight-nextjs-mcp"]`;
+  const newConfig = `"args": ["-y", "midnight-nextjs-mcp@latest"]`;
 
   return {
     instruction:
@@ -200,19 +200,19 @@ export async function getAutoUpdateConfig(_input: AutoUpdateConfigInput) {
     searchAndReplace: {
       find: oldConfig,
       replaceWith: newConfig,
-      description: "Change midnight-mcp to midnight-mcp@latest in args array",
+      description: "Change midnight-nextjs-mcp to midnight-nextjs-mcp@latest in args array",
     },
     alternativePatterns: [
       {
-        find: `"midnight-mcp"`,
-        replaceWith: `"midnight-mcp@latest"`,
+        find: `"midnight-nextjs-mcp"`,
+        replaceWith: `"midnight-nextjs-mcp@latest"`,
         context: "If args uses different formatting",
       },
     ],
     agentInstructions: [
       "1. Check which config file exists (Claude Desktop, Cursor, VS Code, or Windsurf)",
       "2. Read the config file",
-      "3. Replace 'midnight-mcp' with 'midnight-mcp@latest' in the args array",
+      "3. Replace 'midnight-nextjs-mcp' with 'midnight-nextjs-mcp@latest' in the args array",
       "4. Write the updated config file",
       "5. Tell user to restart their editor (Cmd+Q on Mac, Alt+F4 on Windows)",
     ],

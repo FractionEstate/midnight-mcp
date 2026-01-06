@@ -11,9 +11,9 @@
                               │ JSON-RPC 2.0 / stdio
                               ▼
 ┌──────────────────────────────────────────────────────────────────┐
-│                      midnight-mcp                                │
+│                   midnight-nextjs-mcp                            │
 │  ┌────────────┐  ┌─────────────┐  ┌────────────┐                │
-│  │ 28 Tools   │  │ 9 Resources │  │ 5 Prompts  │                │
+│  │ 28+ Tools  │  │26 Resources │  │ 6 Prompts  │                │
 │  └────────────┘  └─────────────┘  └────────────┘                │
 └──────────────────────────────────────────────────────────────────┘
                               │
@@ -417,8 +417,8 @@ NPM package:
 
 ```json
 {
-  "name": "midnight-mcp",
-  "bin": { "midnight-mcp": "./dist/index.js" },
+  "name": "midnight-nextjs-mcp",
+  "bin": { "midnight-nextjs-mcp": "./dist/bin.js" },
   "type": "module"
 }
 ```

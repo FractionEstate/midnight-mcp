@@ -1,7 +1,7 @@
 /**
  * Midnight MCP Server - Library exports
  *
- * For CLI usage, use bin.ts or run: npx midnight-mcp --help
+ * For CLI usage, use bin.ts or run: npx midnight-nextjs-mcp --help
  */
 
 // Server exports

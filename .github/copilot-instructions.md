@@ -209,11 +209,11 @@ Key concepts: `ledger` (on-chain state), `circuit` (ZK-proven logic), `witness` 
 
 This MCP server provides comprehensive support for building Next.js dApps with Midnight:
 
-### Using with next-devtools-mcp
+### Bundled next-devtools-mcp
 
-For the best development experience, use **both** MCP servers together:
-- `midnight-mcp`: Compact contracts, SDK docs, blockchain integration
-- `next-devtools-mcp`: Next.js runtime diagnostics, cache components, upgrades
+This MCP server bundles `next-devtools-mcp` for a unified development experience:
+- `midnight-*` tools: Compact contracts, SDK docs, blockchain integration
+- `nextjs-*` tools: Next.js runtime diagnostics, cache components, upgrades
 
 ### Midnight-specific Next.js Resources
 

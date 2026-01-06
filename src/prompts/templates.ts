@@ -133,6 +133,60 @@ export const promptDefinitions: PromptDefinition[] = [
       },
     ],
   },
+  // Next.js DevTools Prompts (complementing next-devtools-mcp)
+  {
+    name: "nextjs:upgrade-to-16",
+    description:
+      "Guide for upgrading to Next.js 16 with codemods and migration steps",
+    arguments: [
+      {
+        name: "projectPath",
+        description: "Path to Next.js project (defaults to current directory)",
+        required: false,
+      },
+      {
+        name: "includeReact19",
+        description: "Include React 19 migration guidance (yes/no)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "nextjs:enable-cache-components",
+    description:
+      "Migrate and enable Cache Components mode for Next.js 16 with automated error detection",
+    arguments: [
+      {
+        name: "projectPath",
+        description: "Path to Next.js project (defaults to current directory)",
+        required: false,
+      },
+      {
+        name: "strategy",
+        description:
+          "Migration strategy (incremental, full-rewrite, route-by-route)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "nextjs:runtime-diagnostics",
+    description:
+      "Diagnose runtime issues in a Next.js 16+ application using MCP endpoint",
+    arguments: [
+      {
+        name: "issueType",
+        description:
+          "Type of issue (errors, logs, routes, server-actions, all)",
+        required: false,
+      },
+      {
+        name: "port",
+        description: "Dev server port (default: 3000)",
+        required: false,
+      },
+    ],
+  },
 ];
 
 /**
@@ -155,6 +209,13 @@ export function generatePrompt(
       return generateDebugContractPrompt(args);
     case "midnight:nextjs-dapp":
       return generateNextJsDappPrompt(args);
+    // Next.js DevTools prompts
+    case "nextjs:upgrade-to-16":
+      return generateNextJsUpgradePrompt(args);
+    case "nextjs:enable-cache-components":
+      return generateCacheComponentsPrompt(args);
+    case "nextjs:runtime-diagnostics":
+      return generateRuntimeDiagnosticsPrompt(args);
     default:
       return [
         {
@@ -678,7 +739,7 @@ export function useContract<T>(contractAddress: string) {
 
 ### Using Both MCP Servers Together
 For the best development experience, use **both** MCP servers:
-- \`midnight-mcp\`: Compact contracts, SDK docs, blockchain integration
+- \`midnight-nextjs-mcp\`: Compact contracts, SDK docs, blockchain integration
 - \`next-devtools-mcp\`: Next.js runtime diagnostics, cache components, upgrades
 
 ### Key Commands
@@ -706,6 +767,254 @@ Please provide:
 3. Contract compilation pipeline setup
 4. Example page with wallet connection and contract interaction
 5. Testing setup for both contracts and UI`,
+      },
+    },
+  ];
+}
+
+/**
+ * Generate Next.js 16 upgrade prompt
+ */
+function generateNextJsUpgradePrompt(
+  args: Record<string, string>
+): PromptMessage[] {
+  const projectPath = args.projectPath || ".";
+  const includeReact19 = args.includeReact19 === "yes";
+
+  return [
+    {
+      role: "user",
+      content: {
+        type: "text",
+        text: `I need to upgrade my Next.js application to version 16.
+
+**Project Path:** ${projectPath}
+**Include React 19 Migration:** ${includeReact19 ? "Yes" : "No"}
+
+## Upgrade Workflow
+
+### Step 1: Initialize Next.js DevTools
+First, call the \`nextjs-init\` tool to set up the MCP context and understand available capabilities.
+
+### Step 2: Run the Upgrade Tool
+Call \`nextjs-upgrade-nextjs-16\` with:
+- project_path: "${projectPath}"
+
+This will:
+1. Run the official Next.js codemod automatically (requires clean git state)
+2. Handle async API changes (params, searchParams, cookies, headers)
+3. Migrate configuration changes
+4. Update image defaults and optimization
+5. Fix parallel routes and dynamic segments
+6. Handle deprecated API removals
+${includeReact19 ? "7. Provide guidance for React 19 compatibility" : ""}
+
+### Step 3: Search Documentation for Issues
+If you encounter specific issues, use \`nextjs-nextjs-docs\` to search:
+- action: "search"
+- query: "<specific issue or API>"
+
+Then fetch full documentation with:
+- action: "get"
+- path: "<doc path from search results>"
+
+### Step 4: Verify with Browser Testing
+Use \`nextjs-browser-eval\` to verify pages work correctly:
+1. action: "start" - Start the browser
+2. action: "navigate" - Go to your app URL
+3. action: "screenshot" - Take screenshots
+4. action: "console_messages" - Check for errors
+
+### Step 5: Enable Cache Components (Optional)
+For maximum performance, consider enabling Cache Components:
+- Call \`nextjs-enable-cache-components\`
+
+## Key Next.js 16 Changes
+- Async request APIs (params, searchParams, cookies, headers)
+- Cache Components mode for optimal caching
+- Built-in MCP endpoint at \`/_next/mcp\`
+- Improved runtime diagnostics
+- React 19 support
+
+Please guide me through the upgrade process step by step.`,
+      },
+    },
+  ];
+}
+
+/**
+ * Generate Cache Components migration prompt
+ */
+function generateCacheComponentsPrompt(
+  args: Record<string, string>
+): PromptMessage[] {
+  const projectPath = args.projectPath || ".";
+  const strategy = args.strategy || "incremental";
+
+  return [
+    {
+      role: "user",
+      content: {
+        type: "text",
+        text: `I want to enable and migrate to Cache Components in my Next.js 16 application.
+
+**Project Path:** ${projectPath}
+**Migration Strategy:** ${strategy}
+
+## Cache Components Overview
+
+Cache Components is Next.js 16's new caching model that provides:
+- Automatic caching at the component level
+- Public caches for shared data
+- Private caches for user-specific data
+- Better cache invalidation
+- Improved performance
+
+## Migration Workflow
+
+### Step 1: Initialize Context
+Call \`nextjs-init\` to set up proper Next.js DevTools context.
+
+### Step 2: Pre-flight Checks
+Call \`nextjs-enable-cache-components\` which will:
+1. Check package manager and dependencies
+2. Verify Next.js version (must be 16+)
+3. Check current configuration
+
+### Step 3: Enable Cache Components
+The tool will update your next.config.ts to enable Cache Components:
+\`\`\`typescript
+const config: NextConfig = {
+  experimental: {
+    cacheComponents: true,
+  },
+}
+\`\`\`
+
+### Step 4: Start Dev Server with MCP
+The tool will start your dev server with MCP enabled to detect errors.
+
+### Step 5: Route Verification
+${strategy === "route-by-route" ? "We'll verify each route one at a time." : strategy === "full-rewrite" ? "We'll verify all routes at once." : "We'll verify routes incrementally, starting with the most critical."}
+
+### Step 6: Automated Error Fixing
+The tool will detect and fix common issues:
+- Missing Suspense boundaries
+- Incorrect caching directives
+- Static params requirements
+- Server/client component mismatches
+
+### Step 7: Final Verification
+Run a production build to ensure everything works.
+
+## Key Concepts to Learn
+Use \`nextjs-nextjs-docs\` to search for:
+- "cache components overview"
+- "use cache directive"
+- "cache invalidation"
+- "suspense boundaries"
+
+## Available Resources
+The following knowledge base resources are available:
+- \`cache-components://overview\`
+- \`cache-components://core-mechanics\`
+- \`cache-components://public-caches\`
+- \`cache-components://private-caches\`
+- \`cache-components://cache-invalidation\`
+- \`cache-components://error-patterns\`
+
+Please guide me through enabling Cache Components step by step.`,
+      },
+    },
+  ];
+}
+
+/**
+ * Generate runtime diagnostics prompt
+ */
+function generateRuntimeDiagnosticsPrompt(
+  args: Record<string, string>
+): PromptMessage[] {
+  const issueType = args.issueType || "all";
+  const port = args.port || "3000";
+
+  return [
+    {
+      role: "user",
+      content: {
+        type: "text",
+        text: `I need to diagnose runtime issues in my Next.js 16+ application.
+
+**Issue Type:** ${issueType}
+**Dev Server Port:** ${port}
+
+## Prerequisites
+- Next.js 16+ (MCP enabled by default)
+- Running dev server: \`npm run dev\`
+- MCP endpoint available at \`http://localhost:${port}/_next/mcp\`
+
+## Diagnostic Workflow
+
+### Step 1: Discover Running Servers
+Call \`nextjs-nextjs-index\` to:
+- Find all running Next.js dev servers
+- List available diagnostic tools
+- Get server metadata (port, PID, URL)
+
+### Step 2: Run Diagnostics
+Based on the issue type "${issueType}", call \`nextjs-nextjs-call\` with:
+
+${issueType === "errors" || issueType === "all" ? `**For Errors:**
+\`\`\`json
+{ "port": ${port}, "toolName": "get_errors" }
+\`\`\`
+This returns build, runtime, and type errors.
+` : ""}
+${issueType === "logs" || issueType === "all" ? `**For Logs:**
+\`\`\`json
+{ "port": ${port}, "toolName": "get_logs" }
+\`\`\`
+This returns the path to development log file.
+` : ""}
+${issueType === "routes" || issueType === "all" ? `**For Routes:**
+\`\`\`json
+{ "port": ${port}, "toolName": "get_page_metadata" }
+\`\`\`
+This returns application routes, pages, and component metadata.
+` : ""}
+${issueType === "server-actions" || issueType === "all" ? `**For Server Actions:**
+\`\`\`json
+{ "port": ${port}, "toolName": "get_server_action_by_id", "args": { "id": "<action-id>" } }
+\`\`\`
+Look up Server Actions by ID to find source files.
+` : ""}
+
+### Step 3: Get Project Metadata
+\`\`\`json
+{ "port": ${port}, "toolName": "get_project_metadata" }
+\`\`\`
+Returns project structure, config, and dev server URL.
+
+### Step 4: Browser Verification (Optional)
+If issues persist, use \`nextjs-browser-eval\` to:
+1. Navigate to problematic routes
+2. Take screenshots
+3. Capture console errors
+4. Test user interactions
+
+### Step 5: Search Documentation
+Use \`nextjs-nextjs-docs\` to search for solutions:
+- action: "search"
+- query: "<error message or issue description>"
+
+## Available Runtime Tools
+- \`get_errors\` - Build, runtime, and type errors
+- \`get_logs\` - Development log file path
+- \`get_page_metadata\` - Routes and component metadata
+- \`get_project_metadata\` - Project structure and config
+- \`get_server_action_by_id\` - Server Action source lookup
+
+Please help me diagnose and fix the issues in my application.`,
       },
     },
   ];

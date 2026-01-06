@@ -29,7 +29,7 @@ function getActionableErrorMessage(
     404: `Resource not found at ${endpoint}. Use midnight-list-examples to see available resources.`,
     408: `Request timed out. The hosted service may be under heavy load - try again in a moment.`,
     429: `Rate limited. Try again in a few minutes, or set MIDNIGHT_LOCAL=true for unlimited local search (requires ChromaDB + OpenAI API key).`,
-    500: `Server error. This is temporary - try again shortly or report at github.com/Olanetsoft/midnight-mcp/issues`,
+    500: `Server error. This is temporary - try again shortly or report at github.com/Olanetsoft/midnight-nextjs-mcp/issues`,
     502: `Bad gateway. The hosted API may be restarting - try again in 30 seconds.`,
     503: `Service temporarily unavailable. The hosted API may be under maintenance - try again later or use MIDNIGHT_LOCAL=true for local mode.`,
     504: `Gateway timeout. The request took too long - try a simpler query or try again later.`,
@@ -37,7 +37,7 @@ function getActionableErrorMessage(
 
   const actionableMessage =
     baseMessages[status] ||
-    `API error (${status}). Try again or report at github.com/Olanetsoft/midnight-mcp/issues`;
+    `API error (${status}). Try again or report at github.com/Olanetsoft/midnight-nextjs-mcp/issues`;
 
   // Include server message if available and different from our message
   if (serverMessage && !actionableMessage.includes(serverMessage)) {
@@ -150,7 +150,7 @@ async function makeRequest<T>(
       signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
-        "User-Agent": "midnight-mcp",
+        "User-Agent": "midnight-nextjs-mcp",
         ...options.headers,
       },
     });

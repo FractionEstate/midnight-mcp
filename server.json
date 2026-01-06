@@ -1,15 +1,15 @@
 {
-  "name": "midnight-mcp",
-  "version": "0.2.0",
-  "description": "MCP Server for Midnight Blockchain Development - Compact smart contracts, zero-knowledge proofs, and TypeScript integration",
+  "name": "midnight-nextjs-mcp",
+  "version": "0.3.0",
+  "description": "Unified MCP Server for Midnight Blockchain + Next.js Development - Compact smart contracts, zero-knowledge proofs, and turbo monorepo integration",
   "author": "Idris Olubisi",
   "license": "MIT",
-  "repository": "https://github.com/Olanetsoft/midnight-mcp",
-  "homepage": "https://github.com/Olanetsoft/midnight-mcp#readme",
+  "repository": "https://github.com/Olanetsoft/midnight-nextjs-mcp",
+  "homepage": "https://github.com/Olanetsoft/midnight-nextjs-mcp#readme",
   "transport": ["stdio", "http"],
-  "tools": 26,
-  "resources": 9,
-  "prompts": 5,
+  "tools": "28+",
+  "resources": 26,
+  "prompts": 6,
   "keywords": [
     "midnight",
     "blockchain",
@@ -17,7 +17,9 @@
     "zero-knowledge",
     "smart-contracts",
     "ai",
-    "developer-tools"
+    "developer-tools",
+    "nextjs",
+    "turbo-monorepo"
   ],
   "categories": ["blockchain", "developer-tools", "code-generation"]
 }

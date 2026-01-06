@@ -1,6 +1,6 @@
 # Cloudflare Integration
 
-The hosted API for midnight-mcp runs on Cloudflare Workers with Vectorize for vector search.
+The hosted API for midnight-nextjs-mcp runs on Cloudflare Workers with Vectorize for vector search.
 
 ## Architecture
 
@@ -12,7 +12,7 @@ The hosted API for midnight-mcp runs on Cloudflare Workers with Vectorize for ve
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│                   midnight-mcp (npm)                        │
+│                   midnight-nextjs-mcp (npm)                 │
 │                                                             │
 │  Default: calls hosted API                                  │
 │  Local mode: uses ChromaDB + OpenAI directly                │

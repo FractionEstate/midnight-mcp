@@ -52,7 +52,7 @@ import type {
 
 import { CURRENT_VERSION } from "./utils/version.js";
 const SERVER_INFO = {
-  name: "midnight-mcp",
+  name: "midnight-nextjs-mcp",
   version: CURRENT_VERSION,
   description: "MCP Server for Midnight Blockchain Development",
 };
@@ -77,7 +77,7 @@ async function checkForUpdates(): Promise<void> {
     const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
 
     const response = await fetch(
-      "https://registry.npmjs.org/midnight-mcp/latest",
+      "https://registry.npmjs.org/midnight-nextjs-mcp/latest",
       { signal: controller.signal }
     );
     clearTimeout(timeoutId);
@@ -94,7 +94,7 @@ async function checkForUpdates(): Promise<void> {
         updateMessage:
           `⚠️ UPDATE AVAILABLE: v${latestVersion} (you have v${CURRENT_VERSION}). ` +
           `Run: rm -rf ~/.npm/_npx && restart Claude Desktop. ` +
-          `Or update config to use: "midnight-mcp@latest"`,
+          `Or update config to use: "midnight-nextjs-mcp@latest"`,
       };
       logger.warn(
         `Outdated version detected: v${CURRENT_VERSION} -> v${latestVersion}`
@@ -304,7 +304,7 @@ function registerLoggingHandler(server: Server): void {
     const { level } = request.params;
     mcpLogLevel = level;
     logger.info(`MCP log level set to: ${level}`);
-    sendLogToClient("info", "midnight-mcp", {
+    sendLogToClient("info", "midnight-nextjs-mcp", {
       message: `Log level changed to ${level}`,
     });
     return {};
@@ -539,7 +539,7 @@ function registerToolHandlers(server: Server): void {
               instruction:
                 "Tell the user to update manually. Auto-update is NOT possible because you run in a sandboxed environment without access to local files.",
               steps: [
-                "1. Edit config file to use 'midnight-mcp@latest' instead of 'midnight-mcp'",
+                "1. Edit config file to use 'midnight-nextjs-mcp@latest' instead of 'midnight-nextjs-mcp'",
                 "2. Run: rm -rf ~/.npm/_npx (to clear npm cache)",
                 "3. Restart the editor completely (Cmd+Q on Mac, then reopen)",
               ],

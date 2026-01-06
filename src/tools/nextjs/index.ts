@@ -1,6 +1,6 @@
 /**
  * Next.js DevTools Integration
- * Bridges next-devtools-mcp tools into midnight-mcp
+ * Bridges next-devtools-mcp tools into midnight-nextjs-mcp
  *
  * This module spawns next-devtools-mcp as a subprocess and proxies
  * tool calls to it, providing a unified development experience
@@ -45,7 +45,7 @@ export async function initNextDevTools(): Promise<boolean> {
 
     nextDevToolsClient = new Client(
       {
-        name: "midnight-mcp-nextjs-bridge",
+        name: "midnight-nextjs-mcp-bridge",
         version: "1.0.0",
       },
       {
@@ -101,7 +101,7 @@ export async function cleanupNextDevTools(): Promise<void> {
 
 /**
  * Get all Next.js DevTools as MCP tool definitions
- * Tools are prefixed with 'nextjs-' to integrate cleanly with midnight-mcp
+ * Tools are prefixed with 'nextjs-' to integrate cleanly with midnight-nextjs-mcp
  */
 export function getNextJsTools(): ExtendedToolDefinition[] {
   if (!nextDevToolsAvailable || nextDevToolsList.length === 0) {
