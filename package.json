@@ -14,8 +14,8 @@
     "start": "node dist/bin.js --stdio",
     "start:http": "node dist/bin.js --http",
     "dev": "NODE_ENV=development tsup --watch",
-    "test": "run vitest",
-    "test:coverage": "vitest --coverage",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "format": "prettier --write src/**/*.ts",
     "prepublishOnly": "npm run typecheck && npm run build",
     "ci": "npm run typecheck && npm run build && npm test"
