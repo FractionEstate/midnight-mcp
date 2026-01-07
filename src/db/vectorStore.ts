@@ -1,4 +1,4 @@
-import { ChromaClient, Collection } from "chromadb";
+import { ChromaClient, Collection, Where } from "chromadb";
 import { config, logger } from "../utils/index.js";
 import { embeddingGenerator } from "../pipeline/embeddings.js";
 
@@ -129,8 +129,8 @@ class VectorStore {
       // Generate embedding for the query
       const queryEmbedding = await embeddingGenerator.generateEmbedding(query);
 
-      // Build where filter
-      const whereFilter: Record<string, unknown> = {};
+      // Build where filter for chromadb 3.x
+      const whereFilter: Where = {};
       if (filter?.repository) {
         whereFilter.repository = filter.repository;
       }
