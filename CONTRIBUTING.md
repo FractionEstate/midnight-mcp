@@ -1,14 +1,14 @@
-# Contributing to Midnight MCP
+# Contributing to Midnight + Next.js MCP
 
-Thank you for your interest in contributing to Midnight MCP! This guide will help you get started.
+Thank you for your interest in contributing to Midnight + Next.js MCP! This guide will help you get started.
 
 ## 🚀 Getting Started
 
 1. **Fork the repository**
 2. **Clone your fork**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/midnight-mcp.git
-   cd midnight-mcp
+   git clone https://github.com/YOUR_USERNAME/midnight-nextjs-mcp.git
+   cd midnight-nextjs-mcp
    ```
 3. **Install dependencies**:
    ```bash
@@ -28,10 +28,12 @@ Thank you for your interest in contributing to Midnight MCP! This guide will hel
 ## 📁 Project Structure
 
 ```
-midnight-mcp/
+midnight-nextjs-mcp/
 ├── src/
-│   ├── index.ts          # Entry point
-│   ├── tools/            # MCP tools (search, analyze, etc.)
+│   ├── bin.ts            # CLI entry point
+│   ├── index.ts          # Library exports
+│   ├── server.ts         # MCP protocol handler
+│   ├── tools/            # MCP tools (search, analyze, nextjs, etc.)
 │   ├── resources/        # MCP resources (docs, code, schemas)
 │   ├── prompts/          # MCP prompts
 │   ├── utils/            # Shared utilities
@@ -56,7 +58,7 @@ npm start      # Run built server
 ### Testing with MCP Inspector
 
 ```bash
-npx @modelcontextprotocol/inspector node dist/index.js
+npx @modelcontextprotocol/inspector node dist/bin.js
 ```
 
 ### Code Style

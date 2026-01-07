@@ -29,8 +29,8 @@ Paste any error messages here
 
 - OS: [e.g., macOS 14.0]
 - Node.js version: [e.g., 20.11.0]
-- midnight-mcp version: [e.g., 0.0.2]
-- Client: [e.g., Claude Desktop, MCP Inspector]
+- midnight-nextjs-mcp version: [e.g., 0.5.0]
+- Client: [e.g., VS Code Copilot, Claude Desktop, MCP Inspector]
 
 **Additional context**
 Add any other context about the problem here.

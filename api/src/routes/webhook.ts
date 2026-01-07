@@ -128,14 +128,14 @@ async function triggerReindex(
       const workflowFile = isPriority ? "index-priority.yml" : "index.yml";
 
       const response = await fetch(
-        `https://api.github.com/repos/nickkossolapov/midnight-mcp/actions/workflows/${workflowFile}/dispatches`,
+        `https://api.github.com/repos/fractionestate/midnight-nextjs-mcp/actions/workflows/${workflowFile}/dispatches`,
         {
           method: "POST",
           headers: {
             "Accept": "application/vnd.github+json",
             "Authorization": `Bearer ${githubToken}`,
             "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "midnight-mcp-webhook",
+            "User-Agent": "midnight-nextjs-mcp-webhook",
           },
           body: JSON.stringify({
             ref: "main",

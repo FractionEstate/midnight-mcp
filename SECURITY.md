@@ -4,11 +4,13 @@
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 0.0.x   | :white_check_mark: |
+| 0.3.x   | :white_check_mark: |
+| 0.2.x   | :white_check_mark: |
+| < 0.2   | :x:                |
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in Midnight MCP, please report it responsibly:
+If you discover a security vulnerability in Midnight + Next.js MCP, please report it responsibly:
 
 1. **Do NOT** open a public GitHub issue
 2. Email the maintainer directly or use GitHub's private vulnerability reporting
@@ -34,10 +36,16 @@ We will respond within 48 hours and work with you to resolve the issue.
 - `public_repo` scope is sufficient for most operations
 - Consider using fine-grained tokens
 
-### ChromaDB
+### ChromaDB (Local Mode)
 
-- If running ChromaDB, secure it appropriately
+- If running ChromaDB locally, secure it appropriately
 - Don't expose ChromaDB ports publicly without authentication
+
+### MCP Server Security
+
+- The server only exposes read-only operations by default
+- All tool inputs are validated via Zod schemas
+- Path traversal and protocol injection are blocked
 
 ## Dependencies
 
