@@ -40,11 +40,13 @@ export function serialize(data: unknown): string {
   try {
     return yaml.dump(data, {
       indent: 2,
-      lineWidth: 120,
+      lineWidth: 200, // Longer lines = fewer line breaks = fewer tokens
       noRefs: true, // Avoid YAML anchors/aliases for cleaner output
       quotingType: '"',
       forceQuotes: false,
       sortKeys: false, // Preserve object key order
+      flowLevel: 3, // Use inline format for deeply nested objects
+      noArrayIndent: true, // Compact arrays
     });
   } catch {
     // Fallback to JSON if YAML serialization fails
