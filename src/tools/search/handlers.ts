@@ -212,21 +212,31 @@ export async function searchCompact(input: SearchCompactInput) {
 
   const results = await vectorStore.search(sanitizedQuery, limit, filter);
 
-  const response = {
-    results: results.map((r) => ({
-      code: r.content,
-      relevanceScore: r.score,
-      source: {
-        repository: r.metadata.repository,
-        filePath: r.metadata.filePath,
-        lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
-      },
-      codeType: r.metadata.codeType,
-      name: r.metadata.codeName,
-    })),
-    totalResults: results.length,
-    query: sanitizedQuery,
-  };
+  // Brief mode: minimal fields for token efficiency
+  const response = input.brief
+    ? {
+        results: results.map((r) => ({
+          code: r.content,
+          score: Math.round(r.score * 100) / 100,
+          file: `${r.metadata.repository}/${r.metadata.filePath}`,
+        })),
+        total: results.length,
+      }
+    : {
+        results: results.map((r) => ({
+          code: r.content,
+          relevanceScore: r.score,
+          source: {
+            repository: r.metadata.repository,
+            filePath: r.metadata.filePath,
+            lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
+          },
+          codeType: r.metadata.codeType,
+          name: r.metadata.codeName,
+        })),
+        totalResults: results.length,
+        query: sanitizedQuery,
+      };
 
   return finalizeResponse(response, cacheKey, warnings);
 }
@@ -282,22 +292,32 @@ export async function searchTypeScript(input: SearchTypeScriptInput) {
     );
   }
 
-  const response = {
-    results: filteredResults.map((r) => ({
-      code: r.content,
-      relevanceScore: r.score,
-      source: {
-        repository: r.metadata.repository,
-        filePath: r.metadata.filePath,
-        lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
-      },
-      codeType: r.metadata.codeType,
-      name: r.metadata.codeName,
-      isExported: r.metadata.isPublic,
-    })),
-    totalResults: filteredResults.length,
-    query: sanitizedQuery,
-  };
+  // Brief mode: minimal fields for token efficiency
+  const response = input.brief
+    ? {
+        results: filteredResults.map((r) => ({
+          code: r.content,
+          score: Math.round(r.score * 100) / 100,
+          file: `${r.metadata.repository}/${r.metadata.filePath}`,
+        })),
+        total: filteredResults.length,
+      }
+    : {
+        results: filteredResults.map((r) => ({
+          code: r.content,
+          relevanceScore: r.score,
+          source: {
+            repository: r.metadata.repository,
+            filePath: r.metadata.filePath,
+            lines: `${r.metadata.startLine}-${r.metadata.endLine}`,
+          },
+          codeType: r.metadata.codeType,
+          name: r.metadata.codeName,
+          isExported: r.metadata.isPublic,
+        })),
+        totalResults: filteredResults.length,
+        query: sanitizedQuery,
+      };
 
   return finalizeResponse(response, cacheKey, warnings);
 }
@@ -355,21 +375,31 @@ export async function searchDocs(input: SearchDocsInput) {
 
   const results = await vectorStore.search(sanitizedQuery, limit, filter);
 
-  const response = {
-    results: results.map((r) => ({
-      content: r.content,
-      relevanceScore: r.score,
-      source: {
-        repository: r.metadata.repository,
-        filePath: r.metadata.filePath,
-        section: r.metadata.codeName,
-      },
-    })),
-    totalResults: results.length,
-    query: sanitizedQuery,
-    category: input.category,
-    hint: "For guaranteed freshness, use midnight-fetch-docs with the path from these results (e.g., /develop/faq)",
-  };
+  // Brief mode: minimal fields for token efficiency
+  const response = input.brief
+    ? {
+        results: results.map((r) => ({
+          content: r.content,
+          score: Math.round(r.score * 100) / 100,
+          path: r.metadata.filePath,
+        })),
+        total: results.length,
+      }
+    : {
+        results: results.map((r) => ({
+          content: r.content,
+          relevanceScore: r.score,
+          source: {
+            repository: r.metadata.repository,
+            filePath: r.metadata.filePath,
+            section: r.metadata.codeName,
+          },
+        })),
+        totalResults: results.length,
+        query: sanitizedQuery,
+        category: input.category,
+        hint: "For guaranteed freshness, use midnight-fetch-docs with the path from these results (e.g., /develop/faq)",
+      };
 
   return finalizeResponse(response, cacheKey, warnings);
 }

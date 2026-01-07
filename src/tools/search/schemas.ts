@@ -13,6 +13,11 @@ export const SearchCompactInputSchema = z.object({
     .optional()
     .default(10)
     .describe("Maximum results to return"),
+  brief: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe("Return compact results (fewer fields, saves tokens)"),
   filter: z
     .object({
       repository: z.string().optional(),
@@ -34,6 +39,11 @@ export const SearchTypeScriptInputSchema = z.object({
     .optional()
     .default(true)
     .describe("Include usage examples"),
+  brief: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe("Return compact results (fewer fields, saves tokens)"),
   limit: z.number().optional().default(10),
 });
 
@@ -44,6 +54,11 @@ export const SearchDocsInputSchema = z.object({
     .optional()
     .default("all")
     .describe("Filter by documentation category"),
+  brief: z
+    .boolean()
+    .optional()
+    .default(false)
+    .describe("Return compact results (fewer fields, saves tokens)"),
   limit: z.number().optional().default(10),
 });
 
