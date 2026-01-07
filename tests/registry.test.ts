@@ -204,11 +204,12 @@ describe("server.json Schema Compliance", () => {
     expect(Array.isArray(serverJson.packages)).toBe(true);
     expect(serverJson.packages.length).toBeGreaterThan(0);
 
+    // Schema 2025-12-11 uses registryType/identifier instead of registry_name/name
     const npmPackage = serverJson.packages.find(
-      (p: { registry_name: string }) => p.registry_name === "npm"
+      (p: { registryType: string }) => p.registryType === "npm"
     );
     expect(npmPackage).toBeDefined();
-    expect(npmPackage.name).toBe("midnight-nextjs-mcp");
+    expect(npmPackage.identifier).toBe("midnight-nextjs-mcp");
   });
 
   it("should have valid repository configuration", async () => {

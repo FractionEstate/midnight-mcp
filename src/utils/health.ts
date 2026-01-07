@@ -32,7 +32,7 @@ export interface HealthStatus {
 const startTime = Date.now();
 
 // Get package version
-const VERSION = process.env.npm_package_version || "0.0.3";
+const VERSION = process.env.npm_package_version || "0.3.0";
 
 /**
  * Check if GitHub API is accessible
