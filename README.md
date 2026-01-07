@@ -53,6 +53,7 @@ Or manually add to `.vscode/mcp.json`:
 {
   "servers": {
     "midnight-nextjs-mcp": {
+      "type": "stdio",
       "command": "npx",
       "args": ["-y", "midnight-nextjs-mcp@latest"]
     }
@@ -123,7 +124,7 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 
 ## What's Included
 
-### 28+ Tools
+### 29 Midnight Tools + 7 Next.js Tools
 
 | Category          | Tools                                                                                                                             | Description                                      |
 | ----------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
@@ -134,10 +135,12 @@ Add to `~/.codeium/windsurf/mcp_config.json`:
 | **AI Generation** | `generate-contract`, `review-contract`, `document-contract`                                                                       | AI-powered code generation _(requires sampling)_ |
 | **Compound**      | `upgrade-check`, `get-repo-context`                                                                                               | Multi-step operations _(saves 50-70% tokens)_    |
 | **Next.js**       | `init`, `nextjs-docs`, `browser-eval`, `nextjs-index`, `nextjs-call`, `upgrade-nextjs-16`, `enable-cache-components`             | Runtime diagnostics, docs, browser automation    |
-| **Health**        | `health-check`, `get-status`, `check-version`                                                                                     | Server status and version checking               |
+| **Health**        | `health-check`, `get-status`, `check-version`, `data-freshness`, `auto-update-config`                                             | Server status, version, and data freshness       |
 | **Discovery**     | `list-tool-categories`, `list-category-tools`, `suggest-tool`                                                                     | Explore available tools and get recommendations  |
 
 Midnight tools are prefixed with `midnight-` (e.g., `midnight-search-compact`), Next.js tools with `nextjs-`.
+
+> **📍 Listed on GitHub MCP Registry**: Install directly in VS Code via Extensions → MCP Registry → search "midnight"
 
 ### Next.js DevTools (Bundled)
 
@@ -211,8 +214,8 @@ Resources from next-devtools-mcp are automatically available:
 
 | Capability      | Feature                                         |
 | --------------- | ----------------------------------------------- |
-| **Tools**       | 28+ tools with `listChanged` notifications      |
-| **Resources**   | 29 embedded resources with subscription support |
+| **Tools**       | 36 tools with `listChanged` notifications       |
+| **Resources**   | 35 embedded resources with subscription support |
 | **Prompts**     | 9 workflow prompts (Midnight + Next.js)         |
 | **Logging**     | Client-controllable log level                   |
 | **Completions** | Autocomplete for prompt arguments               |
@@ -220,7 +223,7 @@ Resources from next-devtools-mcp are automatically available:
 | **Sampling**    | AI-powered generation (when client supports it) |
 | **Next.js**     | Full turbo monorepo integration                 |
 
-### 29 Embedded Resources
+### 35 Embedded Resources
 
 Quick references available offline:
 
@@ -265,56 +268,30 @@ Quick references available offline:
 
 ---
 
-## MCP Registry
+## GitHub MCP Registry
 
-This server includes an **MCP Registry v0.1** implementation, allowing AI clients (Copilot, Claude, etc.) to discover and configure the server automatically.
+✅ **This server is listed on the official [GitHub MCP Registry](https://github.com/modelcontextprotocol/registry)**!
 
-### Registry URL
+### One-Click Install (VS Code + Copilot)
 
-```
-https://midnight-mcp-api.midnightmcp.workers.dev
-```
+1. Open VS Code Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`)
+2. Click the **filter icon** → select **MCP Registry**
+3. Search for `midnight-nextjs-mcp`
+4. Click **Install**
 
-### Registry Endpoints
+### Registry Details
 
-| Endpoint | Description |
-|----------|-------------|
-| `GET /v0.1` | Registry info |
-| `GET /v0.1/servers` | List all servers |
-| `GET /v0.1/servers/{name}/versions` | List versions |
-| `GET /v0.1/servers/{name}/versions/latest` | Get latest version |
+| Property | Value |
+|----------|-------|
+| **Registry Name** | `io.github.FractionEstate/midnight-nextjs-mcp` |
+| **npm Package** | `midnight-nextjs-mcp` |
+| **Version** | `0.3.0` |
+| **Transport** | stdio |
 
-### Configure Custom Registry in IDE
+### Verify Registration
 
-**VS Code / Copilot:**
-1. Open Settings → search "MCP Registry"
-2. Add URL: `https://midnight-mcp-api.midnightmcp.workers.dev`
-3. Restart Copilot Chat
-
-**JetBrains (Preview/Nightly):**
-1. Settings → Tools → Copilot → MCP Registry URL
-2. Add the registry URL
-
-The server will appear in "Browse MCP Servers" for one-click installation.
-
-### server.json
-
-This repository includes a `server.json` file following the [MCP Registry schema](https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json):
-
-```json
-{
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.fractionestate/midnight-nextjs-mcp",
-  "title": "Midnight + Next.js MCP",
-  "description": "Unified MCP server for Midnight blockchain development and Next.js dApps...",
-  "version": "0.3.0",
-  "packages": [{
-    "registry_name": "npm",
-    "name": "midnight-nextjs-mcp",
-    "version": "0.3.0",
-    "runtime": "node"
-  }]
-}
+```bash
+curl "https://registry.modelcontextprotocol.io/v0.1/servers?search=midnight-nextjs-mcp"
 ```
 
 ---

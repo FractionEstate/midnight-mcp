@@ -15,7 +15,7 @@ This is a **unified MCP (Model Context Protocol) server** that gives AI assistan
 ```
 src/                    # MCP server (main package)
 ├── server.ts           # MCP protocol handler (JSON-RPC 2.0 over stdio)
-├── tools/              # 28+ MCP tools organized by category
+├── tools/              # 29 Midnight + 7 Next.js MCP tools organized by category
 │   ├── {category}/
 │   │   ├── index.ts    # Barrel exports
 │   │   ├── schemas.ts  # Zod validation schemas
@@ -57,7 +57,7 @@ The `server.json` file in the repository root follows the registry schema for au
 ## MCP Primitives (per spec)
 
 This server implements three core MCP primitives:
-- **Tools** (30): Executable functions (`tools/list`, `tools/call`)
+- **Tools** (36): 29 Midnight + 7 Next.js tools (`tools/list`, `tools/call`)
 - **Resources** (35): Context data via `midnight://` URIs (`resources/list`, `resources/read`)
   - 12 docs, 19 code examples/patterns/integrations/infrastructure, 3 schemas
 - **Prompts** (9): Reusable templates (`prompts/list`, `prompts/get`)

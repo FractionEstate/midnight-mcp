@@ -13,7 +13,7 @@
 ┌──────────────────────────────────────────────────────────────────┐
 │                   midnight-nextjs-mcp                            │
 │  ┌────────────┐  ┌─────────────┐  ┌────────────┐                │
-│  │ 28+ Tools  │  │26 Resources │  │ 6 Prompts  │                │
+│  │ 36 Tools   │  │35 Resources │  │ 9 Prompts  │                │
 │  └────────────┘  └─────────────┘  └────────────┘                │
 └──────────────────────────────────────────────────────────────────┘
                               │
@@ -93,6 +93,7 @@ Additional repositories accessible via `midnight-get-file` and other GitHub tool
 | `midnight-health-check`               | Server health                                  |
 | `midnight-get-status`                 | Rate limits, cache stats                       |
 | `midnight-check-version`              | Check for server updates                       |
+| `midnight-data-freshness`             | Check indexed data freshness                   |
 | `midnight-auto-update-config`         | Auto-update MCP client config                  |
 | `midnight-generate-contract`          | AI-generate contracts from natural language    |
 | `midnight-review-contract`            | AI-powered security review                     |
