@@ -1692,6 +1692,7 @@ Ensure you're using \`--vscode\` flag and have problem matchers configured in \`
 |---------|---------|-------------|
 | \`@midnight-ntwrk/compact-js\` | **^2.3.0** | TypeScript execution environment |
 | \`@midnight-ntwrk/compact-js-command\` | **^2.3.0** | CLI utilities |
+| \`@midnight-ntwrk/compact-js-node\` | **^2.3.0** | Node.js platform utilities |
 | \`@midnight-ntwrk/compact-runtime\` | **^0.9.0** | Runtime library |
 
 ## Provider Packages (v2.1.0)
@@ -1815,10 +1816,72 @@ These packages are in active development:
 | \`@midnight-ntwrk/wallet-sdk-facade\` | 1.0.0-beta.13 | Beta |
 | \`@midnight-ntwrk/wallet-sdk-shielded\` | 1.0.0-beta.11 | Beta |
 | \`@midnight-ntwrk/wallet-sdk-runtime\` | 1.0.0-beta.9 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-abstractions\` | 1.0.0-beta.9 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-utilities\` | 1.0.0-beta.7 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-node-client\` | 1.0.0-beta.10 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-prover-client\` | 1.0.0-beta.11 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-indexer-client\` | 1.0.0-beta.14 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-dust-wallet\` | 1.0.0-beta.12 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-unshielded-wallet\` | 1.0.0-beta.14 | Beta |
+| \`@midnight-ntwrk/wallet-sdk-unshielded-state\` | 1.0.0-beta.10 | Beta |
 | \`@midnight-ntwrk/ledger-v6\` | 6.2.0-rc.3 | RC |
 | \`@midnight-ntwrk/ledger-v7\` | 7.0.0-alpha.1 | Alpha |
+| \`@midnight-ntwrk/onchain-runtime-v1\` | 1.0.0-rc.3 | RC |
+| \`@midnight-ntwrk/onchain-runtime-v2\` | 2.0.0-alpha.1 | Alpha |
+| \`@midnight-ntwrk/zkir-v2\` | 2.0.0-rc.3 | RC |
 
 > **Note**: Use beta/RC packages only for testing new features, not production.
+
+---
+
+## Complete Package List (41 Official Packages)
+
+All packages from \`ntwrk-bot\` publisher:
+
+### Stable Packages (27)
+1. \`@midnight-ntwrk/compact-js\` - 2.3.0
+2. \`@midnight-ntwrk/compact-js-command\` - 2.3.0
+3. \`@midnight-ntwrk/compact-js-node\` - 2.3.0
+4. \`@midnight-ntwrk/compact-runtime\` - 0.9.0
+5. \`@midnight-ntwrk/dapp-connector-api\` - 3.0.0
+6. \`@midnight-ntwrk/ledger\` - 4.0.0
+7. \`@midnight-ntwrk/midnight-js-contracts\` - 2.1.0
+8. \`@midnight-ntwrk/midnight-js-fetch-zk-config-provider\` - 2.1.0
+9. \`@midnight-ntwrk/midnight-js-http-client-proof-provider\` - 2.1.0
+10. \`@midnight-ntwrk/midnight-js-indexer-public-data-provider\` - 2.1.0
+11. \`@midnight-ntwrk/midnight-js-level-private-state-provider\` - 2.1.0
+12. \`@midnight-ntwrk/midnight-js-logger-provider\` - 2.1.0
+13. \`@midnight-ntwrk/midnight-js-network-id\` - 2.1.0
+14. \`@midnight-ntwrk/midnight-js-node-zk-config-provider\` - 2.1.0
+15. \`@midnight-ntwrk/midnight-js-testing\` - 2.0.2
+16. \`@midnight-ntwrk/midnight-js-types\` - 2.1.0
+17. \`@midnight-ntwrk/midnight-js-utils\` - 2.1.0
+18. \`@midnight-ntwrk/onchain-runtime\` - 0.3.0
+19. \`@midnight-ntwrk/platform-js\` - 2.1.0
+20. \`@midnight-ntwrk/wallet\` - 5.0.0
+21. \`@midnight-ntwrk/wallet-api\` - 5.0.0
+22. \`@midnight-ntwrk/wallet-sdk-address-format\` - 2.0.0
+23. \`@midnight-ntwrk/wallet-sdk-capabilities\` - 2.0.0
+24. \`@midnight-ntwrk/wallet-sdk-hd\` - 2.0.0
+25. \`@midnight-ntwrk/zswap\` - 4.0.0
+
+### Beta/RC/Alpha Packages (16)
+26. \`@midnight-ntwrk/ledger-v6\` - 6.2.0-rc.3
+27. \`@midnight-ntwrk/ledger-v7\` - 7.0.0-alpha.1
+28. \`@midnight-ntwrk/onchain-runtime-v1\` - 1.0.0-rc.3
+29. \`@midnight-ntwrk/onchain-runtime-v2\` - 2.0.0-alpha.1
+30. \`@midnight-ntwrk/wallet-sdk-abstractions\` - 1.0.0-beta.9
+31. \`@midnight-ntwrk/wallet-sdk-dust-wallet\` - 1.0.0-beta.12
+32. \`@midnight-ntwrk/wallet-sdk-facade\` - 1.0.0-beta.13
+33. \`@midnight-ntwrk/wallet-sdk-indexer-client\` - 1.0.0-beta.14
+34. \`@midnight-ntwrk/wallet-sdk-node-client\` - 1.0.0-beta.10
+35. \`@midnight-ntwrk/wallet-sdk-prover-client\` - 1.0.0-beta.11
+36. \`@midnight-ntwrk/wallet-sdk-runtime\` - 1.0.0-beta.9
+37. \`@midnight-ntwrk/wallet-sdk-shielded\` - 1.0.0-beta.11
+38. \`@midnight-ntwrk/wallet-sdk-unshielded-state\` - 1.0.0-beta.10
+39. \`@midnight-ntwrk/wallet-sdk-unshielded-wallet\` - 1.0.0-beta.14
+40. \`@midnight-ntwrk/wallet-sdk-utilities\` - 1.0.0-beta.7
+41. \`@midnight-ntwrk/zkir-v2\` - 2.0.0-rc.3
 `,
 };
 
