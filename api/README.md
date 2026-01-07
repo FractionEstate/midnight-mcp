@@ -42,7 +42,7 @@ curl https://midnight-mcp-api.midnightmcp.workers.dev/v0.1/servers
     {
       "server": {
         "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-        "name": "io.github.olanetsoft/midnight-nextjs-mcp",
+        "name": "io.github.fractionestate/midnight-nextjs-mcp",
         "title": "Midnight + Next.js MCP",
         "description": "Unified MCP server for Midnight blockchain development...",
         "version": "0.3.0",
@@ -64,7 +64,7 @@ curl https://midnight-mcp-api.midnightmcp.workers.dev/v0.1/servers
 ### Example: Get Latest Version
 
 ```bash
-curl https://midnight-mcp-api.midnightmcp.workers.dev/v0.1/servers/io.github.olanetsoft%2Fmidnight-nextjs-mcp/versions/latest
+curl https://midnight-mcp-api.midnightmcp.workers.dev/v0.1/servers/io.github.fractionestate%2Fmidnight-nextjs-mcp/versions/latest
 ```
 
 ### Configure as Custom Registry

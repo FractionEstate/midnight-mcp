@@ -69,10 +69,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/Olanetsoft/midnight-nextjs-mcp.git"
+    "url": "https://github.com/FractionEstate/midnight-nextjs-mcp.git"
   },
-  "homepage": "https://github.com/Olanetsoft/midnight-nextjs-mcp#readme",
+  "homepage": "https://github.com/FractionEstate/midnight-nextjs-mcp#readme",
   "bugs": {
-    "url": "https://github.com/Olanetsoft/midnight-nextjs-mcp/issues"
+    "url": "https://github.com/FractionEstate/midnight-nextjs-mcp/issues"
   }
 }

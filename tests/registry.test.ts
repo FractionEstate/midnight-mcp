@@ -48,7 +48,7 @@ describe("MCP Registry v0.1 Specification", () => {
             server: {
               $schema:
                 "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-              name: "io.github.olanetsoft/midnight-nextjs-mcp",
+              name: "io.github.fractionestate/midnight-nextjs-mcp",
               description: "Test server",
               version: "0.3.0",
               packages: [
@@ -79,7 +79,7 @@ describe("MCP Registry v0.1 Specification", () => {
     });
 
     it("should have correct server name format (reverse-DNS)", () => {
-      const serverName = "io.github.olanetsoft/midnight-nextjs-mcp";
+      const serverName = "io.github.fractionestate/midnight-nextjs-mcp";
 
       // Validate reverse-DNS format with namespace/server pattern
       expect(serverName).toMatch(/^[a-zA-Z0-9.-]+\/[a-zA-Z0-9._-]+$/);
@@ -89,7 +89,7 @@ describe("MCP Registry v0.1 Specification", () => {
       const server = {
         $schema:
           "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-        name: "io.github.olanetsoft/midnight-nextjs-mcp",
+        name: "io.github.fractionestate/midnight-nextjs-mcp",
         description: "Unified MCP server for Midnight blockchain development",
         version: "0.3.0",
       };

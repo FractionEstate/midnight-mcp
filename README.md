@@ -4,7 +4,7 @@
 [![npm downloads](https://img.shields.io/npm/dm/midnight-nextjs-mcp)](https://www.npmjs.com/package/midnight-nextjs-mcp)
 [![License](https://img.shields.io/npm/l/midnight-nextjs-mcp)](./LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue?logo=typescript)](https://www.typescriptlang.org/)
-[![CI](https://github.com/Olanetsoft/midnight-nextjs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/Olanetsoft/midnight-nextjs-mcp/actions/workflows/ci.yml)
+[![CI](https://github.com/FractionEstate/midnight-nextjs-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/FractionEstate/midnight-nextjs-mcp/actions/workflows/ci.yml)
 
 Unified MCP server that gives AI assistants access to **Midnight blockchain** and **Next.js development**—combining Compact contract analysis, turbo monorepo scaffolding, and full-stack dApp development in one package.
 
@@ -285,7 +285,7 @@ This repository includes a `server.json` file following the [MCP Registry schema
 ```json
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.olanetsoft/midnight-nextjs-mcp",
+  "name": "io.github.fractionestate/midnight-nextjs-mcp",
   "title": "Midnight + Next.js MCP",
   "description": "Unified MCP server for Midnight blockchain development and Next.js dApps...",
   "version": "0.3.0",

@@ -99,20 +99,20 @@ const MIDNIGHT_MCP_SERVERS: ServerResponse[] = [
     server: {
       $schema:
         "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-      name: "io.github.olanetsoft/midnight-nextjs-mcp",
+      name: "io.github.fractionestate/midnight-nextjs-mcp",
       title: "Midnight + Next.js MCP",
       description:
         "Unified MCP server for Midnight blockchain development and Next.js dApps. Provides semantic search across Compact contracts, TypeScript SDK, documentation, and full Next.js DevTools integration.",
       version: "0.3.0",
-      websiteUrl: "https://github.com/Olanetsoft/midnight-mcp",
+      websiteUrl: "https://github.com/FractionEstate/midnight-nextjs-mcp",
       repository: {
-        url: "https://github.com/Olanetsoft/midnight-mcp",
+        url: "https://github.com/FractionEstate/midnight-nextjs-mcp",
         source: "github",
         directory: "/",
       },
       icons: [
         {
-          src: "https://raw.githubusercontent.com/Olanetsoft/midnight-mcp/main/docs/icon.png",
+          src: "https://raw.githubusercontent.com/FractionEstate/midnight-nextjs-mcp/main/docs/icon.png",
           sizes: "512x512",
           type: "image/png",
         },
@@ -174,14 +174,14 @@ const MIDNIGHT_MCP_SERVERS: ServerResponse[] = [
     server: {
       $schema:
         "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-      name: "io.github.olanetsoft/midnight-nextjs-mcp",
+      name: "io.github.fractionestate/midnight-nextjs-mcp",
       title: "Midnight + Next.js MCP",
       description:
         "Unified MCP server for Midnight blockchain development and Next.js dApps.",
       version: "0.2.0",
-      websiteUrl: "https://github.com/Olanetsoft/midnight-mcp",
+      websiteUrl: "https://github.com/FractionEstate/midnight-nextjs-mcp",
       repository: {
-        url: "https://github.com/Olanetsoft/midnight-mcp",
+        url: "https://github.com/FractionEstate/midnight-nextjs-mcp",
         source: "github",
       },
       packages: [
