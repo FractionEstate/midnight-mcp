@@ -70,7 +70,7 @@ jobs:
           sudo mv mcp-publisher /usr/local/bin/
 
       - name: Login to MCP Registry via GitHub OIDC
-        run: mcp-publisher login github-actions
+        run: mcp-publisher login github-oidc
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
