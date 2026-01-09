@@ -26,17 +26,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Check NPM_TOKEN_ELEVATED secret exists
+      - name: Check NPM_TOKEN secret exists
         run: |
-          if [ -z "${{ secrets.NPM_TOKEN_ELEVATED }}" ]; then
-            echo "Missing secret NPM_TOKEN_ELEVATED"
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "Missing secret NPM_TOKEN"
             exit 1
           fi
           echo "NPM token present"
 
       - name: Validate NPM auth
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_ELEVATED }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
           npm whoami
