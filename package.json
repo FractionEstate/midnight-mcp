@@ -1,15 +1,15 @@
 {
-  "name": "next-devtools-mcp",
-  "version": "0.3.10",
+  "name": "midnight-nextjs-mcp",
+  "version": "0.1.0",
   "type": "module",
-  "description": "Next.js development tools MCP server with stdio transport",
+  "description": "Development MCP server combining Midnight Network blockchain tools with Next.js DevTools",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vercel/next-devtools-mcp.git"
+    "url": "https://github.com/user/midnight-nextjs-mcp.git"
   },
   "bin": {
-    "next-devtools-mcp": "./dist/index.js"
+    "midnight-nextjs-mcp": "./dist/index.js"
   },
   "main": "dist/index.js",
   "exports": {
@@ -19,7 +19,7 @@
   "files": [
     "dist"
   ],
-  "mcpName": "io.github.vercel/next-devtools-mcp",
+  "mcpName": "io.github.midnight/midnight-nextjs-mcp",
   "scripts": {
     "dev": "tsc --watch",
     "copy-resources": "node scripts/copy-resources.js",
@@ -37,7 +37,19 @@
     "find-process": "2.0.0",
     "pid-port": "2.0.0",
     "undici": "7.16.0",
-    "zod": "3.25.76"
+    "zod": "3.25.76",
+    "graphql": "^16.9.0",
+    "graphql-request": "^7.1.0",
+    "level": "^8.0.1",
+    "@midnight-ntwrk/midnight-js-contracts": "^2.1.0",
+    "@midnight-ntwrk/midnight-js-types": "^2.1.0",
+    "@midnight-ntwrk/midnight-js-utils": "^2.1.0",
+    "@midnight-ntwrk/midnight-js-network-id": "^2.1.0",
+    "@midnight-ntwrk/compact-runtime": "^0.9.0",
+    "@midnight-ntwrk/ledger": "^4.0.0",
+    "@midnight-ntwrk/wallet": "^5.0.0",
+    "@midnight-ntwrk/wallet-api": "^5.0.0",
+    "@midnight-ntwrk/dapp-connector-api": "^3.0.0"
   },
   "devDependencies": {
     "@anthropic-ai/claude-agent-sdk": "^0.1.15",

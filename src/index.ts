@@ -18,19 +18,31 @@ import type { McpToolName } from "./telemetry/mcp-telemetry-tracker.js"
 import { queueEvent, getSessionAggregationJSON } from "./telemetry/event-queue.js"
 import { log } from "./telemetry/logger.js"
 
+// Import version management
+import {
+  startPolling as startVersionPolling,
+  stopPolling as stopVersionPolling,
+  fetchAllLatestVersions,
+  getCacheStatus,
+  type VersionDiff,
+} from "./providers/versions.js"
+
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-import * as browserEval from "./tools/browser-eval.js"
-import * as enableCacheComponents from "./tools/enable-cache-components.js"
-import * as init from "./tools/init.js"
-import * as nextjsDocs from "./tools/nextjs-docs.js"
-import * as nextjsIndex from "./tools/nextjs_index.js"
-import * as nextjsCall from "./tools/nextjs_call.js"
-import * as upgradeNextjs16 from "./tools/upgrade-nextjs-16.js"
+// Import unified tool registry
+import {
+  getEnabledTools,
+  getToolByName,
+  toolNameToTelemetryName,
+  categories
+} from "./tools/index.js"
 
+// Import prompts
 import * as upgradeNextjs16Prompt from "./prompts/upgrade-nextjs-16.js"
 import * as enableCacheComponentsPrompt from "./prompts/enable-cache-components.js"
+
+// Import resources
 import * as cacheComponentsOverview from "./resources/(cache-components)/overview.js"
 import * as cacheComponentsCoreMechanics from "./resources/(cache-components)/core-mechanics.js"
 import * as cacheComponentsPublicCaches from "./resources/(cache-components)/public-caches.js"
@@ -49,21 +61,64 @@ import * as nextjs16BetaToStable from "./resources/(nextjs16)/migration/beta-to-
 import * as nextjs16Examples from "./resources/(nextjs16)/migration/examples.js"
 import * as nextjsDocsLlmsIndex from "./resources/(nextjs-docs)/llms-index.js"
 
-const tools = [browserEval, enableCacheComponents, init, nextjsDocs, nextjsIndex, nextjsCall, upgradeNextjs16]
+// Import Midnight resources
+import * as midnightCompactOverview from "./resources/(midnight-compact)/overview.js"
+import * as midnightCompactReference from "./resources/(midnight-compact)/reference.js"
+import * as midnightSdkOverview from "./resources/(midnight-sdk)/overview.js"
 
-const toolNameToTelemetryName: Record<string, McpToolName> = {
-  browser_eval: "mcp/browser_eval",
-  enable_cache_components: "mcp/enable_cache_components",
-  init: "mcp/init",
-  nextjs_docs: "mcp/nextjs_docs",
-  nextjs_index: "mcp/nextjs_index",
-  nextjs_call: "mcp/nextjs_call",
-  upgrade_nextjs_16: "mcp/upgrade_nextjs_16",
+// Import Midnight prompts
+import * as createMidnightContractPrompt from "./prompts/create-midnight-contract.js"
+
+// Parse CLI arguments for tool categories and features
+const args = process.argv.slice(2)
+const enableMidnight = !args.includes("--no-midnight")
+const enableNextjs = !args.includes("--no-nextjs")
+const enableAlpha = args.includes("--alpha")
+const enableVersionPolling = !args.includes("--no-version-polling")
+const checkVersionsOnStart = args.includes("--check-versions")
+
+// Version polling interval (default 24 hours, can be set via --poll-interval=HOURS)
+const pollIntervalArg = args.find(a => a.startsWith("--poll-interval="))
+const pollIntervalHours = pollIntervalArg ? parseInt(pollIntervalArg.split("=")[1], 10) : 24
+const pollIntervalMs = pollIntervalHours * 60 * 60 * 1000
+
+// Start version polling if enabled
+if (enableVersionPolling) {
+  startVersionPolling({
+    interval: pollIntervalMs,
+    onUpdate: (updates: VersionDiff[]) => {
+      log("info", `📦 ${updates.length} Midnight package update(s) available:`)
+      for (const update of updates) {
+        log("info", `  - ${update.package}: ${update.current} → ${update.latest}`)
+      }
+    },
+    onError: (error: Error) => {
+      log("error", `Version polling error: ${error.message}`)
+    },
+  })
 }
 
-const prompts = [upgradeNextjs16Prompt, enableCacheComponentsPrompt]
+// Check versions on startup if requested
+if (checkVersionsOnStart) {
+  fetchAllLatestVersions().then(() => {
+    const status = getCacheStatus()
+    log("info", `📦 Version cache updated: ${status.packageCount} packages tracked`)
+  }).catch((err) => {
+    log("error", `Failed to check versions: ${(err as Error).message}`)
+  })
+}
+
+// Get tools based on configuration
+const tools = getEnabledTools({ midnight: enableMidnight, nextjs: enableNextjs })
+
+const prompts = [
+  upgradeNextjs16Prompt,
+  enableCacheComponentsPrompt,
+  createMidnightContractPrompt,
+]
 
 const resources = [
+  // Next.js resources
   cacheComponentsOverview,
   cacheComponentsCoreMechanics,
   cacheComponentsPublicCaches,
@@ -81,6 +136,10 @@ const resources = [
   nextjs16BetaToStable,
   nextjs16Examples,
   nextjsDocsLlmsIndex,
+  // Midnight resources
+  midnightCompactOverview,
+  midnightCompactReference,
+  midnightSdkOverview,
 ]
 
 // Type definitions
@@ -95,7 +154,7 @@ interface JSONSchema {
 // Create server
 const server = new Server(
   {
-    name: "next-devtools-mcp",
+    name: "midnight-nextjs-mcp",
     version: pkg.version,
   },
   {
@@ -127,13 +186,13 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
 server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params
 
-  const tool = tools.find((t) => t.metadata.name === name)
+  const tool = getToolByName(name)
   if (!tool) {
     throw new Error(`Tool not found: ${name}`)
   }
 
   // Queue telemetry event for later batch sending
-  const telemetryName = toolNameToTelemetryName[name]
+  const telemetryName = toolNameToTelemetryName[name] as McpToolName | undefined
   if (telemetryName) {
     const event = {
       eventName: "NEXT_MCP_TOOL_USAGE",
@@ -302,6 +361,11 @@ async function main() {
   await server.connect(transport)
 
   log('Server started')
+  log(`Enabled categories: ${categories.filter(c =>
+    (c.name === 'midnight' && enableMidnight) ||
+    (c.name === 'nextjs' && enableNextjs)
+  ).map(c => c.displayName).join(', ')}`)
+  log(`Total tools: ${tools.length}`)
 
   const shutdown = () => {
     log('Server terminated')
