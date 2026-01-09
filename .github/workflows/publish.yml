@@ -40,21 +40,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Validate NPM token
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_ELEVATED || secrets.NPM_TOKEN || secrets.NPM_ACCESS_TOKEN }}
-        run: |
-          if [ -z "$NODE_AUTH_TOKEN" ]; then
-            echo "No NPM token found in secrets; publish step may be skipped or fail"
-          else
-            echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
-            if ! npm whoami; then
-              echo "NPM auth failed with provided token"
-              exit 1
-            fi
-            echo "NPM token validated"
-          fi
-
       - name: Build
         run: pnpm build
 
@@ -69,6 +54,24 @@ jobs:
             echo "Version $PACKAGE_VERSION not found, will publish"
             echo "skip=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Validate NPM token
+        if: ${{ steps.check-version.outputs.skip != 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_ELEVATED || secrets.NPM_TOKEN || secrets.NPM_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$NODE_AUTH_TOKEN" ]; then
+            echo "No NPM token found in secrets; failing validation step"
+            exit 1
+          fi
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > ~/.npmrc
+          if ! npm whoami; then
+            echo "NPM auth failed with provided token"
+            rm -f ~/.npmrc
+            exit 1
+          fi
+          echo "NPM token validated"
+          rm -f ~/.npmrc
 
       - name: Publish to npm
         id: publish
@@ -109,7 +112,7 @@ jobs:
       - name: MCP publish dry-run
         run: |
           set -e
-          mcp-publisher whoami || true
+          mcp-publisher whoami
           mcp-publisher publish --dry-run
 
       - name: Publish to MCP Registry
