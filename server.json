@@ -1,17 +1,17 @@
 {
-  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-10-17/server.schema.json",
-  "name": "io.github.vercel/next-devtools-mcp",
-  "description": "Next.js development tools MCP server with stdio transport",
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.FractionEstate/midnight-nextjs-mcp",
+  "description": "Development MCP server combining Midnight Network blockchain tools with Next.js DevTools",
   "repository": {
-    "url": "https://github.com/vercel/next-devtools-mcp",
+    "url": "https://github.com/FractionEstate/midnight-nextjs-mcp",
     "source": "github"
   },
-  "version": "0.3.10",
+  "version": "0.3.2",
   "packages": [
     {
       "registryType": "npm",
-      "identifier": "next-devtools-mcp",
-      "version": "0.3.10",
+      "identifier": "midnight-nextjs-mcp",
+      "version": "0.3.2",
       "transport": {
         "type": "stdio"
       },
