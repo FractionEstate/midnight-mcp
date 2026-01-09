@@ -48,6 +48,8 @@ Common Next.js MCP tools include:
 Example usage:
 1. Call 'nextjs_index' to see servers and tools
 2. Call 'nextjs_call' with port=3000, toolName="get_errors" to get errors from server on port 3000`,
+  toolset: "nextjs:devtools" as const,
+  readOnly: true,
 }
 
 type NextjsCallArgs = {

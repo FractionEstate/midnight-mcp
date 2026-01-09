@@ -19,7 +19,9 @@ const REPO_ROOT = join(__dirname, '../..')
 const FIXTURE_PATH = join(REPO_ROOT, 'test/fixtures/nextjs14-minimal')
 const MCP_SERVER_PATH = join(REPO_ROOT, 'dist/index.js')
 
-describe('Next.js 14 → 16 Upgrade via MCP', () => {
+const maybeDescribe = process.env.ANTHROPIC_API_KEY ? describe : describe.skip
+
+maybeDescribe('Next.js 14 → 16 Upgrade via MCP', () => {
   let tmpProjectDir: string
 
   beforeAll(() => {
@@ -65,7 +67,7 @@ describe('Next.js 14 → 16 Upgrade via MCP', () => {
     for await (const msg of query({
       prompt: upgradePrompt,
       options: {
-        workingDirectory: tmpProjectDir,
+        cwd: tmpProjectDir,
         maxTurns: 50,
         allowedTools: ['Bash', 'Read', 'Write', 'Edit', 'Glob', 'Grep']
       }

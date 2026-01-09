@@ -51,6 +51,8 @@ This tool embeds complete knowledge base for:
 - Advanced patterns (cacheLife, cacheTag, draft mode)
 - Build behavior and prefetching
 - Test-driven patterns from 125+ fixtures`,
+  toolset: "nextjs:migration" as const,
+  readOnly: false,
 }
 
 export async function handler(args: EnableCacheComponentsArgs): Promise<string> {

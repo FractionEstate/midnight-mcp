@@ -32,6 +32,8 @@ Use this tool to:
 - Check transaction status
 - Debug failed transactions
 - Inspect contract interactions`,
+  toolset: "midnight:network" as const,
+  readOnly: true,
 }
 
 type GetTransactionArgs = {

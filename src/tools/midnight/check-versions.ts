@@ -47,6 +47,8 @@ Use this tool to:
 - Find available updates for Midnight SDK
 - Get upgrade commands
 - Track alpha/beta releases for early testing`,
+  toolset: "midnight:dev" as const,
+  readOnly: true,
 }
 
 type CheckVersionsArgs = {

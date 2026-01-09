@@ -71,8 +71,9 @@ import * as createMidnightContractPrompt from "./prompts/create-midnight-contrac
 
 // Parse CLI arguments for tool categories and features
 const args = process.argv.slice(2)
-const enableMidnight = !args.includes("--no-midnight")
-const enableNextjs = !args.includes("--no-nextjs")
+// Default behavior: enable Next.js devtools by default; Midnight tools are opt-in via --midnight
+const enableMidnight = args.includes("--midnight") ? true : args.includes("--no-midnight") ? false : false
+const enableNextjs = args.includes("--no-nextjs") ? false : true
 const enableAlpha = args.includes("--alpha")
 const enableVersionPolling = !args.includes("--no-version-polling")
 const checkVersionsOnStart = args.includes("--check-versions")
@@ -114,7 +115,7 @@ const tools = getEnabledTools({ midnight: enableMidnight, nextjs: enableNextjs }
 const prompts = [
   upgradeNextjs16Prompt,
   enableCacheComponentsPrompt,
-  createMidnightContractPrompt,
+  ...(enableMidnight ? [createMidnightContractPrompt] : []),
 ]
 
 const resources = [

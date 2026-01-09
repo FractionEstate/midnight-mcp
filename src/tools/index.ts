@@ -30,6 +30,9 @@ import * as midnightCompileContract from "./midnight/compile-contract.js"
 import * as midnightAnalyzeContract from "./midnight/analyze-contract.js"
 import * as midnightCheckVersions from "./midnight/check-versions.js"
 
+// Import documentation tools with auto-sync
+import { documentationToolModules } from "./midnight/documentation-tools.js"
+
 // Import dynamic tools
 import { dynamicTools } from "./dynamic/dynamic-tools.js"
 
@@ -74,6 +77,8 @@ export const midnightTools: ToolModule[] = [
   midnightCompileContract as unknown as ToolModule,
   midnightAnalyzeContract as unknown as ToolModule,
   midnightCheckVersions as unknown as ToolModule,
+  // Documentation tools with auto-sync from official docs
+  ...documentationToolModules,
   // Dynamic tools (for toolset management)
   ...dynamicTools,
   // Context tools (for session info)
@@ -153,6 +158,12 @@ export const toolNameToTelemetryName: Record<string, string> = {
   midnight_compile_contract: "mcp/midnight_compile_contract",
   midnight_analyze_contract: "mcp/midnight_analyze_contract",
   midnight_check_versions: "mcp/midnight_check_versions",
+  // Documentation tools with auto-sync
+  "midnight-search-docs": "mcp/midnight_search_docs",
+  "midnight-fetch-docs": "mcp/midnight_fetch_docs",
+  "midnight-sync-docs": "mcp/midnight_sync_docs",
+  "midnight-docs-status": "mcp/midnight_docs_status",
+  "midnight-list-docs": "mcp/midnight_list_docs",
 }
 
 // =============================================================================

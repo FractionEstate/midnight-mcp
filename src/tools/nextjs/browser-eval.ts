@@ -113,6 +113,8 @@ Available actions:
 - list_tools: List all available browser automation tools from the server
 
 Note: The playwright-mcp server will be automatically installed if not present.`,
+  toolset: "nextjs:devtools" as const,
+  readOnly: false,
 }
 
 type BrowserEvalArgs = {

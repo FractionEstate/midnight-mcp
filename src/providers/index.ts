@@ -8,6 +8,71 @@ export { IndexerProvider, createIndexerProvider, type IndexerConfig } from "./in
 export { ProofServerProvider, createProofServerProvider, type ProofServerConfig, type ProofRequest, type ProofResult } from "./proof-server.js"
 export { NodeProvider, createNodeProvider, type NodeConfig, type SubmitTransactionResult } from "./node.js"
 
+// Documentation sync provider
+export {
+  DOCS_REPO,
+  DOC_SOURCES,
+  type DocSourceConfig,
+  type DocMetadata,
+  type DocContent,
+  type ParsedDoc,
+  type DocSection,
+  type CodeBlock,
+  type DocsCache,
+  type SyncResult,
+  syncDocSource,
+  syncAllDocs,
+  getDocContent,
+  getAllDocs,
+  getDocsByCategory,
+  searchDocs,
+  checkForUpdates,
+  getDocSources,
+  getCacheStats,
+  clearDocsCache,
+  exportCache,
+  importCache,
+} from "./docs-sync.js"
+
+// Documentation metadata system
+export {
+  type UpdateRecord,
+  type DocsMetadata,
+  type SourceMetadata,
+  type UpdateCheckResult,
+  type UpdateListener,
+  getMetadataPath,
+  setMetadataPath,
+  loadMetadata,
+  saveMetadata,
+  addUpdateListener,
+  removeAllListeners,
+  syncWithMetadata,
+  getSourceMetadata,
+  getAllSourceMetadata,
+  getUpdateHistory,
+  getSyncStatus,
+  getStaleSources,
+  clearMetadata,
+  exportMetadata,
+  importMetadata,
+} from "./docs-metadata.js"
+
+// Documentation update scheduler
+export {
+  type SchedulerConfig,
+  type SchedulerState,
+  type SchedulerCallbacks,
+  DocsUpdateScheduler,
+  getGlobalScheduler,
+  startGlobalScheduler,
+  stopGlobalScheduler,
+  destroyGlobalScheduler,
+  syncDocsOnce,
+  hasUpdatesAvailable,
+  getTimeUntilNextCheck,
+} from "./docs-scheduler.js"
+
 import { IndexerProvider, type IndexerConfig } from "./indexer.js"
 import { ProofServerProvider, type ProofServerConfig } from "./proof-server.js"
 import { NodeProvider, type NodeConfig } from "./node.js"

@@ -45,6 +45,8 @@ Use this tool to:
 - Start a new Midnight project quickly
 - Learn from example contracts
 - Set up proper project structure`,
+  toolset: "midnight:dev" as const,
+  readOnly: false,
 }
 
 type ScaffoldProjectArgs = {

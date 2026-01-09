@@ -5,3 +5,19 @@
  */
 
 export * from "./resources.js"
+
+// Dynamic resource loading
+export {
+  type DynamicResourceConfig,
+  type DynamicResourceResult,
+  stripMdxSyntax,
+  extractMetadata,
+  addSourceAttribution,
+  defaultTransformer,
+  loadDynamicResource,
+  createDynamicResourceHandler,
+  registerDynamicResource,
+  getDynamicResource,
+  getAllDynamicResources,
+  loadRegisteredResource,
+} from "./dynamic-loader.js"

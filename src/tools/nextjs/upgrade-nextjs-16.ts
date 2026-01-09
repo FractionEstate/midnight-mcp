@@ -35,6 +35,8 @@ The codemod requires:
 - npm/pnpm/yarn/bun installed
 
 After codemod runs, provides manual guidance for any remaining issues not covered by the codemod.`,
+  toolset: "nextjs:migration" as const,
+  readOnly: false,
 }
 
 export async function handler(args: UpgradeNextjs16Args): Promise<string> {

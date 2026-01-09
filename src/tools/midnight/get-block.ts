@@ -32,6 +32,8 @@ Use this tool to:
 - Get current block height (omit height parameter)
 - Inspect specific blocks
 - Monitor chain progress`,
+  toolset: "midnight:network" as const,
+  readOnly: true,
 }
 
 type GetBlockArgs = {

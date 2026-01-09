@@ -31,6 +31,8 @@ Use this tool to:
 - Look up Compact syntax
 - Find code examples
 - Learn Midnight concepts`,
+  toolset: "midnight:docs" as const,
+  readOnly: true,
 }
 
 type SearchDocsArgs = {

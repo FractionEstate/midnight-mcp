@@ -363,3 +363,88 @@ export async function tryCatch<T>(
     throw wrapError(error, errorMessage, errorCode)
   }
 }
+
+// =============================================================================
+// COMPATIBILITY ALIASES
+// =============================================================================
+
+/**
+ * Alias for MidnightError for MCP compatibility
+ */
+export const MCPError = MidnightError
+
+/**
+ * Tool not found error
+ */
+export class ToolNotFoundError extends MidnightError {
+  constructor(
+    public readonly toolName: string,
+    message?: string
+  ) {
+    super(
+      "TOOL_NOT_FOUND",
+      message || `Tool not found: ${toolName}`
+    )
+    this.name = "ToolNotFoundError"
+  }
+}
+
+/**
+ * Resource not found error
+ */
+export class ResourceNotFoundError extends MidnightError {
+  constructor(
+    public readonly resourceUri: string,
+    message?: string
+  ) {
+    super(
+      "RESOURCE_NOT_FOUND",
+      message || `Resource not found: ${resourceUri}`
+    )
+    this.name = "ResourceNotFoundError"
+  }
+}
+
+/**
+ * Prompt not found error
+ */
+export class PromptNotFoundError extends MidnightError {
+  constructor(
+    public readonly promptName: string,
+    message?: string
+  ) {
+    super(
+      "PROMPT_NOT_FOUND",
+      message || `Prompt not found: ${promptName}`
+    )
+    this.name = "PromptNotFoundError"
+  }
+}
+
+/**
+ * Rate limit error
+ */
+export class RateLimitError extends MidnightError {
+  constructor(
+    message: string,
+    public readonly retryAfter?: number,
+    cause?: unknown
+  ) {
+    super("RATE_LIMITED", message, cause)
+    this.name = "RateLimitError"
+  }
+}
+
+/**
+ * Timeout error
+ */
+export class TimeoutError extends MidnightError {
+  constructor(
+    message: string,
+    public readonly timeoutMs?: number,
+    cause?: unknown
+  ) {
+    super("TIMEOUT", message, cause)
+    this.name = "TimeoutError"
+  }
+}

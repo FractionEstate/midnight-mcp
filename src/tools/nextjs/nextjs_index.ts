@@ -64,6 +64,8 @@ If the MCP endpoint is not available:
 1. Ensure you're running Next.js 16 or later (use the 'upgrade-nextjs-16' prompt to upgrade)
 2. Verify the dev server is running (npm run dev)
 3. Check that the dev server started successfully without errors`,
+  toolset: "nextjs:devtools" as const,
+  readOnly: true,
 }
 
 type NextjsIndexArgs = {

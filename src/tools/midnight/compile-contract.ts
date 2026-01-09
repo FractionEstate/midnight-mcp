@@ -36,6 +36,8 @@ Use this tool to:
 - Prepare contracts for deployment
 
 **Note:** Full compilation requires the \`compactc\` compiler installed locally.`,
+  toolset: "midnight:contracts" as const,
+  readOnly: true,
 }
 
 type CompileContractArgs = {

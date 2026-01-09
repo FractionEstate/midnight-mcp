@@ -31,6 +31,8 @@ Use this tool to:
 - Monitor account funds
 
 **Note:** For testnet, you can get free tDUST from the faucet.`,
+  toolset: "midnight:wallet" as const,
+  readOnly: true,
 }
 
 type GetBalanceArgs = {

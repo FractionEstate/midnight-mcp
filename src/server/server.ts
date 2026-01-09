@@ -278,6 +278,11 @@ export async function runStdioServer(
   const { server, state } = await createMCPServer(config)
   const { logger } = state
 
+  // Initialize documentation sync if enabled
+  if (state.config.docsSync?.enabled !== false) {
+    await initializeDocSync(state)
+  }
+
   // Create stdio transport
   const transport = new StdioServerTransport()
 
@@ -289,6 +294,10 @@ export async function runStdioServer(
   // Handle shutdown signals
   const shutdown = async () => {
     logger.info("Shutting down server")
+
+    // Stop docs scheduler
+    stopDocSync()
+
     await server.close()
     process.exit(0)
   }
@@ -304,6 +313,79 @@ export async function runStdioServer(
     logger.error("Failed to start server", error as Error)
     process.exit(1)
   }
+}
+
+/**
+ * Initialize documentation sync
+ */
+async function initializeDocSync(state: ServerState): Promise<void> {
+  const { logger, config } = state
+  const docsConfig = config.docsSync
+
+  logger.info("Initializing documentation sync")
+
+  try {
+    // Import docs sync modules dynamically to avoid circular deps
+    const { loadMetadata, setMetadataPath } = await import("../providers/docs-metadata.js")
+    const { startGlobalScheduler, syncDocsOnce } = await import("../providers/docs-scheduler.js")
+
+    // Set metadata path if configured
+    if (docsConfig?.metadataPath) {
+      setMetadataPath(docsConfig.metadataPath)
+    }
+
+    // Load existing metadata
+    await loadMetadata()
+
+    // Do initial sync (non-blocking)
+    syncDocsOnce({ force: false }).catch((e) => {
+      logger.warn("Initial docs sync failed", { error: String(e) })
+    })
+
+    // Start scheduler if auto-start is enabled
+    if (docsConfig?.autoStart !== false) {
+      startGlobalScheduler(
+        {
+          checkInterval: docsConfig?.checkInterval || 60 * 60 * 1000,
+          forceUpdateInterval: docsConfig?.forceInterval || 24 * 60 * 60 * 1000,
+          persistMetadata: docsConfig?.persistMetadata !== false,
+          autoStart: true,
+        },
+        {
+          onUpdateDetected: (records) => {
+            logger.info("Documentation updated", {
+              count: records.length,
+              types: records.map((r) => r.type),
+            })
+          },
+          onError: (error) => {
+            logger.warn("Documentation sync error", { error: error.message })
+          },
+        }
+      )
+
+      logger.info("Documentation sync scheduler started", {
+        checkInterval: docsConfig?.checkInterval || 60 * 60 * 1000,
+      })
+    }
+  } catch (error) {
+    logger.warn("Failed to initialize documentation sync", {
+      error: error instanceof Error ? error.message : String(error),
+    })
+  }
+}
+
+/**
+ * Stop documentation sync
+ */
+function stopDocSync(): void {
+  import("../providers/docs-scheduler.js")
+    .then(({ stopGlobalScheduler }) => {
+      stopGlobalScheduler()
+    })
+    .catch(() => {
+      // Ignore errors during shutdown
+    })
 }
 
 /**

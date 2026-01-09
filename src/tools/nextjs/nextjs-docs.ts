@@ -1,8 +1,16 @@
 import { z } from "zod"
 
 export const inputSchema = {
+  action: z
+    .enum(["search"]).optional()
+    .describe("Action to perform. Use 'search' to search the Next.js docs index (llms.txt)."),
+  query: z
+    .string()
+    .optional()
+    .describe("Search query to run against the Next.js docs index (used when action=search)."),
   path: z
     .string()
+    .optional()
     .describe(
       "Documentation path from the llms.txt index (e.g., '/docs/app/api-reference/functions/refresh'). You MUST get this path from the nextjs-docs://llms-index resource."
     ),
@@ -15,8 +23,10 @@ export const inputSchema = {
 }
 
 type NextjsDocsArgs = {
-  path: string
+  path?: string
   anchor?: string
+  action?: "search"
+  query?: string
 }
 
 export const metadata = {
@@ -32,9 +42,52 @@ Workflow:
 
 Example:
   nextjs_docs({ path: "/docs/app/api-reference/functions/refresh" })`,
+  toolset: "nextjs:docs" as const,
+  readOnly: true,
 }
 
-export async function handler({ path, anchor }: NextjsDocsArgs): Promise<string> {
+export async function handler({ path, anchor, action, query }: NextjsDocsArgs): Promise<string> {
+  // Support simple 'search' action against the Next.js llms.txt index
+  if (action === "search") {
+    const q = (query || "").toLowerCase().trim()
+    if (!q) {
+      return JSON.stringify({
+        error: "INVALID_ARGUMENT",
+        message: "Search action requires a non-empty 'query' parameter.",
+      })
+    }
+
+    try {
+      const response = await fetch("https://nextjs.org/docs/llms.txt")
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+      }
+
+      const indexText = await response.text()
+      const lines = indexText.split("\n").filter((l) => l.toLowerCase().includes(q))
+      const sample = lines.slice(0, 10).join("\n") || "No matches found"
+
+      return JSON.stringify({
+        action: "search",
+        query: q,
+        results: lines.length,
+        sample,
+        message: `Next.js docs search results for \"${q}\"`,
+      })
+    } catch (error) {
+      const errMsg = error instanceof Error ? error.message : String(error)
+      return JSON.stringify({ error: "SEARCH_FAILED", message: `Search failed: ${errMsg}` })
+    }
+  }
+
+  // Default: fetch the documentation by path
+  if (!path) {
+    return JSON.stringify({
+      error: "INVALID_ARGUMENT",
+      message: "A 'path' parameter is required when not using action=search.",
+    })
+  }
+
   // Fetch the documentation
   const url = `https://nextjs.org${path}`
   const response = await fetch(url, {

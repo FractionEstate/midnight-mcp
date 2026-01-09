@@ -24,6 +24,8 @@ Use this tool at the beginning of a Next.js session to:
 - Ensure 100% documentation-first approach with no exceptions
 - Understand available tools and their use cases
 - Follow best practices for Next.js development`,
+  toolset: "nextjs:devtools" as const,
+  readOnly: true,
 }
 
 type InitArgs = {

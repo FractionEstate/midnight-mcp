@@ -38,6 +38,8 @@ Use this tool to:
 - Understand available tools for contract development
 - Learn about Compact language basics
 - Get started with Midnight dApp development`,
+  toolset: "midnight:dev" as const,
+  readOnly: true,
 }
 
 type InitArgs = {

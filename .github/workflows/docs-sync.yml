@@ -1,0 +1,41 @@
+name: Docs Sync
+
+on:
+  schedule:
+    - cron: '0 3 * * *' # Runs daily at 03:00 UTC
+  workflow_dispatch: {}
+
+jobs:
+  sync:
+    name: Sync Midnight docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm build
+
+      - name: Run docs sync
+        id: run_sync
+        run: |
+          node ./scripts/run-docs-sync.mjs | tee sync-output.txt
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          tail -n 50 sync-output.txt >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Notify Slack (if configured)
+        if: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          summary=$(head -n 10 sync-output.txt | sed 's/"/\\"/g' | sed ':a;N;$!ba;s/\n/\\n/g')
+          payload=$(printf '{"text":"Docs sync completed on %s - Summary:\n%s"}' "${{ github.repository }}" "$summary")
+          curl -s -X POST -H 'Content-type: application/json' --data "$payload" "${{ secrets.SLACK_WEBHOOK_URL }}"

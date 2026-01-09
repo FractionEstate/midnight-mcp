@@ -62,11 +62,37 @@ export interface MCPServerConfig {
   /** Export translations for i18n */
   exportTranslations?: boolean
 
+  /** Documentation sync configuration */
+  docsSync?: DocsSyncConfig
+
   /** Midnight Network specific config */
   midnight?: MidnightConfig
 
   /** Next.js DevTools specific config */
   nextjs?: NextJSConfig
+}
+
+/**
+ * Documentation sync configuration
+ */
+export interface DocsSyncConfig {
+  /** Enable automatic documentation sync */
+  enabled?: boolean
+
+  /** Auto-start sync scheduler on server start */
+  autoStart?: boolean
+
+  /** Sync check interval in milliseconds */
+  checkInterval?: number
+
+  /** Force full sync interval in milliseconds */
+  forceInterval?: number
+
+  /** Persist metadata to disk */
+  persistMetadata?: boolean
+
+  /** Metadata file path */
+  metadataPath?: string
 }
 
 /**
@@ -169,6 +195,13 @@ export const DefaultServerConfig: Partial<MCPServerConfig> = {
   contentWindowSize: 100000,
   enableRequestLogging: false,
   exportTranslations: false,
+  docsSync: {
+    enabled: true,
+    autoStart: true,
+    checkInterval: 60 * 60 * 1000, // 1 hour
+    forceInterval: 24 * 60 * 60 * 1000, // 24 hours
+    persistMetadata: true,
+  },
 }
 
 /**
