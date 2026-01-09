@@ -433,7 +433,7 @@ export function validateToolsets(toolsets: string[]): {
 
   for (const ts of toolsets) {
     const normalized = ts.toLowerCase().trim()
-    
+
     if (VALID_TOOLSETS.includes(normalized as ValidToolsetId)) {
       valid.push(normalized)
     } else {

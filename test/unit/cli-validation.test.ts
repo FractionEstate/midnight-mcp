@@ -15,7 +15,7 @@ describe("CLI Toolset Validation", () => {
   describe("validateToolsets", () => {
     it("should accept valid toolsets", () => {
       const result = validateToolsets(["midnight:network", "nextjs:docs"])
-      
+
       expect(result.valid).toContain("midnight:network")
       expect(result.valid).toContain("nextjs:docs")
       expect(result.invalid).toHaveLength(0)
@@ -23,14 +23,14 @@ describe("CLI Toolset Validation", () => {
 
     it("should accept special toolsets", () => {
       const result = validateToolsets(["all", "default", "midnight", "nextjs"])
-      
+
       expect(result.valid).toHaveLength(4)
       expect(result.invalid).toHaveLength(0)
     })
 
     it("should identify invalid toolsets", () => {
       const result = validateToolsets(["invalid-toolset", "unknown"])
-      
+
       expect(result.valid).toHaveLength(0)
       expect(result.invalid).toContain("invalid-toolset")
       expect(result.invalid).toContain("unknown")
@@ -38,14 +38,14 @@ describe("CLI Toolset Validation", () => {
 
     it("should provide suggestions for typos", () => {
       const result = validateToolsets(["midnigth:network", "nextj:docs"])
-      
+
       expect(result.invalid).toContain("midnigth:network")
       expect(result.suggestions.get("midnigth:network")).toContain("midnight:network")
     })
 
     it("should handle mixed valid and invalid", () => {
       const result = validateToolsets(["midnight:network", "fake", "nextjs:docs"])
-      
+
       expect(result.valid).toContain("midnight:network")
       expect(result.valid).toContain("nextjs:docs")
       expect(result.invalid).toContain("fake")
@@ -53,7 +53,7 @@ describe("CLI Toolset Validation", () => {
 
     it("should normalize case", () => {
       const result = validateToolsets(["MIDNIGHT:NETWORK", "NextJS:Docs"])
-      
+
       expect(result.valid).toContain("midnight:network")
       expect(result.valid).toContain("nextjs:docs")
     })
@@ -62,7 +62,7 @@ describe("CLI Toolset Validation", () => {
   describe("validateCliConfig", () => {
     it("should validate default config", () => {
       const result = validateCliConfig(DEFAULT_CONFIG)
-      
+
       expect(result.valid).toBe(true)
       expect(result.errors).toHaveLength(0)
     })
@@ -72,9 +72,9 @@ describe("CLI Toolset Validation", () => {
         ...DEFAULT_CONFIG,
         enabledToolsets: ["invalid-toolset"],
       }
-      
+
       const result = validateCliConfig(config)
-      
+
       expect(result.valid).toBe(false)
       expect(result.errors.some((e) => e.includes("invalid-toolset"))).toBe(true)
     })
@@ -84,9 +84,9 @@ describe("CLI Toolset Validation", () => {
         ...DEFAULT_CONFIG,
         contentWindowSize: 10,
       }
-      
+
       const result = validateCliConfig(config)
-      
+
       expect(result.valid).toBe(false)
       expect(result.errors.some((e) => e.includes("window size"))).toBe(true)
     })
@@ -96,9 +96,9 @@ describe("CLI Toolset Validation", () => {
         ...DEFAULT_CONFIG,
         contentWindowSize: 150000,
       }
-      
+
       const result = validateCliConfig(config)
-      
+
       expect(result.valid).toBe(true)
       expect(result.warnings.some((w) => w.includes("performance"))).toBe(true)
     })
@@ -108,9 +108,9 @@ describe("CLI Toolset Validation", () => {
         ...DEFAULT_CONFIG,
         versionPollingInterval: 30000, // 30 seconds
       }
-      
+
       const result = validateCliConfig(config)
-      
+
       expect(result.warnings.some((w) => w.includes("polling"))).toBe(true)
     })
   })
@@ -118,33 +118,33 @@ describe("CLI Toolset Validation", () => {
   describe("parseCliArgs", () => {
     it("should parse toolsets flag", () => {
       const { config } = parseCliArgs(["--toolsets", "midnight:network,nextjs:docs"])
-      
+
       expect(config.enabledToolsets).toContain("midnight:network")
       expect(config.enabledToolsets).toContain("nextjs:docs")
     })
 
     it("should parse boolean flags", () => {
       const { config } = parseCliArgs(["--read-only", "--dynamic-toolsets"])
-      
+
       expect(config.readOnly).toBe(true)
       expect(config.dynamicToolsets).toBe(true)
     })
 
     it("should parse no-midnight flag", () => {
       const { config } = parseCliArgs(["--no-midnight"])
-      
+
       expect(config.enableMidnight).toBe(false)
     })
 
     it("should parse help flag", () => {
       const { showHelp } = parseCliArgs(["--help"])
-      
+
       expect(showHelp).toBe(true)
     })
 
     it("should parse version flag", () => {
       const { showVersion } = parseCliArgs(["-v"])
-      
+
       expect(showVersion).toBe(true)
     })
   })
