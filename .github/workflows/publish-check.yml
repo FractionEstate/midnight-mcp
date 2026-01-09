@@ -46,8 +46,5 @@ jobs:
           # Try to login via GitHub OIDC (requires permissions above)
           pnpm dlx @modelcontextprotocol/mcp-publisher@latest login github-oidc --non-interactive || true
 
-          # Show current auth status (helpful for debugging)
-          pnpm dlx @modelcontextprotocol/mcp-publisher@latest whoami || true
-
           # Run a dry-run publish to detect auth/validation issues
           pnpm dlx @modelcontextprotocol/mcp-publisher@latest publish --dry-run || true

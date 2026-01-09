@@ -108,10 +108,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: MCP publish dry-run
-        run: |
-          set -e
-          mcp-publisher whoami
-          mcp-publisher publish --dry-run
+        run: mcp-publisher publish --dry-run
 
       - name: Publish to MCP Registry
         run: mcp-publisher publish
