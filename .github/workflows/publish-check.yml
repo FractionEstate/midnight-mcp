@@ -1,0 +1,53 @@
+name: "Publish check (manual)"
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        run: npm i -g pnpm@9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Check NPM_TOKEN_ELEVATED secret exists
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN_ELEVATED }}" ]; then
+            echo "Missing secret NPM_TOKEN_ELEVATED"
+            exit 1
+          fi
+          echo "NPM token present"
+
+      - name: Validate NPM auth
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN_ELEVATED }}
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
+          npm whoami
+
+      - name: Install and run mcp-publisher checks
+        run: |
+          # Try to login via GitHub OIDC (requires permissions above)
+          pnpm dlx @modelcontextprotocol/mcp-publisher@latest login github-oidc --non-interactive || true
+
+          # Show current auth status (helpful for debugging)
+          pnpm dlx @modelcontextprotocol/mcp-publisher@latest whoami || true
+
+          # Run a dry-run publish to detect auth/validation issues
+          pnpm dlx @modelcontextprotocol/mcp-publisher@latest publish --dry-run || true
